@@ -22,9 +22,7 @@
         </div>
         <ul class="nav-links">
             <li><a href="{% url 'home:home' %}" class="active">HOME</a></li>
-            <li><a href="#">ADMISSIONS</a></li>
-            <li><a href="#">SCHOLARSHIPS</a></li>
-            <li><a href="#">PROFILE</a></li>
+            <li><a href="#">AVAILABLE OFFICES</a></li>
         </ul>
     </div>
     <div class="navbar-right">
@@ -32,7 +30,9 @@
             <span class="welcome-text">Welcome, {{ student_name }}!</span>
             <span class="app-id">Application ID: {{ application_id }}</span>
         </div>
-        <button class="btn-logout">LOGOUT</button>
+        <button class="btn-apply"><i class="fa-solid fa-paper-plane"></i> Apply / Renew as Student Assistant</button>
+        <button class="btn-staff-login"><i class="fa-solid fa-user-tie"></i> Log in as Staff</button>
+        <button class="btn-director-login"><i class="fa-solid fa-user-shield"></i> Log in as Student Director</button>
     </div>
 </nav>
 

@@ -1,0 +1,630 @@
+/* ==========================================
+   CHMEU Student Application Portal - Styles
+   ========================================== */
+
+// ========== VARIABLES ==========
+$green-primary: #1a5632;
+$green-dark: #0e3d22;
+$green-light: #2d7a4a;
+$gold-primary: #c8a84e;
+$gold-light: #f5ecd0;
+$white: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$success: #22c55e;
+$warning: #f59e0b;
+$danger: #ef4444;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+$radius: 8px;
+$radius-lg: 12px;
+
+// ========== RESET ==========
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: $gray-100;
+    color: $gray-800;
+    min-height: 100vh;
+}
+
+// ========== NAVBAR ==========
+.navbar {
+    background-color: $green-primary;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    height: 64px;
+    box-shadow: $shadow-md;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.logo-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: $white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid $gold-primary;
+}
+
+.logo-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: $green-primary;
+    letter-spacing: 0.5px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 8px;
+
+    a {
+        color: $white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        padding: 8px 16px;
+        border-radius: 4px;
+        transition: background 0.2s;
+
+        &:hover,
+        &.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    }
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info {
+    text-align: right;
+    color: $white;
+}
+
+.welcome-text {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    color: $gold-primary;
+}
+
+.app-id {
+    font-size: 11px;
+    opacity: 0.85;
+}
+
+// ========== NAVBAR BUTTONS ==========
+// Shared base mixin for all navbar action buttons
+@mixin nav-btn-base {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    border: none;
+    position: relative;
+    overflow: hidden;
+
+    i {
+        font-size: 13px;
+        transition: transform 0.2s ease;
+    }
+
+    &:hover i {
+        transform: scale(1.15);
+    }
+
+    &:active {
+        transform: scale(0.97);
+    }
+}
+
+.btn-apply {
+    @include nav-btn-base;
+    background: linear-gradient(135deg, $gold-primary, #b89530);
+    color: $green-dark;
+    box-shadow: 0 2px 8px rgba($gold-primary, 0.4);
+
+    &:hover {
+        background: linear-gradient(135deg, #d4b86a, $gold-primary);
+        box-shadow: 0 4px 14px rgba($gold-primary, 0.5);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0) scale(0.97);
+        box-shadow: 0 1px 4px rgba($gold-primary, 0.3);
+    }
+}
+
+.btn-staff-login {
+    @include nav-btn-base;
+    background: rgba(255, 255, 255, 0.12);
+    color: $white;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(4px);
+
+    &:hover {
+        background: $white;
+        color: $green-primary;
+        border-color: $white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0) scale(0.97);
+    }
+}
+
+.btn-director-login {
+    @include nav-btn-base;
+    background: rgba(255, 255, 255, 0.12);
+    color: $white;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(4px);
+
+    &:hover {
+        background: $white;
+        color: $green-primary;
+        border-color: $white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0) scale(0.97);
+    }
+}
+
+// ========== MAIN CONTENT ==========
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+// Section Headers
+.section-headers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 8px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: $gray-500;
+    padding-left: 4px;
+}
+
+// Dashboard Grid
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+// ========== CARDS ==========
+.card {
+    background: $white;
+    border-radius: $radius-lg;
+    padding: 24px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $gray-200;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: $gray-800;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+// ========== DOCUMENT CHECKLIST ==========
+.doc-list {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.doc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid $gray-100;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.doc-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.doc-icon {
+    font-size: 18px;
+    color: $gray-400;
+
+    &.checked {
+        color: $green-primary;
+    }
+}
+
+.doc-name {
+    font-size: 14px;
+    color: $gray-700;
+}
+
+.status-badge {
+    font-size: 18px;
+
+    &.success { color: $success; }
+    &.warning { color: $warning; }
+    &.danger  { color: $danger; }
+}
+
+.btn-secondary {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: $white;
+    color: $gray-700;
+    border: 1.5px solid $gray-300;
+    border-radius: $radius;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+
+    &:hover {
+        background: $gray-50;
+        border-color: $gray-400;
+    }
+}
+
+// ========== APPLICATION TRACKER ==========
+.tracker-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.tracker-label {
+    text-align: center;
+    flex: 1;
+
+    &.active .step-name {
+        color: $green-primary;
+        font-weight: 700;
+    }
+}
+
+.step-name {
+    font-size: 11px;
+    color: $gray-500;
+    font-weight: 500;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: $gray-200;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, $green-primary, $green-light);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.step-thumbnails {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.step-thumb {
+    text-align: center;
+    flex: 1;
+}
+
+.thumb-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 6px;
+    font-size: 18px;
+
+    &.done {
+        background: #dcfce7;
+        color: $success;
+        border: 2px solid $success;
+    }
+
+    &.current {
+        background: #fef3c7;
+        color: $warning;
+        border: 2px solid $warning;
+    }
+
+    &.locked {
+        background: $gray-100;
+        color: $gray-400;
+        border: 2px solid $gray-300;
+    }
+}
+
+.thumb-label {
+    font-size: 10px;
+    color: $gray-500;
+    font-weight: 500;
+}
+
+// ========== DEADLINES & HELP ==========
+.dates-table {
+    width: 100%;
+    margin-bottom: 20px;
+
+    td {
+        padding: 12px 4px;
+        border-bottom: 1px solid $gray-100;
+        font-size: 14px;
+    }
+}
+
+.date-event {
+    color: $gray-700;
+    font-weight: 500;
+}
+
+.date-value {
+    text-align: right;
+    color: $gray-800;
+    font-weight: 700;
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: $green-primary;
+    color: $white;
+    border: none;
+    border-radius: $radius;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: center;
+
+    &:hover {
+        background: $green-dark;
+    }
+}
+
+// ========== APPLICATION STATUS BANNER ==========
+.status-banner {
+    background: linear-gradient(135deg, $green-primary, $green-light);
+    color: $white;
+    border-radius: $radius-lg;
+    padding: 28px 32px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: $shadow-md;
+}
+
+.status-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+}
+
+.status-message {
+    font-size: 14px;
+    opacity: 0.9;
+    color: $gold-light;
+}
+
+// ========== REMINDER BANNER ==========
+.reminder-banner {
+    background: $gold-light;
+    border: 1.5px solid $gold-primary;
+    border-radius: $radius-lg;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    max-width: 560px;
+}
+
+.reminder-icon {
+    font-size: 18px;
+}
+
+.reminder-text {
+    font-size: 13px;
+    color: $gray-700;
+    font-weight: 500;
+}
+
+// ========== ANNOUNCEMENTS ==========
+.announcements-section {
+    margin-top: 8px;
+}
+
+.announcements-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: $gray-800;
+    margin-bottom: 16px;
+}
+
+.announcements-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.announcement-card {
+    background: $white;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    box-shadow: $shadow-sm;
+    border: 1px solid $gray-200;
+    display: flex;
+    flex-direction: row;
+}
+
+.announcement-img {
+    width: 120px;
+    min-height: 100px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: $gray-100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.announcement-placeholder {
+    color: $gray-300;
+    font-size: 32px;
+}
+
+.announcement-content {
+    padding: 16px;
+    flex: 1;
+}
+
+.announcement-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: $green-primary;
+    margin-bottom: 6px;
+}
+
+.announcement-summary {
+    font-size: 12px;
+    color: $gray-500;
+    line-height: 1.5;
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 1024px) {
+    .dashboard-grid,
+    .section-headers {
+        grid-template-columns: 1fr;
+    }
+
+    .announcements-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar {
+        flex-direction: column;
+        height: auto;
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .navbar-left {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .navbar-right {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .user-info {
+        text-align: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-content {
+        padding: 16px;
+    }
+
+    .status-banner {
+        padding: 20px 16px;
+    }
+
+    .status-title {
+        font-size: 16px;
+    }
+
+    .navbar-right {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
