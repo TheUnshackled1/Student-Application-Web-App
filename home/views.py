@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseForbidden
 from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement,
@@ -101,9 +103,54 @@ def home(request):
     return render(request, 'home/home.html', context)
 
 
+def staff_login(request):
+    """Login page for staff users."""
+    if request.user.is_authenticated:
+        return redirect('home:staff_dashboard')
+
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None and (user.is_staff or user.is_superuser):
+            login(request, user)
+            return redirect('home:staff_dashboard')
+        elif user is not None:
+            error = 'This account does not have staff privileges.'
+        else:
+            error = 'Invalid username or password. Please try again.'
+
+    return render(request, 'staff/login.html', {'error': error})
+
+
+def director_login(request):
+    """Login page for the Student Director (superuser)."""
+    if request.user.is_authenticated:
+        return redirect('home:director_dashboard')
+
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_superuser:
+            login(request, user)
+            return redirect('home:director_dashboard')
+        elif user is not None:
+            error = 'This account does not have director privileges.'
+        else:
+            error = 'Invalid username or password. Please try again.'
+
+    return render(request, 'director/login.html', {'error': error})
+
+
 @login_required
 def staff_dashboard(request):
-    """Staff dashboard view."""
+    """Staff dashboard view. Accessible by staff users and superusers (director)."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+
     pending_applications = [
         {'id': 'APP-2024-001', 'student': 'Maria Santos', 'date': 'Feb 10, 2026', 'status': 'pending'},
         {'id': 'APP-2024-002', 'student': 'Jose Rizal Jr.', 'date': 'Feb 12, 2026', 'status': 'pending'},
@@ -134,7 +181,10 @@ def staff_dashboard(request):
 
 @login_required
 def director_dashboard(request):
-    """Student Director dashboard view."""
+    """Student Director dashboard view. Accessible by superusers only."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
     assistants = [
         {'name': 'Juan Dela Cruz', 'office': 'Registrar', 'hours': 120, 'status': 'active'},
         {'name': 'Maria Santos', 'office': 'Library', 'hours': 95, 'status': 'active'},

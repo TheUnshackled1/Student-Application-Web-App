@@ -31,18 +31,13 @@
         </a>
     </div>
     <div class="navbar-right d-flex align-items-center gap-2">
-        <a href="#" class="btn btn-nav btn-nav--apply">
-            <i class="fa-solid fa-paper-plane"></i>
-            <span>Apply / Renew as Student Assistant</span>
-        </a>
-        <a href="{% url 'home:staff_dashboard' %}" class="btn btn-nav btn-nav--active">
-            <i class="fa-solid fa-user-tie"></i>
-            <span>Log in as Staff</span>
-        </a>
-        <a href="{% url 'home:director_dashboard' %}" class="btn btn-nav btn-nav--director">
-            <i class="fa-solid fa-user-shield"></i>
-            <span>Log in as Student Director</span>
-        </a>
+        <form method="post" action="{% url 'logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-nav btn-nav--active" style="border:none; cursor:pointer;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </button>
+        </form>
     </div>
 </nav>
 
