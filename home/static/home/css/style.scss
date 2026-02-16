@@ -56,9 +56,11 @@ body {
 }
 
 .navbar-left {
-    display: flex;
-    align-items: center;
-    gap: 32px;
+    gap: 10px !important;
+}
+
+.navbar-right {
+    gap: 8px !important;
 }
 
 .logo-circle {
@@ -70,6 +72,7 @@ body {
     align-items: center;
     justify-content: center;
     border: 2px solid $gold-primary;
+    flex-shrink: 0;
 }
 
 .logo-text {
@@ -79,52 +82,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 8px;
-
-    a {
-        color: $white;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-        padding: 8px 16px;
-        border-radius: 4px;
-        transition: background 0.2s;
-
-        &:hover,
-        &.active {
-            background: rgba(255, 255, 255, 0.15);
-        }
-    }
-}
-
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.user-info {
-    text-align: right;
-    color: $white;
-}
-
-.welcome-text {
-    display: block;
-    font-weight: 600;
-    font-size: 13px;
-    color: $gold-primary;
-}
-
-.app-id {
-    font-size: 11px;
-    opacity: 0.85;
-}
-
-// ========== NAVBAR BUTTONS (Bootstrap + Custom) ==========
+// ========== NAVBAR BUTTONS ==========
 .nav-btn-group {
     gap: 8px !important;
 }
@@ -163,6 +121,65 @@ body {
     &:focus-visible {
         outline: 2px solid $gold-primary;
         outline-offset: 2px;
+    }
+
+    // --- HOME active (Gold CTA) ---
+    &--active {
+        background: linear-gradient(135deg, $gold-primary 0%, #d4b86a 100%);
+        color: $green-dark !important;
+        border: none;
+        box-shadow:
+            0 2px 4px rgba(0, 0, 0, 0.12),
+            0 4px 12px rgba($gold-primary, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        &:hover {
+            background: linear-gradient(135deg, #d4b86a 0%, #e0c87e 100%);
+            color: $green-dark !important;
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                0 8px 24px rgba($gold-primary, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        &:active {
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.1),
+                0 2px 6px rgba($gold-primary, 0.25);
+        }
+    }
+
+    // --- Nav link (Ghost/Outline) ---
+    &--link {
+        background: rgba(255, 255, 255, 0.08);
+        color: $white !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+
+        &:hover {
+            background: $white;
+            color: $green-primary !important;
+            border-color: $white;
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.12),
+                0 2px 4px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        &:active {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
     }
 
     // --- Apply / Renew (Primary CTA - Gold) ---
@@ -617,29 +634,15 @@ body {
     }
 
     .navbar {
-        flex-direction: column;
+        flex-wrap: wrap;
         height: auto;
         padding: 12px 16px;
-        gap: 8px;
+        gap: 10px;
     }
 
-    .navbar-left {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .nav-links {
+    .nav-btn-group {
         flex-wrap: wrap;
         justify-content: center;
-    }
-
-    .navbar-right {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .user-info {
-        text-align: center;
     }
 }
 
@@ -656,7 +659,7 @@ body {
         font-size: 16px;
     }
 
-    .navbar-right {
+    .nav-btn-group {
         flex-wrap: wrap;
         justify-content: center;
     }

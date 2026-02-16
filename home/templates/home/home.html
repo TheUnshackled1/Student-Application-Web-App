@@ -15,32 +15,34 @@
 
 <!-- ========== NAVBAR ========== -->
 <nav class="navbar">
-    <div class="navbar-left">
+    <div class="navbar-left d-flex align-items-center gap-2">
         <div class="logo">
             <div class="logo-circle">
                 <span class="logo-text">CHMSU</span>
             </div>
         </div>
-        <ul class="nav-links">
-            <li><a href="{% url 'home:home' %}" class="active">HOME</a></li>
-            <li><a href="#">AVAILABLE OFFICES</a></li>
-        </ul>
+        <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--active">
+            <i class="fa-solid fa-house"></i>
+            <span>HOME</span>
+        </a>
+        <a href="#" class="btn btn-nav btn-nav--link">
+            <i class="fa-solid fa-building"></i>
+            <span>AVAILABLE OFFICES</span>
+        </a>
     </div>
-    <div class="navbar-right">
-        <div class="nav-btn-group d-flex align-items-center gap-2">
-            <a href="#" class="btn btn-nav btn-nav--apply">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Apply / Renew as Student Assistant</span>
-            </a>
-            <a href="#" class="btn btn-nav btn-nav--staff">
-                <i class="fa-solid fa-user-tie"></i>
-                <span>Log in as Staff</span>
-            </a>
-            <a href="#" class="btn btn-nav btn-nav--director">
-                <i class="fa-solid fa-user-shield"></i>
-                <span>Log in as Student Director</span>
-            </a>
-        </div>
+    <div class="navbar-right d-flex align-items-center gap-2">
+        <a href="#" class="btn btn-nav btn-nav--apply">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Apply / Renew as Student Assistant</span>
+        </a>
+        <a href="#" class="btn btn-nav btn-nav--staff">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Log in as Staff</span>
+        </a>
+        <a href="#" class="btn btn-nav btn-nav--director">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Log in as Student Director</span>
+        </a>
     </div>
 </nav>
 
