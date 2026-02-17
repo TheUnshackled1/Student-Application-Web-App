@@ -797,3 +797,82 @@ body {
 .btn-form--submit:active {
   transform: scale(0.97);
 }
+
+/* ==========================================
+   REQUIREMENT ITEMS (APPLY NEW)
+   ========================================== */
+.requirement-item {
+  background: #f9fafb;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+
+.requirement-header {
+  margin-bottom: 10px;
+}
+
+.requirement-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.requirement-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, #1a5632 0%, #2d7a4a 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-upload:hover {
+  background: linear-gradient(135deg, #0e3d22 0%, #1a5632 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 86, 50, 0.3);
+}
+
+.btn-camera {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, #c8a84e 0%, #d4b86a 100%);
+  color: #0e3d22;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-camera:hover {
+  background: linear-gradient(135deg, #b8963e 0%, #c8a84e 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 168, 78, 0.3);
+}
+
+.file-preview {
+  display: none;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}

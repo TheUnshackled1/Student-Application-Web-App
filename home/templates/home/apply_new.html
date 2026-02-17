@@ -127,46 +127,158 @@
                 </div>
             </div>
 
-            <!-- Office Preference -->
-            <h4 class="form-section-title"><i class="fa-solid fa-building"></i> Office Preference</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label">Preferred Office <span class="text-danger">*</span></label>
-                    <select class="form-select" name="preferred_office" required>
-                        <option value="" selected disabled>Select office</option>
-                        <option value="registrar">Registrar</option>
-                        <option value="library">Library</option>
-                        <option value="guidance">Guidance Office</option>
-                        <option value="deans">Dean's Office</option>
-                        <option value="cashier">Cashier</option>
-                        <option value="osa">Office of Student Affairs</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Reason for Applying</label>
-                    <textarea class="form-control" name="reason" rows="3" placeholder="Briefly explain why you want to become a student assistant..."></textarea>
+            <!-- Requirements for New Applicants -->
+            <h4 class="form-section-title"><i class="fa-solid fa-clipboard-list"></i> Requirements for New Applicants</h4>
+
+            <!-- Application Form -->
+            <div class="requirement-item">
+                <div class="requirement-header">
+                    <span class="requirement-label">Application Form</span>
                 </div>
             </div>
 
-            <!-- Document Upload -->
-            <h4 class="form-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> Document Upload</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label">Certificate of Registration (COR) <span class="text-danger">*</span></label>
-                    <input type="file" class="form-control" name="cor" accept=".pdf,.jpg,.png" required>
+            <!-- 1x1 ID Picture -->
+            <div class="requirement-item" data-field="id_picture">
+                <div class="requirement-header">
+                    <span class="requirement-label">(1) 1x1 ID Picture</span>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Grade Report / Transcript</label>
-                    <input type="file" class="form-control" name="grades" accept=".pdf,.jpg,.png">
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="id_picture" accept=".jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('id_picture')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">2x2 ID Photo <span class="text-danger">*</span></label>
-                    <input type="file" class="form-control" name="photo" accept=".jpg,.png" required>
+                <div class="file-preview" id="preview_id_picture"></div>
+                <input type="hidden" name="id_picture_photo" id="photo_id_picture">
+            </div>
+
+            <!-- Barangay Clearance -->
+            <div class="requirement-item" data-field="barangay_clearance">
+                <div class="requirement-header">
+                    <span class="requirement-label">Barangay Clearance</span>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Other Supporting Documents</label>
-                    <input type="file" class="form-control" name="other_docs" accept=".pdf,.jpg,.png">
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="barangay_clearance" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('barangay_clearance')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
                 </div>
+                <div class="file-preview" id="preview_barangay_clearance"></div>
+                <input type="hidden" name="barangay_clearance_photo" id="photo_barangay_clearance">
+            </div>
+
+            <!-- Parents ITR / Certification -->
+            <div class="requirement-item" data-field="parents_itr">
+                <div class="requirement-header">
+                    <span class="requirement-label">Parents ITR / Certification from BIR / Parents Certificate of Indigency</span>
+                </div>
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="parents_itr" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('parents_itr')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
+                </div>
+                <div class="file-preview" id="preview_parents_itr"></div>
+                <input type="hidden" name="parents_itr_photo" id="photo_parents_itr">
+            </div>
+
+            <!-- Photocopy of Enrolment Form -->
+            <div class="requirement-item" data-field="enrolment_form">
+                <div class="requirement-header">
+                    <span class="requirement-label">Photocopy of Enrolment Form</span>
+                </div>
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="enrolment_form" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('enrolment_form')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
+                </div>
+                <div class="file-preview" id="preview_enrolment_form"></div>
+                <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
+            </div>
+
+            <!-- Schedule of Classes -->
+            <div class="requirement-item" data-field="schedule_classes">
+                <div class="requirement-header">
+                    <span class="requirement-label">Schedule of Classes</span>
+                </div>
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="schedule_classes" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('schedule_classes')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
+                </div>
+                <div class="file-preview" id="preview_schedule_classes"></div>
+                <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
+            </div>
+
+            <!-- Proof of Insurance -->
+            <div class="requirement-item" data-field="proof_insurance">
+                <div class="requirement-header">
+                    <span class="requirement-label">Proof of Insurance (c/o OSAS)</span>
+                </div>
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="proof_insurance" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('proof_insurance')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
+                </div>
+                <div class="file-preview" id="preview_proof_insurance"></div>
+                <input type="hidden" name="proof_insurance_photo" id="photo_proof_insurance">
+            </div>
+
+            <!-- Grades for last semester -->
+            <div class="requirement-item" data-field="grades_last_sem">
+                <div class="requirement-header">
+                    <span class="requirement-label">Grades for the last semester attended</span>
+                </div>
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="grades_last_sem" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('grades_last_sem')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
+                </div>
+                <div class="file-preview" id="preview_grades_last_sem"></div>
+                <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
+            </div>
+
+            <!-- Filled Out Official Time -->
+            <div class="requirement-item" data-field="official_time">
+                <div class="requirement-header">
+                    <span class="requirement-label">Filled Out Official Time</span>
+                </div>
+                <div class="requirement-actions">
+                    <label class="btn-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
+                        <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                    </label>
+                    <button type="button" class="btn-camera" onclick="openCameraModal('official_time')">
+                        <i class="fa-solid fa-camera"></i> Take a photo
+                    </button>
+                </div>
+                <div class="file-preview" id="preview_official_time"></div>
+                <input type="hidden" name="official_time_photo" id="photo_official_time">
             </div>
 
             <!-- Submit -->
@@ -184,5 +296,23 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Open camera input
+    function openCamera(inputName) {
+        document.querySelector('input[name="' + inputName + '"]').click();
+    }
+
+    // Show file name on upload/camera
+    document.querySelectorAll('.requirement-item input[type="file"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            var item = this.closest('.requirement-item');
+            var preview = item.querySelector('.file-preview');
+            if (this.files.length > 0) {
+                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
+                preview.style.display = 'block';
+            }
+        });
+    });
+</script>
 </body>
 </html>
