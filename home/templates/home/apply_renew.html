@@ -143,24 +143,98 @@
                 </div>
             </div>
 
-            <!-- Document Upload -->
-            <h4 class="form-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> Document Upload</h4>
+            <!-- Requirements for Renewal -->
+            <h4 class="form-section-title"><i class="fa-solid fa-clipboard-list"></i> Requirements for Renewal</h4>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label">Updated Certificate of Registration (COR) <span class="text-danger">*</span></label>
-                    <input type="file" class="form-control" name="cor" accept=".pdf,.jpg,.png" required>
+                    <label class="form-label">Photocopy of Enrolment Form <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="enrolment_form" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('enrolment_form')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_enrolment_form"></div>
+                    <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Latest Grade Report</label>
-                    <input type="file" class="form-control" name="grades" accept=".pdf,.jpg,.png">
+                    <label class="form-label">Schedule of Classes <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="schedule_classes" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('schedule_classes')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_schedule_classes"></div>
+                    <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Performance Evaluation (from previous office)</label>
-                    <input type="file" class="form-control" name="evaluation" accept=".pdf,.jpg,.png">
+                    <label class="form-label">Grades for the last semester attended <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="grades_last_sem" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('grades_last_sem')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_grades_last_sem"></div>
+                    <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Other Supporting Documents</label>
-                    <input type="file" class="form-control" name="other_docs" accept=".pdf,.jpg,.png">
+                    <label class="form-label">Filled Out Official Time (provided by OSAS) <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('official_time')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_official_time"></div>
+                    <input type="hidden" name="official_time_photo" id="photo_official_time">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Recommendation Letter and Budget Allocation <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="recommendation_letter" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('recommendation_letter')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_recommendation_letter"></div>
+                    <input type="hidden" name="recommendation_letter_photo" id="photo_recommendation_letter">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Evaluation Form (with a rating of 80% and above) <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="evaluation_form" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('evaluation_form')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_evaluation_form"></div>
+                    <input type="hidden" name="evaluation_form_photo" id="photo_evaluation_form">
                 </div>
             </div>
 
@@ -178,6 +252,182 @@
 
 </main>
 
+<!-- ========== CAMERA MODAL ========== -->
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content camera-modal-card">
+      <div class="modal-header camera-modal-header">
+        <h5 class="modal-title" id="cameraModalLabel">
+            <i class="fa-solid fa-camera"></i> Take a Photo
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="camera-feed-container">
+            <video id="cameraFeed" autoplay playsinline></video>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+        </div>
+        <div class="captured-preview-container" id="capturedPreview" style="display:none;">
+            <img id="capturedImage" alt="Captured photo">
+        </div>
+        <p class="camera-status" id="cameraStatus">Starting camera...</p>
+      </div>
+      <div class="modal-footer camera-modal-footer">
+        <button type="button" class="btn-form btn-form--cancel" data-bs-dismiss="modal">
+            <i class="fa-solid fa-xmark"></i> Cancel
+        </button>
+        <button type="button" class="btn-camera-retake" id="btnRetake" style="display:none;" onclick="retakePhoto()">
+            <i class="fa-solid fa-arrows-rotate"></i> Retake
+        </button>
+        <button type="button" class="btn-camera-capture" id="btnCapture" onclick="capturePhoto()">
+            <i class="fa-solid fa-camera"></i> Capture
+        </button>
+        <button type="button" class="btn-form btn-form--submit" id="btnUsePhoto" style="display:none;" onclick="usePhoto()">
+            <i class="fa-solid fa-check"></i> Use Photo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let cameraStream = null;
+    let currentField = null;
+    const cameraModal = document.getElementById('cameraModal');
+
+    function openCameraModal(fieldName) {
+        currentField = fieldName;
+        const modal = new bootstrap.Modal(cameraModal);
+        modal.show();
+    }
+
+    cameraModal.addEventListener('shown.bs.modal', function () {
+        startCamera();
+    });
+
+    cameraModal.addEventListener('hidden.bs.modal', function () {
+        stopCamera();
+        resetCameraUI();
+    });
+
+    function startCamera() {
+        const video = document.getElementById('cameraFeed');
+        const status = document.getElementById('cameraStatus');
+        status.textContent = 'Starting camera...';
+
+        navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' } })
+            .then(function(stream) {
+                cameraStream = stream;
+                video.srcObject = stream;
+                status.textContent = 'Camera ready — click Capture to take a photo';
+            })
+            .catch(function(err) {
+                status.textContent = 'Could not access camera: ' + err.message;
+            });
+    }
+
+    function stopCamera() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(function(track) { track.stop(); });
+            cameraStream = null;
+        }
+        document.getElementById('cameraFeed').srcObject = null;
+    }
+
+    function capturePhoto() {
+        const video = document.getElementById('cameraFeed');
+        const canvas = document.getElementById('cameraCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+
+        const dataUrl = canvas.toDataURL('image/png');
+        document.getElementById('capturedImage').src = dataUrl;
+        document.getElementById('capturedPreview').style.display = 'block';
+        video.style.display = 'none';
+
+        document.getElementById('btnCapture').style.display = 'none';
+        document.getElementById('btnRetake').style.display = 'inline-flex';
+        document.getElementById('btnUsePhoto').style.display = 'inline-flex';
+        document.getElementById('cameraStatus').textContent = 'Photo captured! Use it or retake.';
+    }
+
+    function retakePhoto() {
+        document.getElementById('capturedPreview').style.display = 'none';
+        document.getElementById('cameraFeed').style.display = 'block';
+        document.getElementById('btnCapture').style.display = 'inline-flex';
+        document.getElementById('btnRetake').style.display = 'none';
+        document.getElementById('btnUsePhoto').style.display = 'none';
+        document.getElementById('cameraStatus').textContent = 'Camera ready — click Capture to take a photo';
+    }
+
+    function usePhoto() {
+        const canvas = document.getElementById('cameraCanvas');
+        const dataUrl = canvas.toDataURL('image/png');
+
+        fetch("{% url 'home:process_camera_photo' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                image: dataUrl,
+                field: currentField
+            })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.status === 'ok') {
+                document.getElementById('photo_' + currentField).value = data.filename;
+                var preview = document.getElementById('preview_' + currentField);
+                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <i class="fa-solid fa-camera" style="color:#6b7280;"></i> ' + data.filename;
+                preview.style.display = 'block';
+            }
+        })
+        .catch(function(err) {
+            alert('Error processing photo: ' + err.message);
+        });
+
+        bootstrap.Modal.getInstance(cameraModal).hide();
+    }
+
+    function resetCameraUI() {
+        document.getElementById('capturedPreview').style.display = 'none';
+        document.getElementById('cameraFeed').style.display = 'block';
+        document.getElementById('btnCapture').style.display = 'inline-flex';
+        document.getElementById('btnRetake').style.display = 'none';
+        document.getElementById('btnUsePhoto').style.display = 'none';
+        document.getElementById('cameraStatus').textContent = '';
+    }
+
+    // Show file name on regular file upload
+    document.querySelectorAll('input[type="file"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            // Update custom file text
+            var wrapper = this.closest('.custom-file-upload');
+            if (wrapper) {
+                var textSpan = wrapper.querySelector('.custom-file-text');
+                if (textSpan && this.files.length > 0) {
+                    textSpan.textContent = this.files[0].name;
+                    textSpan.classList.add('has-file');
+                } else if (textSpan) {
+                    textSpan.textContent = textSpan.dataset.default;
+                    textSpan.classList.remove('has-file');
+                }
+            }
+            var col = this.closest('.col-md-6');
+            if (!col) return;
+            var preview = col.querySelector('.file-preview');
+            if (preview && this.files.length > 0) {
+                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
+                preview.style.display = 'block';
+            }
+        });
+    });
+</script>
 </body>
 </html>

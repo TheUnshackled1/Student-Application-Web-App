@@ -111,6 +111,11 @@ def home(request):
     return render(request, 'home/home.html', context)
 
 
+def available_offices(request):
+    """GIS campus map with available offices for student assistants."""
+    return render(request, 'home/available_offices.html')
+
+
 def apply_new(request):
     """Application form for new student assistants."""
     return render(request, 'home/apply_new.html')

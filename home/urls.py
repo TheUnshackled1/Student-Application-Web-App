@@ -5,6 +5,7 @@ app_name = 'home'
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('offices/', views.available_offices, name='available_offices'),
     path('apply/new/', views.apply_new, name='apply_new'),
     path('apply/renew/', views.apply_renew, name='apply_renew'),
     path('apply/camera-photo/', views.process_camera_photo, name='process_camera_photo'),

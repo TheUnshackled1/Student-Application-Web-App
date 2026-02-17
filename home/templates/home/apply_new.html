@@ -129,156 +129,142 @@
 
             <!-- Requirements for New Applicants -->
             <h4 class="form-section-title"><i class="fa-solid fa-clipboard-list"></i> Requirements for New Applicants</h4>
-
-            <!-- Application Form -->
-            <div class="requirement-item">
-                <div class="requirement-header">
-                    <span class="requirement-label">Application Form</span>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Application Form <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="application_form" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('application_form')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_application_form"></div>
+                    <input type="hidden" name="application_form_photo" id="photo_application_form">
                 </div>
-            </div>
-
-            <!-- 1x1 ID Picture -->
-            <div class="requirement-item" data-field="id_picture">
-                <div class="requirement-header">
-                    <span class="requirement-label">(1) 1x1 ID Picture</span>
+                <div class="col-md-6">
+                    <label class="form-label">(1) 1x1 ID Picture <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="id_picture" accept=".jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('id_picture')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_id_picture"></div>
+                    <input type="hidden" name="id_picture_photo" id="photo_id_picture">
                 </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="id_picture" accept=".jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('id_picture')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
+                <div class="col-md-6">
+                    <label class="form-label">Barangay Clearance <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="barangay_clearance" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('barangay_clearance')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_barangay_clearance"></div>
+                    <input type="hidden" name="barangay_clearance_photo" id="photo_barangay_clearance">
                 </div>
-                <div class="file-preview" id="preview_id_picture"></div>
-                <input type="hidden" name="id_picture_photo" id="photo_id_picture">
-            </div>
-
-            <!-- Barangay Clearance -->
-            <div class="requirement-item" data-field="barangay_clearance">
-                <div class="requirement-header">
-                    <span class="requirement-label">Barangay Clearance</span>
+                <div class="col-md-6">
+                    <label class="form-label">Parents ITR / Cert. from BIR / Certificate of Indigency <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="parents_itr" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('parents_itr')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_parents_itr"></div>
+                    <input type="hidden" name="parents_itr_photo" id="photo_parents_itr">
                 </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="barangay_clearance" accept=".pdf,.jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('barangay_clearance')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
+                <div class="col-md-6">
+                    <label class="form-label">Photocopy of Enrolment Form <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="enrolment_form" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('enrolment_form')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_enrolment_form"></div>
+                    <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
                 </div>
-                <div class="file-preview" id="preview_barangay_clearance"></div>
-                <input type="hidden" name="barangay_clearance_photo" id="photo_barangay_clearance">
-            </div>
-
-            <!-- Parents ITR / Certification -->
-            <div class="requirement-item" data-field="parents_itr">
-                <div class="requirement-header">
-                    <span class="requirement-label">Parents ITR / Certification from BIR / Parents Certificate of Indigency</span>
+                <div class="col-md-6">
+                    <label class="form-label">Schedule of Classes <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="schedule_classes" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('schedule_classes')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_schedule_classes"></div>
+                    <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
                 </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="parents_itr" accept=".pdf,.jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('parents_itr')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
+                <div class="col-md-6">
+                    <label class="form-label">Proof of Insurance (c/o OSAS) <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="proof_insurance" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('proof_insurance')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_proof_insurance"></div>
+                    <input type="hidden" name="proof_insurance_photo" id="photo_proof_insurance">
                 </div>
-                <div class="file-preview" id="preview_parents_itr"></div>
-                <input type="hidden" name="parents_itr_photo" id="photo_parents_itr">
-            </div>
-
-            <!-- Photocopy of Enrolment Form -->
-            <div class="requirement-item" data-field="enrolment_form">
-                <div class="requirement-header">
-                    <span class="requirement-label">Photocopy of Enrolment Form</span>
+                <div class="col-md-6">
+                    <label class="form-label">Grades for the last semester attended <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="grades_last_sem" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('grades_last_sem')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_grades_last_sem"></div>
+                    <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
                 </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="enrolment_form" accept=".pdf,.jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('enrolment_form')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
+                <div class="col-md-6">
+                    <label class="form-label">Filled Out Official Time <span class="text-danger">*</span></label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" required>
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('official_time')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_official_time"></div>
+                    <input type="hidden" name="official_time_photo" id="photo_official_time">
                 </div>
-                <div class="file-preview" id="preview_enrolment_form"></div>
-                <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
-            </div>
-
-            <!-- Schedule of Classes -->
-            <div class="requirement-item" data-field="schedule_classes">
-                <div class="requirement-header">
-                    <span class="requirement-label">Schedule of Classes</span>
-                </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="schedule_classes" accept=".pdf,.jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('schedule_classes')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
-                </div>
-                <div class="file-preview" id="preview_schedule_classes"></div>
-                <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
-            </div>
-
-            <!-- Proof of Insurance -->
-            <div class="requirement-item" data-field="proof_insurance">
-                <div class="requirement-header">
-                    <span class="requirement-label">Proof of Insurance (c/o OSAS)</span>
-                </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="proof_insurance" accept=".pdf,.jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('proof_insurance')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
-                </div>
-                <div class="file-preview" id="preview_proof_insurance"></div>
-                <input type="hidden" name="proof_insurance_photo" id="photo_proof_insurance">
-            </div>
-
-            <!-- Grades for last semester -->
-            <div class="requirement-item" data-field="grades_last_sem">
-                <div class="requirement-header">
-                    <span class="requirement-label">Grades for the last semester attended</span>
-                </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="grades_last_sem" accept=".pdf,.jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('grades_last_sem')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
-                </div>
-                <div class="file-preview" id="preview_grades_last_sem"></div>
-                <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
-            </div>
-
-            <!-- Filled Out Official Time -->
-            <div class="requirement-item" data-field="official_time">
-                <div class="requirement-header">
-                    <span class="requirement-label">Filled Out Official Time</span>
-                </div>
-                <div class="requirement-actions">
-                    <label class="btn-upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload a file
-                        <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" hidden>
-                    </label>
-                    <button type="button" class="btn-camera" onclick="openCameraModal('official_time')">
-                        <i class="fa-solid fa-camera"></i> Take a photo
-                    </button>
-                </div>
-                <div class="file-preview" id="preview_official_time"></div>
-                <input type="hidden" name="official_time_photo" id="photo_official_time">
             </div>
 
             <!-- Submit -->
@@ -461,11 +447,24 @@
     }
 
     // Show file name on regular file upload
-    document.querySelectorAll('.requirement-item input[type="file"]').forEach(function(input) {
+    document.querySelectorAll('input[type="file"]').forEach(function(input) {
         input.addEventListener('change', function() {
-            var item = this.closest('.requirement-item');
-            var preview = item.querySelector('.file-preview');
-            if (this.files.length > 0) {
+            // Update custom file text
+            var wrapper = this.closest('.custom-file-upload');
+            if (wrapper) {
+                var textSpan = wrapper.querySelector('.custom-file-text');
+                if (textSpan && this.files.length > 0) {
+                    textSpan.textContent = this.files[0].name;
+                    textSpan.classList.add('has-file');
+                } else if (textSpan) {
+                    textSpan.textContent = textSpan.dataset.default;
+                    textSpan.classList.remove('has-file');
+                }
+            }
+            var col = this.closest('.col-md-6');
+            if (!col) return;
+            var preview = col.querySelector('.file-preview');
+            if (preview && this.files.length > 0) {
                 preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
                 preview.style.display = 'block';
             }
