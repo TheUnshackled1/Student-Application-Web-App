@@ -566,3 +566,234 @@ body {
 }
 
 /*# sourceMappingURL=style.css.map */
+
+/* ==========================================
+   APPLY / RENEW MODAL
+   ========================================== */
+.apply-renew-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.apply-renew-card .modal-body {
+  padding: 40px 36px 32px;
+}
+
+.modal-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a5632, #2d7a4a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.modal-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.modal-subtext {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 28px;
+}
+
+.modal-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-modal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.btn-modal i {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.btn-modal:active {
+  transform: scale(0.97);
+}
+
+.btn-modal--apply {
+  background: linear-gradient(135deg, #1a5632 0%, #2d7a4a 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(26, 86, 50, 0.3);
+}
+.btn-modal--apply:hover {
+  background: linear-gradient(135deg, #0e3d22 0%, #1a5632 100%);
+  box-shadow: 0 6px 20px rgba(26, 86, 50, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-modal--renew {
+  background: linear-gradient(135deg, #c8a84e 0%, #d4b86a 100%);
+  color: #0e3d22 !important;
+  box-shadow: 0 4px 12px rgba(200, 168, 78, 0.3);
+}
+.btn-modal--renew:hover {
+  background: linear-gradient(135deg, #b8963e 0%, #c8a84e 100%);
+  box-shadow: 0 6px 20px rgba(200, 168, 78, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-modal-close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.btn-modal-close:hover {
+  color: #374151;
+}
+
+/* ==========================================
+   FORM PAGES (APPLY / RENEW)
+   ========================================== */
+.form-page-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.form-icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a5632, #2d7a4a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: #ffffff;
+  font-size: 28px;
+  box-shadow: 0 4px 12px rgba(26, 86, 50, 0.3);
+}
+
+.form-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+
+.form-page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.form-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a5632;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-section-title i {
+  font-size: 16px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.form-control,
+.form-select {
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
+  padding: 10px 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: #1a5632;
+  box-shadow: 0 0 0 3px rgba(26, 86, 50, 0.12);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-form--cancel {
+  background: #f3f4f6;
+  color: #374151 !important;
+}
+.btn-form--cancel:hover {
+  background: #e5e7eb;
+  color: #1f2937 !important;
+}
+
+.btn-form--submit {
+  background: linear-gradient(135deg, #1a5632 0%, #2d7a4a 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(26, 86, 50, 0.3);
+}
+.btn-form--submit:hover {
+  background: linear-gradient(135deg, #0e3d22 0%, #1a5632 100%);
+  box-shadow: 0 6px 20px rgba(26, 86, 50, 0.4);
+  transform: translateY(-1px);
+}
+.btn-form--submit:active {
+  transform: scale(0.97);
+}
