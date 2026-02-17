@@ -1,11 +1,19 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
+from django.views.decorators.http import require_POST
+from django.conf import settings
 from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement,
 )
+import json
+import base64
+import os
+import uuid
+import cv2
+import numpy as np
 
 
 def home(request):
@@ -111,6 +119,57 @@ def apply_new(request):
 def apply_renew(request):
     """Renewal form for existing student assistants."""
     return render(request, 'home/apply_renew.html')
+
+
+@require_POST
+def process_camera_photo(request):
+    """Receive a base64 webcam image, process with OpenCV (cv2), and save."""
+    try:
+        data = json.loads(request.body)
+        image_data = data.get('image', '')
+        field_name = data.get('field', 'photo')
+
+        # Strip the data URL prefix (e.g. "data:image/png;base64,")
+        if ',' in image_data:
+            image_data = image_data.split(',', 1)[1]
+
+        # Decode base64 to bytes
+        img_bytes = base64.b64decode(image_data)
+
+        # Convert to numpy array and decode with OpenCV
+        np_arr = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        if img is None:
+            return JsonResponse({'status': 'error', 'message': 'Invalid image data'}, status=400)
+
+        # --- OpenCV processing ---
+        # Auto-adjust brightness/contrast
+        lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        l = clahe.apply(l)
+        img = cv2.merge([l, a, b])
+        img = cv2.cvtColor(img, cv2.COLOR_LAB2BGR)
+
+        # Light denoise
+        img = cv2.fastNlMeansDenoisingColored(img, None, 5, 5, 7, 21)
+
+        # Save processed image
+        upload_dir = os.path.join(settings.MEDIA_ROOT, 'camera_photos')
+        os.makedirs(upload_dir, exist_ok=True)
+
+        filename = f"{field_name}_{uuid.uuid4().hex[:8]}.png"
+        filepath = os.path.join(upload_dir, filename)
+        cv2.imwrite(filepath, img)
+
+        return JsonResponse({
+            'status': 'ok',
+            'filename': filename,
+            'path': f"{settings.MEDIA_URL}camera_photos/{filename}",
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
 def staff_login(request):
