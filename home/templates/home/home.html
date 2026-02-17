@@ -31,7 +31,7 @@
         </a>
     </div>
     <div class="navbar-right d-flex align-items-center gap-2">
-        <a href="#" class="btn btn-nav btn-nav--apply">
+        <a href="#" class="btn btn-nav btn-nav--apply" data-bs-toggle="modal" data-bs-target="#applyRenewModal">
             <i class="fa-solid fa-paper-plane"></i>
             <span>Apply / Renew as Student Assistant</span>
         </a>
@@ -199,6 +199,32 @@
     </div>
 
 </main>
+
+<!-- ========== APPLY / RENEW MODAL ========== -->
+<div class="modal fade" id="applyRenewModal" tabindex="-1" aria-labelledby="applyRenewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content apply-renew-card">
+      <div class="modal-body text-center">
+        <div class="modal-icon-circle">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <h3 class="modal-heading" id="applyRenewModalLabel">Student Assistant Portal</h3>
+        <p class="modal-subtext">What would you like to do?</p>
+        <div class="modal-btn-group">
+          <a href="{% url 'home:apply_new' %}" class="btn-modal btn-modal--apply">
+            <i class="fa-solid fa-file-circle-plus"></i>
+            <span>Apply as New Student Assistant</span>
+          </a>
+          <a href="{% url 'home:apply_renew' %}" class="btn-modal btn-modal--renew">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Renew as Student Assistant</span>
+          </a>
+        </div>
+        <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

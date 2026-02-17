@@ -103,6 +103,16 @@ def home(request):
     return render(request, 'home/home.html', context)
 
 
+def apply_new(request):
+    """Application form for new student assistants."""
+    return render(request, 'home/apply_new.html')
+
+
+def apply_renew(request):
+    """Renewal form for existing student assistants."""
+    return render(request, 'home/apply_renew.html')
+
+
 def staff_login(request):
     """Login page for staff users."""
     if request.user.is_authenticated:
