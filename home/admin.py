@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     StudentProfile, Document, ApplicationStep,
-    UpcomingDate, Reminder, Announcement, NewApplication,
+    UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
 )
 
 
@@ -44,3 +44,17 @@ class NewApplicationAdmin(admin.ModelAdmin):
     list_display = ('student_id', 'first_name', 'last_name', 'course', 'status', 'submitted_at')
     list_filter = ('status', 'gender', 'year_level', 'semester')
     search_fields = ('first_name', 'last_name', 'student_id', 'email')
+
+
+@admin.register(RenewalApplication)
+class RenewalApplicationAdmin(admin.ModelAdmin):
+    list_display = ('student_id', 'full_name', 'course', 'status', 'submitted_at')
+    list_filter = ('status', 'year_level', 'semester')
+    search_fields = ('full_name', 'student_id', 'email')
+
+
+@admin.register(Office)
+class OfficeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'building', 'room', 'head', 'total_slots', 'is_active')
+    list_filter = ('is_active', 'building')
+    search_fields = ('name', 'building', 'head')

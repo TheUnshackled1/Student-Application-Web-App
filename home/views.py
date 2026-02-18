@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils import timezone
 from .models import (
     StudentProfile, Document, ApplicationStep,
-    UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication,
+    UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
 )
 from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm, RenewalApplicationForm
 from datetime import date as _date, timedelta
@@ -322,8 +322,80 @@ def home(request):
 
 
 def available_offices(request):
-    """GIS campus map with available offices for student assistants."""
-    return render(request, 'home/available_offices.html')
+    """GIS campus map with available offices — real data from DB."""
+    offices_qs = Office.objects.filter(is_active=True)
+
+    # Count filled slots per office from both application types
+    # (students with status office_assigned or approved)
+    offices_data = []
+    for office in offices_qs:
+        filled_new = NewApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).count()
+        filled_renewal = RenewalApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).count()
+        filled = filled_new + filled_renewal
+        available = max(0, office.total_slots - filled)
+
+        if filled >= office.total_slots:
+            status = 'full'
+        elif available <= 1 and office.total_slots > 1:
+            status = 'limited'
+        else:
+            status = 'open'
+
+        # Get list of assigned students for this office
+        assigned_students = []
+        for app in NewApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).order_by('last_name'):
+            assigned_students.append({
+                'name': f"{app.first_name} {app.last_name}",
+                'student_id': app.student_id,
+                'status': app.get_status_display(),
+                'status_key': app.status,
+            })
+        for app in RenewalApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).order_by('full_name'):
+            assigned_students.append({
+                'name': app.full_name,
+                'student_id': app.student_id,
+                'status': app.get_status_display(),
+                'status_key': app.status,
+            })
+
+        offices_data.append({
+            'id': office.pk,
+            'name': office.name,
+            'building': office.building,
+            'room': office.room,
+            'hours': office.hours,
+            'head': office.head,
+            'total_slots': office.total_slots,
+            'filled': filled,
+            'available': available,
+            'status': status,
+            'lat': office.latitude,
+            'lng': office.longitude,
+            'icon': office.icon,
+            'description': office.description,
+            'students': assigned_students,
+        })
+
+    context = {
+        'offices_json': json.dumps(offices_data),
+        'total_offices': offices_qs.count(),
+        'total_open': sum(1 for o in offices_data if o['status'] == 'open'),
+        'total_limited': sum(1 for o in offices_data if o['status'] == 'limited'),
+        'total_full': sum(1 for o in offices_data if o['status'] == 'full'),
+    }
+    return render(request, 'home/available_offices.html', context)
 
 
 def apply_new(request):
@@ -872,6 +944,8 @@ def director_dashboard(request):
         'rejected': all_apps.filter(status='rejected').count(),
     }
 
+    offices = Office.objects.filter(is_active=True).order_by('name')
+
     context = {
         'director_name': request.user.get_full_name() or 'Director',
         'interview_apps': interview_apps,
@@ -879,6 +953,7 @@ def director_dashboard(request):
         'approved_apps': approved_apps,
         'all_apps': all_apps.order_by('-submitted_at'),
         'stats': stats,
+        'offices': offices,
     }
     return render(request, 'director/dashboard.html', context)
 
@@ -914,12 +989,15 @@ def director_review_application(request, pk):
     total_docs = len(documents)
     uploaded_docs = sum(1 for d in documents if d['uploaded'])
 
+    offices = Office.objects.filter(is_active=True).order_by('name')
+
     context = {
         'app': app,
         'documents': documents,
         'total_docs': total_docs,
         'uploaded_docs': uploaded_docs,
         'director_name': request.user.get_full_name() or 'Director',
+        'offices': offices,
     }
     return render(request, 'director/review_application.html', context)
 

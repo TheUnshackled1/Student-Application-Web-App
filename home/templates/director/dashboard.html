@@ -278,16 +278,9 @@
                 <select name="assigned_office" required
                         style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: #fff;">
                     <option value="">Select an office…</option>
-                    <option value="Registrar's Office">Registrar's Office</option>
-                    <option value="Library">Library</option>
-                    <option value="Guidance Office">Guidance Office</option>
-                    <option value="Dean's Office">Dean's Office</option>
-                    <option value="Accounting Office">Accounting Office</option>
-                    <option value="Cashier's Office">Cashier's Office</option>
-                    <option value="Student Affairs Office">Student Affairs Office</option>
-                    <option value="ICT Office">ICT Office</option>
-                    <option value="Research Office">Research Office</option>
-                    <option value="HR Office">HR Office</option>
+                    {% for office in offices %}
+                    <option value="{{ office.name }}">{{ office.name }}</option>
+                    {% endfor %}
                 </select>
                 <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #f59e0b, #d97706);">
                     <i class="fa-solid fa-building"></i> Confirm Office Assignment

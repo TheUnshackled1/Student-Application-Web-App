@@ -2,6 +2,27 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Office(models.Model):
+    """Campus office that can accept student assistants."""
+    name = models.CharField(max_length=200, unique=True)
+    building = models.CharField(max_length=200)
+    room = models.CharField(max_length=200, blank=True, default='')
+    hours = models.CharField(max_length=200, default='Mon–Fri, 8:00 AM – 5:00 PM')
+    head = models.CharField(max_length=200, blank=True, default='')
+    total_slots = models.PositiveIntegerField(default=3)
+    latitude = models.FloatField(default=10.6432)
+    longitude = models.FloatField(default=122.9394)
+    icon = models.CharField(max_length=100, default='fa-solid fa-building')
+    description = models.TextField(blank=True, default='')
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     application_id = models.CharField(max_length=20, unique=True)
