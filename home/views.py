@@ -224,7 +224,8 @@ def apply_new(request):
     if request.method == 'POST':
         form = NewApplicationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            application = form.save()
+            request.session['application_pk'] = application.pk
             return redirect('home:home')
     else:
         form = NewApplicationForm()
