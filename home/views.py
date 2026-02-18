@@ -100,19 +100,25 @@ def home(request):
                     {'step_number': s.step_number, 'title': s.title, 'status': s.status}
                     for s in db_steps
                 ]
-            db_reminders = Reminder.objects.filter(student=student, is_active=True)
-            if db_reminders.exists():
-                reminders = [
-                    {
-                        'message': r.message,
-                        'priority': getattr(r, 'priority', 'info'),
-                        'id': r.id,
-                        'created_at': r.created_at.strftime('%b %d, %Y'),
-                    }
-                    for r in db_reminders
-                ]
         except StudentProfile.DoesNotExist:
             pass
+
+    # --- Global + student-specific reminders (visible to everyone) ---
+    from django.db.models import Q
+    reminder_filter = Q(student__isnull=True, is_active=True)
+    if student:
+        reminder_filter |= Q(student=student, is_active=True)
+    db_reminders = Reminder.objects.filter(reminder_filter).order_by('-created_at')
+    if db_reminders.exists():
+        reminders = [
+            {
+                'message': r.message,
+                'priority': r.priority,
+                'id': r.id,
+                'created_at': r.created_at.strftime('%b %d, %Y'),
+            }
+            for r in db_reminders
+        ]
 
     # --- Upcoming Dates with countdown & urgency ---
     db_dates = UpcomingDate.objects.filter(is_active=True)
