@@ -37,215 +37,342 @@
 <!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
 
-    <div class="form-page-header">
-        <div class="form-icon-circle">
-            <i class="fa-solid fa-arrows-rotate"></i>
+    <!-- ── Hero Banner with Progress Steps ── -->
+    <div class="applyform-hero">
+        <div class="applyform-hero-bg"></div>
+        <div class="applyform-hero-content">
+            <div class="applyform-hero-icon">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </div>
+            <h2 class="applyform-hero-title">Renew as Student Assistant</h2>
+            <p class="applyform-hero-sub">Complete the renewal form below. Your previous records will be referenced. Fields marked with <span style="color:#fbbf24;">*</span> are required.</p>
+            <div class="applyform-steps">
+                <div class="applyform-step applyform-step--active" data-step="1">
+                    <span class="applyform-step-num">1</span>
+                    <span class="applyform-step-label">Identity</span>
+                </div>
+                <div class="applyform-step-line"></div>
+                <div class="applyform-step" data-step="2">
+                    <span class="applyform-step-num">2</span>
+                    <span class="applyform-step-label">Academic</span>
+                </div>
+                <div class="applyform-step-line"></div>
+                <div class="applyform-step" data-step="3">
+                    <span class="applyform-step-num">3</span>
+                    <span class="applyform-step-label">Assignment</span>
+                </div>
+                <div class="applyform-step-line"></div>
+                <div class="applyform-step" data-step="4">
+                    <span class="applyform-step-num">4</span>
+                    <span class="applyform-step-label">Documents</span>
+                </div>
+            </div>
         </div>
-        <h2 class="form-page-title">Renew as Student Assistant</h2>
-        <p class="form-page-subtitle">Complete the renewal form below. Your previous records will be referenced. Fields marked with <span class="text-danger">*</span> are required.</p>
     </div>
 
-    <div class="form-card">
-        <form method="post" enctype="multipart/form-data">
+    <!-- ── Form Card ── -->
+    <div class="applyform-card">
+        <form method="post" enctype="multipart/form-data" id="applyRenewForm">
             {% csrf_token %}
 
-            <!-- Student Identification -->
-            <h4 class="form-section-title"><i class="fa-solid fa-id-card"></i> Student Identification</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <label class="form-label">Student ID <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="student_id" required>
+            <!-- ━━━ SECTION 1: STUDENT IDENTIFICATION ━━━ -->
+            <div class="applyform-section" id="section-1">
+                <div class="applyform-section-head">
+                    <span class="applyform-section-badge">1</span>
+                    <div>
+                        <h4 class="applyform-section-title">Student Identification</h4>
+                        <p class="applyform-section-hint">Verify your identity and contact details.</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="full_name" required>
+
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-id-card"></i> Basic Info</span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Student ID <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-id-badge"></i>
+                                <input type="text" class="form-control" name="student_id" maxlength="8" inputmode="numeric" placeholder="12345678" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-user"></i>
+                                <input type="text" class="form-control" name="full_name" placeholder="Juan A. Dela Cruz" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-at"></i>
+                                <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control" name="email" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Contact Number <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="contact_number" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Home Address <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="address" required>
+
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-phone"></i> Contact</span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Contact Number <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                                <input type="text" class="form-control" name="contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" required>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Home Address <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <input type="text" class="form-control" name="address" placeholder="Street, Barangay, City / Municipality, Province" required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Current Academic Info -->
-            <h4 class="form-section-title"><i class="fa-solid fa-graduation-cap"></i> Current Academic Information</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label">Course / Program <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="course" required>
+            <!-- ━━━ SECTION 2: CURRENT ACADEMIC INFO ━━━ -->
+            <div class="applyform-section" id="section-2">
+                <div class="applyform-section-head">
+                    <span class="applyform-section-badge applyform-section-badge--blue">2</span>
+                    <div>
+                        <h4 class="applyform-section-title">Current Academic Information</h4>
+                        <p class="applyform-section-hint">Provide your current enrollment details.</p>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Year Level <span class="text-danger">*</span></label>
-                    <select class="form-select" name="year_level" required>
-                        <option value="" selected disabled>Select year</option>
-                        <option value="1">1st Year</option>
-                        <option value="2">2nd Year</option>
-                        <option value="3">3rd Year</option>
-                        <option value="4">4th Year</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Semester <span class="text-danger">*</span></label>
-                    <select class="form-select" name="semester" required>
-                        <option value="" selected disabled>Select semester</option>
-                        <option value="1st">1st Semester</option>
-                        <option value="2nd">2nd Semester</option>
-                        <option value="summer">Summer</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Current GPA / GWA <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="gpa" required>
+
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-graduation-cap"></i> Enrollment</span>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Course / Program <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-book-open"></i>
+                                <input type="text" class="form-control" name="course" placeholder="e.g. BSIT, BSCS, BEED" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Year Level <span class="text-danger">*</span></label>
+                            <select class="form-select" name="year_level" required>
+                                <option value="" selected disabled>Select year</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Semester <span class="text-danger">*</span></label>
+                            <select class="form-select" name="semester" required>
+                                <option value="" selected disabled>Select semester</option>
+                                <option value="1st">1st Semester</option>
+                                <option value="2nd">2nd Semester</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Previous Assignment -->
-            <h4 class="form-section-title"><i class="fa-solid fa-building"></i> Previous & Preferred Assignment</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label">Previous Office Assigned <span class="text-danger">*</span></label>
-                    <select class="form-select" name="previous_office" required>
-                        <option value="" selected disabled>Select office</option>
-                        <option value="registrar">Registrar</option>
-                        <option value="library">Library</option>
-                        <option value="guidance">Guidance Office</option>
-                        <option value="deans">Dean's Office</option>
-                        <option value="cashier">Cashier</option>
-                        <option value="osa">Office of Student Affairs</option>
-                    </select>
+            <!-- ━━━ SECTION 3: PREVIOUS & PREFERRED ASSIGNMENT ━━━ -->
+            <div class="applyform-section" id="section-3">
+                <div class="applyform-section-head">
+                    <span class="applyform-section-badge applyform-section-badge--amber">3</span>
+                    <div>
+                        <h4 class="applyform-section-title">Previous &amp; Preferred Assignment</h4>
+                        <p class="applyform-section-hint">Tell us about your previous SA experience.</p>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Preferred Office for Renewal <span class="text-danger">*</span></label>
-                    <select class="form-select" name="preferred_office" required>
-                        <option value="" selected disabled>Select office</option>
-                        <option value="registrar">Registrar</option>
-                        <option value="library">Library</option>
-                        <option value="guidance">Guidance Office</option>
-                        <option value="deans">Dean's Office</option>
-                        <option value="cashier">Cashier</option>
-                        <option value="osa">Office of Student Affairs</option>
-                    </select>
+
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-building"></i> Office Assignment</span>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Previous Office Assigned <span class="text-danger">*</span></label>
+                            <select class="form-select" name="previous_office" required>
+                                <option value="" selected disabled>Select office</option>
+                                <option value="registrar">Registrar</option>
+                                <option value="library">Library</option>
+                                <option value="guidance">Guidance Office</option>
+                                <option value="deans">Dean's Office</option>
+                                <option value="cashier">Cashier</option>
+                                <option value="osa">Office of Student Affairs</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Preferred Office for Renewal <span class="text-danger">*</span></label>
+                            <select class="form-select" name="preferred_office" required>
+                                <option value="" selected disabled>Select office</option>
+                                <option value="registrar">Registrar</option>
+                                <option value="library">Library</option>
+                                <option value="guidance">Guidance Office</option>
+                                <option value="deans">Dean's Office</option>
+                                <option value="cashier">Cashier</option>
+                                <option value="osa">Office of Student Affairs</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Total Hours Rendered <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" name="hours_rendered" required>
-                </div>
-                <div class="col-md-8">
-                    <label class="form-label">Supervisor's Name (Previous)</label>
-                    <input type="text" class="form-control" name="supervisor_name">
+
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-clock"></i> Service Record</span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Total Hours Rendered <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                                <input type="number" class="form-control" name="hours_rendered" placeholder="e.g. 120" required>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Supervisor's Name (Previous)</label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-user-tie"></i>
+                                <input type="text" class="form-control" name="supervisor_name" placeholder="Full name of your previous supervisor">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Requirements for Renewal -->
-            <h4 class="form-section-title"><i class="fa-solid fa-clipboard-list"></i> Requirements for Renewal</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label">Photocopy of Enrolment Form <span class="text-danger">*</span></label>
-                    <div class="input-with-camera">
-                        <div class="custom-file-upload">
-                            <input type="file" name="enrolment_form" accept=".pdf,.jpg,.png,.jpeg" required>
-                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
-                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
-                        </div>
-                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('enrolment_form')">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
+            <!-- ━━━ SECTION 4: REQUIREMENTS FOR RENEWAL ━━━ -->
+            <div class="applyform-section" id="section-4">
+                <div class="applyform-section-head">
+                    <span class="applyform-section-badge" style="background: linear-gradient(135deg, #7c3aed, #a855f7); box-shadow: 0 3px 10px rgba(124, 58, 237, 0.25);">4</span>
+                    <div>
+                        <h4 class="applyform-section-title">Requirements for Renewal</h4>
+                        <p class="applyform-section-hint">Upload scanned copies or take photos of each requirement.</p>
                     </div>
-                    <div class="file-preview" id="preview_enrolment_form"></div>
-                    <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Schedule of Classes <span class="text-danger">*</span></label>
-                    <div class="input-with-camera">
-                        <div class="custom-file-upload">
-                            <input type="file" name="schedule_classes" accept=".pdf,.jpg,.png,.jpeg" required>
-                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
-                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
-                        </div>
-                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('schedule_classes')">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                    </div>
-                    <div class="file-preview" id="preview_schedule_classes"></div>
-                    <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Grades for the last semester attended <span class="text-danger">*</span></label>
-                    <div class="input-with-camera">
-                        <div class="custom-file-upload">
-                            <input type="file" name="grades_last_sem" accept=".pdf,.jpg,.png,.jpeg" required>
-                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
-                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
-                        </div>
-                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('grades_last_sem')">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                    </div>
-                    <div class="file-preview" id="preview_grades_last_sem"></div>
-                    <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Filled Out Official Time (provided by OSAS) <span class="text-danger">*</span></label>
-                    <div class="input-with-camera">
-                        <div class="custom-file-upload">
-                            <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" required>
-                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
-                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
-                        </div>
-                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('official_time')">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                    </div>
-                    <div class="file-preview" id="preview_official_time"></div>
-                    <input type="hidden" name="official_time_photo" id="photo_official_time">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Recommendation Letter and Budget Allocation <span class="text-danger">*</span></label>
-                    <div class="input-with-camera">
-                        <div class="custom-file-upload">
-                            <input type="file" name="recommendation_letter" accept=".pdf,.jpg,.png,.jpeg" required>
-                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
-                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
-                        </div>
-                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('recommendation_letter')">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                    </div>
-                    <div class="file-preview" id="preview_recommendation_letter"></div>
-                    <input type="hidden" name="recommendation_letter_photo" id="photo_recommendation_letter">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Evaluation Form (with a rating of 80% and above) <span class="text-danger">*</span></label>
-                    <div class="input-with-camera">
-                        <div class="custom-file-upload">
-                            <input type="file" name="evaluation_form" accept=".pdf,.jpg,.png,.jpeg" required>
-                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
-                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
-                        </div>
-                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('evaluation_form')">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                    </div>
-                    <div class="file-preview" id="preview_evaluation_form"></div>
-                    <input type="hidden" name="evaluation_form_photo" id="photo_evaluation_form">
-                </div>
-            </div>
 
-            <!-- Submit -->
-            <div class="form-actions">
-                <a href="{% url 'home:home' %}" class="btn-form btn-form--cancel">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Home
-                </a>
-                <button type="submit" class="btn-form btn-form--submit">
-                    <i class="fa-solid fa-paper-plane"></i> Submit Renewal
-                </button>
+                <div class="applyform-docs-grid">
+
+                    <!-- Doc 1 -->
+                    <div class="applyform-doc-card">
+                        <div class="applyform-doc-num">1</div>
+                        <label class="applyform-doc-label">Photocopy of Enrolment Form <span class="text-danger">*</span></label>
+                        <div class="input-with-camera">
+                            <div class="custom-file-upload">
+                                <input type="file" name="enrolment_form" accept=".pdf,.jpg,.png,.jpeg" required>
+                                <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                                <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                            </div>
+                            <button type="button" class="btn-camera-sm" onclick="openCameraModal('enrolment_form')">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="file-preview" id="preview_enrolment_form"></div>
+                        <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
+                    </div>
+
+                    <!-- Doc 2 -->
+                    <div class="applyform-doc-card">
+                        <div class="applyform-doc-num">2</div>
+                        <label class="applyform-doc-label">Schedule of Classes <span class="text-danger">*</span></label>
+                        <div class="input-with-camera">
+                            <div class="custom-file-upload">
+                                <input type="file" name="schedule_classes" accept=".pdf,.jpg,.png,.jpeg" required>
+                                <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                                <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                            </div>
+                            <button type="button" class="btn-camera-sm" onclick="openCameraModal('schedule_classes')">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="file-preview" id="preview_schedule_classes"></div>
+                        <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
+                    </div>
+
+                    <!-- Doc 3 -->
+                    <div class="applyform-doc-card">
+                        <div class="applyform-doc-num">3</div>
+                        <label class="applyform-doc-label">Grades for the last semester attended <span class="text-danger">*</span></label>
+                        <div class="input-with-camera">
+                            <div class="custom-file-upload">
+                                <input type="file" name="grades_last_sem" accept=".pdf,.jpg,.png,.jpeg" required>
+                                <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                                <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                            </div>
+                            <button type="button" class="btn-camera-sm" onclick="openCameraModal('grades_last_sem')">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="file-preview" id="preview_grades_last_sem"></div>
+                        <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
+                    </div>
+
+                    <!-- Doc 4 -->
+                    <div class="applyform-doc-card">
+                        <div class="applyform-doc-num">4</div>
+                        <label class="applyform-doc-label">Filled Out Official Time (provided by OSAS) <span class="text-danger">*</span></label>
+                        <div class="input-with-camera">
+                            <div class="custom-file-upload">
+                                <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" required>
+                                <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                                <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                            </div>
+                            <button type="button" class="btn-camera-sm" onclick="openCameraModal('official_time')">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="file-preview" id="preview_official_time"></div>
+                        <input type="hidden" name="official_time_photo" id="photo_official_time">
+                    </div>
+
+                    <!-- Doc 5 -->
+                    <div class="applyform-doc-card">
+                        <div class="applyform-doc-num">5</div>
+                        <label class="applyform-doc-label">Recommendation Letter &amp; Budget Allocation <span class="text-danger">*</span></label>
+                        <div class="input-with-camera">
+                            <div class="custom-file-upload">
+                                <input type="file" name="recommendation_letter" accept=".pdf,.jpg,.png,.jpeg" required>
+                                <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                                <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                            </div>
+                            <button type="button" class="btn-camera-sm" onclick="openCameraModal('recommendation_letter')">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="file-preview" id="preview_recommendation_letter"></div>
+                        <input type="hidden" name="recommendation_letter_photo" id="photo_recommendation_letter">
+                    </div>
+
+                    <!-- Doc 6 -->
+                    <div class="applyform-doc-card">
+                        <div class="applyform-doc-num">6</div>
+                        <label class="applyform-doc-label">Evaluation Form (rating of 80% and above) <span class="text-danger">*</span></label>
+                        <div class="input-with-camera">
+                            <div class="custom-file-upload">
+                                <input type="file" name="evaluation_form" accept=".pdf,.jpg,.png,.jpeg" required>
+                                <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                                <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                            </div>
+                            <button type="button" class="btn-camera-sm" onclick="openCameraModal('evaluation_form')">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="file-preview" id="preview_evaluation_form"></div>
+                        <input type="hidden" name="evaluation_form_photo" id="photo_evaluation_form">
+                    </div>
+
+                </div>
+            </div><!-- /section-4 -->
+
+            <!-- ━━━ SUBMIT AREA ━━━ -->
+            <div class="applyform-submit-area">
+                <div class="applyform-submit-info">
+                    <i class="fa-solid fa-shield-check"></i>
+                    <span>Your information is secure and will only be used for this renewal application.</span>
+                </div>
+                <div class="applyform-submit-actions">
+                    <a href="{% url 'home:home' %}" class="btn-form btn-form--cancel">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Home
+                    </a>
+                    <button type="submit" class="btn-form btn-form--submit">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Renewal
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -419,7 +546,7 @@
                     textSpan.classList.remove('has-file');
                 }
             }
-            var col = this.closest('.col-md-6');
+            var col = this.closest('.applyform-doc-card') || this.closest('.col-md-6');
             if (!col) return;
             var preview = col.querySelector('.file-preview');
             if (preview && this.files.length > 0) {
@@ -428,6 +555,35 @@
             }
         });
     });
+
+    // ── Progress Step Highlighting (scroll-based) ──
+    (function() {
+        var sections = [
+            document.getElementById('section-1'),
+            document.getElementById('section-2'),
+            document.getElementById('section-3'),
+            document.getElementById('section-4')
+        ];
+        var steps = document.querySelectorAll('.applyform-step[data-step]');
+        var lines = document.querySelectorAll('.applyform-step-line');
+
+        function updateSteps() {
+            var active = 0;
+            for (var i = 0; i < sections.length; i++) {
+                if (sections[i] && sections[i].getBoundingClientRect().top < window.innerHeight * 0.5) {
+                    active = i;
+                }
+            }
+            steps.forEach(function(step, idx) {
+                step.classList.toggle('applyform-step--active', idx <= active);
+            });
+            lines.forEach(function(line, idx) {
+                line.style.background = idx < active ? 'rgba(200,168,78,0.6)' : 'rgba(255,255,255,0.2)';
+            });
+        }
+        window.addEventListener('scroll', updateSteps, { passive: true });
+        updateSteps();
+    })();
 </script>
 </body>
 </html>
