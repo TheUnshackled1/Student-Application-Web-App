@@ -4895,3 +4895,221 @@ button.review-doc-link:hover {
     justify-content: center;
   }
 }
+
+/* ==========================================
+   HAMBURGER TOGGLE (mobile navbar)
+   ========================================== */
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 20px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  line-height: 1;
+}
+.navbar-toggle:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+/* 3-column variant for dashboard content management grid */
+.dashboard-grid--3col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ==========================================
+   COMPREHENSIVE MOBILE RESPONSIVE
+   ========================================== */
+
+/* ── Tablet: 768px ── */
+@media (max-width: 768px) {
+  .form-card {
+    padding: 24px 18px;
+  }
+  .form-page-title {
+    font-size: 20px;
+  }
+  .form-page-subtitle {
+    font-size: 13px;
+  }
+  .staff-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* ── Mobile: 640px ── */
+@media (max-width: 640px) {
+  /* Navbar hamburger activation */
+  .navbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px 16px;
+    gap: 0;
+  }
+  .navbar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .navbar-left {
+    width: 100%;
+    justify-content: space-between !important;
+  }
+  .navbar-left .btn-nav {
+    display: none;
+  }
+  .navbar-left .logo {
+    order: 0;
+  }
+  .navbar-right {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 10px;
+    gap: 6px !important;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 10px;
+  }
+  .navbar-right.nav-open {
+    display: flex !important;
+  }
+  /* Show nav links moved to mobile menu */
+  .navbar-left .btn-nav.nav-mobile-show {
+    display: inline-flex;
+  }
+  /* Stack the nav buttons as full-width */
+  .navbar-right .btn-nav,
+  .navbar-right .btn,
+  .navbar-right form {
+    width: 100%;
+  }
+  .navbar-right .btn-nav,
+  .navbar-right button.btn-nav {
+    justify-content: flex-start;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+  .navbar-right form {
+    margin: 0 !important;
+  }
+  .navbar-right form button {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Mobile nav links that were hidden from navbar-left */
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 6px;
+  }
+  .mobile-nav-links .btn-nav {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 10px 14px;
+  }
+
+  /* Dashboard 3-col → 1 col */
+  .dashboard-grid--3col {
+    grid-template-columns: 1fr;
+  }
+  .section-headers {
+    grid-template-columns: 1fr;
+  }
+
+  /* Form card tighter */
+  .form-card {
+    padding: 20px 14px;
+  }
+
+  /* Announcement cards stack */
+  .ann-card {
+    flex-direction: column;
+  }
+  .ann-thumb {
+    width: 100%;
+    min-height: 160px;
+  }
+
+  /* Stats 1 column */
+  .staff-stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Staff stat card smaller */
+  .staff-stat-card {
+    padding: 16px 14px;
+    gap: 12px;
+  }
+  .staff-stat-val {
+    font-size: 22px;
+  }
+
+  /* Status banner tighter */
+  .status-banner-content {
+    padding: 20px 16px;
+  }
+}
+
+/* ── Small Phones: 480px ── */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 12px;
+  }
+  .btn-nav {
+    font-size: 11px;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .btn-nav i {
+    font-size: 13px;
+  }
+  .status-title {
+    font-size: 16px;
+  }
+  .status-message {
+    font-size: 12px;
+  }
+  .form-page-title {
+    font-size: 18px;
+  }
+  .form-card {
+    padding: 16px 12px;
+  }
+  .staff-panel-header {
+    padding: 14px 16px;
+  }
+  .staff-table th,
+  .staff-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  /* Welcome-track row */
+  .welcome-track-row {
+    gap: 12px;
+  }
+  .track-app-card {
+    padding: 16px;
+  }
+  .track-app-form input {
+    font-size: 13px;
+  }
+  /* Director panels */
+  .director-panels-row {
+    gap: 16px;
+  }
+  /* Card titles */
+  .card-title {
+    font-size: 14px;
+  }
+}
