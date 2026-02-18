@@ -100,7 +100,7 @@
                 <span class="staff-panel-icon staff-panel-icon--purple"><i class="fa-solid fa-calendar-check"></i></span>
                 <h3 class="staff-panel-title">Interview Queue</h3>
             </div>
-            <span class="staff-panel-count" style="background: #f3e8ff; color: #7c3aed;">{{ interview_apps|length }}</span>
+            <span class="staff-panel-count" style="background: rgba(124,58,237,0.15); color: #c4b5fd;">{{ interview_apps|length }}</span>
         </div>
         {% if interview_apps %}
         <div class="staff-table-wrap">
@@ -133,7 +133,7 @@
                                         onclick="openOfficeModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}')">
                                     <i class="fa-solid fa-building"></i> Assign Office
                                 </button>
-                                <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+                                <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:rgba(255,255,255,0.08); color:#e2e8f0; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.12);">
                                     <i class="fa-solid fa-eye"></i> Review
                                 </a>
                             </div>
@@ -158,7 +158,7 @@
                 <span class="staff-panel-icon staff-panel-icon--amber"><i class="fa-solid fa-building"></i></span>
                 <h3 class="staff-panel-title">Awaiting Final Approval</h3>
             </div>
-            <span class="staff-panel-count" style="background: #fef3c7; color: #92400e;">{{ office_assigned_apps|length }}</span>
+            <span class="staff-panel-count" style="background: rgba(251,191,36,0.15); color: #fbbf24;">{{ office_assigned_apps|length }}</span>
         </div>
         {% if office_assigned_apps %}
         <div class="staff-table-wrap">
@@ -178,14 +178,14 @@
                         <td><strong>{{ a.student_id }}</strong></td>
                         <td>{{ a.first_name }} {{ a.last_name }}</td>
                         <td>{{ a.course }}</td>
-                        <td><span style="font-weight:600; color:#d97706;">{{ a.assigned_office|default:"—" }}</span></td>
+                        <td><span style="font-weight:600; color:#fbbf24;">{{ a.assigned_office|default:"—" }}</span></td>
                         <td>
                             <div class="staff-action-group">
                                 <button type="button" class="doc-action-btn doc-action-btn--view" style="background: linear-gradient(135deg,#22c55e,#16a34a);"
                                         onclick="openApproveModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}', '{{ a.assigned_office }}')">
                                     <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start
                                 </button>
-                                <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+                                <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:rgba(255,255,255,0.08); color:#e2e8f0; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.12);">
                                     <i class="fa-solid fa-eye"></i> Review
                                 </a>
                             </div>
@@ -210,7 +210,7 @@
                 <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-circle-check"></i></span>
                 <h3 class="staff-panel-title">Approved Student Assistants</h3>
             </div>
-            <span class="staff-panel-count" style="background: #dcfce7; color: #166534;">{{ approved_apps|length }}</span>
+            <span class="staff-panel-count" style="background: rgba(22,163,74,0.15); color: #86efac;">{{ approved_apps|length }}</span>
         </div>
         {% if approved_apps %}
         <div class="staff-table-wrap">
@@ -269,19 +269,19 @@
                 </button>
             </div>
         </div>
-        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #fff; padding: 24px;">
+        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #0f2942; padding: 24px;">
             <form id="officeForm" method="post" action="">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'home:director_dashboard' %}">
                 <input type="hidden" name="status" value="office_assigned">
-                <p style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">
-                    Assign <strong id="officeStudentName"></strong> to an office after completing the interview.
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+                    Assign <strong id="officeStudentName" style="color:#ffffff;"></strong> to an office after completing the interview.
                 </p>
-                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
+                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #e2e8f0;">
                     Office Name
                 </label>
                 <select name="assigned_office" required
-                        style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: #fff;">
+                        style="width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: rgba(255,255,255,0.06); color: #ffffff;">
                     <option value="">Select an office…</option>
                     {% for office in offices %}
                     <option value="{{ office.name }}">{{ office.name }}</option>
@@ -309,22 +309,22 @@
                 </button>
             </div>
         </div>
-        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #fff; padding: 24px;">
+        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #0f2942; padding: 24px;">
             <form id="approveForm" method="post" action="">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'home:director_dashboard' %}">
                 <input type="hidden" name="status" value="approved">
-                <p style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
-                    Approve <strong id="approveStudentName"></strong> and set their start date.
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">
+                    Approve <strong id="approveStudentName" style="color:#ffffff;"></strong> and set their start date.
                 </p>
-                <p style="font-size: 12px; color: #9ca3af; margin-bottom: 16px;">
-                    Office: <strong id="approveOfficeName" style="color:#d97706;"></strong>
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 16px;">
+                    Office: <strong id="approveOfficeName" style="color:#fbbf24;"></strong>
                 </p>
-                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
+                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #e2e8f0;">
                     Start Date
                 </label>
                 <input type="date" name="start_date" required
-                       style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px;">
+                       style="width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: rgba(255,255,255,0.06); color: #ffffff;">
                 <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #22c55e, #16a34a);">
                     <i class="fa-solid fa-circle-check"></i> Approve Application
                 </button>

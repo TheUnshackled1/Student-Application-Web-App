@@ -1911,11 +1911,11 @@ body {
   margin-bottom: 6px;
 }
 .office-list-card:hover {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(94,234,212,0.25);
 }
 .office-list-card.active {
-  background: #f0fdf4;
+  background: rgba(13,148,136,0.10);
   border-color: #5eead4;
   box-shadow: 0 2px 8px rgba(13, 148, 136, 0.12);
 }
@@ -1987,7 +1987,7 @@ body {
 .map-sidebar-footer {
   padding: 14px 20px;
   border-top: 1px solid rgba(255,255,255,0.08);
-  background: #fafafa;
+  background: rgba(255,255,255,0.03);
 }
 .map-legend h5 {
   font-size: 12px;
@@ -2158,12 +2158,15 @@ body {
   border-radius: 12px !important;
   padding: 0 !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
+  background: #0f2942 !important;
 }
 .leaflet-popup-content {
   margin: 14px 16px !important;
+  color: #e2e8f0 !important;
 }
 .leaflet-popup-tip {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  background: #0f2942 !important;
 }
 
 /* Office Detail Panel */
@@ -2228,7 +2231,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: #f0fdf4;
+  background: rgba(13,148,136,0.15);
   color: #5eead4;
   display: flex;
   align-items: center;
