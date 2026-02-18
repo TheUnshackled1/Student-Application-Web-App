@@ -911,6 +911,12 @@ body {
   .home-two-col {
     grid-template-columns: 1fr;
   }
+  .welcome-track-row {
+    grid-template-columns: 1fr;
+  }
+  .welcome-track-row .track-app-card {
+    flex-direction: row;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -2316,6 +2322,27 @@ body {
   border: 1px solid rgba(255,255,255,0.10);
   margin-bottom: 24px;
   overflow: hidden;
+}
+
+/* ── Staff Panels Inline Row ── */
+.staff-panels-row {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 0;
+}
+.staff-panels-row .staff-panel {
+  margin-bottom: 0;
+}
+.staff-panels-row .staff-panel--recent {
+  position: sticky;
+  top: 24px;
+}
+@media (max-width: 1100px) {
+  .staff-panels-row {
+    grid-template-columns: 1fr;
+  }
 }
 .staff-panel-header {
   display: flex;
@@ -4420,6 +4447,32 @@ button.review-doc-link:hover {
 /* ══════════════════════════════════════════════
    Track Your Application Section
    ══════════════════════════════════════════════ */
+/* =============================================
+   WELCOME + TRACK  — Inline Two-Column Row
+   ============================================= */
+.welcome-track-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+  align-items: stretch;
+}
+.welcome-track-row .welcome-banner-col {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.welcome-track-row .track-app-col {
+  margin: 0;
+}
+.welcome-track-row .track-app-card {
+  height: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
 .track-app-section {
   margin-top: 24px;
   margin-bottom: 8px;
