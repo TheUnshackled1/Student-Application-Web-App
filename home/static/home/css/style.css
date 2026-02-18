@@ -1487,6 +1487,24 @@ body {
   box-shadow: 0 0 0 3px rgba(13,148,136,0.20);
   background: rgba(255,255,255,0.08);
 }
+.form-control::placeholder {
+  color: rgba(255,255,255,0.40);
+}
+.form-select option {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+.form-check-label {
+  color: #e2e8f0;
+}
+.form-check-input {
+  background-color: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.25);
+}
+.form-check-input:checked {
+  background-color: #0d9488;
+  border-color: #0d9488;
+}
 
 .form-actions {
   display: flex;
@@ -2324,20 +2342,37 @@ body {
   overflow: hidden;
 }
 
+/* ── Director Panels Inline Row ── */
+.director-panels-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 24px;
+}
+.director-panels-row .staff-panel {
+  margin-bottom: 0;
+}
+@media (max-width: 1200px) {
+  .director-panels-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Staff Panels Inline Row ── */
 .staff-panels-row {
   display: grid;
   grid-template-columns: 1.8fr 1fr;
   gap: 24px;
-  align-items: start;
-  margin-bottom: 0;
+  align-items: stretch;
+  margin-bottom: 24px;
 }
 .staff-panels-row .staff-panel {
   margin-bottom: 0;
 }
 .staff-panels-row .staff-panel--recent {
-  position: sticky;
-  top: 24px;
+  display: flex;
+  flex-direction: column;
 }
 @media (max-width: 1100px) {
   .staff-panels-row {
@@ -3031,6 +3066,183 @@ body {
   border-radius: 8px;
   padding: 12px;
   margin: 8px 0 12px;
+}
+
+/* ── Staff Upload Zone ── */
+.staff-upload-zone {
+  border: 2px dashed rgba(255,255,255,0.18);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.staff-upload-zone:hover,
+.staff-upload-zone.dragover {
+  border-color: #0d9488;
+  background: rgba(13,148,136,0.08);
+}
+.staff-upload-zone.has-preview {
+  padding: 8px;
+  border-style: solid;
+  border-color: rgba(94,234,212,0.30);
+}
+.staff-upload-zone.has-preview .staff-upload-placeholder {
+  display: none;
+}
+.staff-upload-zone--sm {
+  padding: 14px 12px;
+}
+.staff-upload-zone--sm .staff-upload-placeholder i {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.staff-upload-zone--sm .staff-upload-placeholder span {
+  font-size: 11px;
+}
+.staff-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.45);
+}
+.staff-upload-placeholder i {
+  font-size: 26px;
+  color: rgba(255,255,255,0.30);
+}
+.staff-upload-placeholder span {
+  font-size: 12px;
+  font-weight: 600;
+}
+.staff-upload-placeholder small {
+  font-size: 10px;
+  color: rgba(255,255,255,0.30);
+}
+.staff-upload-preview {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+.staff-upload-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.staff-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.staff-upload-btn--camera {
+  background: rgba(13,148,136,0.18);
+  color: #5eead4;
+}
+.staff-upload-btn--camera:hover {
+  background: #0d9488;
+  color: #ffffff;
+}
+.staff-upload-btn--remove {
+  background: rgba(220,38,38,0.15);
+  color: #f87171;
+}
+.staff-upload-btn--remove:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* ── Staff Camera Modal ── */
+.staff-camera-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s, visibility 0.25s;
+}
+.staff-camera-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.staff-camera-modal {
+  background: linear-gradient(160deg, #0c2d48 0%, #0f2942 50%, #122240 100%);
+  border: 1px solid rgba(94,234,212,0.20);
+  border-radius: 16px;
+  width: 440px;
+  max-width: 92vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.50);
+  overflow: hidden;
+}
+.staff-camera-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.staff-camera-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.staff-camera-header h4 i {
+  color: #5eead4;
+}
+.staff-camera-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.60);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.staff-camera-close:hover {
+  background: rgba(220,38,38,0.25);
+  color: #f87171;
+}
+.staff-camera-body {
+  padding: 0;
+  background: #000;
+}
+.staff-camera-body video {
+  width: 100%;
+  display: block;
+}
+.staff-camera-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255,255,255,0.10);
 }
 
 /* ==========================================

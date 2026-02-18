@@ -281,7 +281,7 @@
 
         <!-- ===== MANAGE REMINDERS ===== -->
         <div class="card">
-            <h3 class="card-title"><i class="fa-solid fa-bell" style="color:#c8a84e;"></i> Reminders</h3>
+            <h3 class="card-title"><i class="fa-solid fa-bell" style="color:#fde68a;"></i> Reminders</h3>
 
             <!-- Add Reminder Form -->
             <form method="post" action="{% url 'home:staff_add_reminder' %}" class="staff-mgmt-form">
@@ -303,7 +303,7 @@
                 </button>
             </form>
 
-            <hr style="margin:16px 0; border-color:#e5e7eb;">
+            <hr style="margin:16px 0; border-color:rgba(255,255,255,0.10);">
 
             <!-- Existing Reminders List -->
             {% for r in reminders %}
@@ -350,7 +350,7 @@
 
         <!-- ===== MANAGE UPCOMING DATES ===== -->
         <div class="card">
-            <h3 class="card-title"><i class="fa-regular fa-calendar" style="color:#1a5632;"></i> Important Dates</h3>
+            <h3 class="card-title"><i class="fa-regular fa-calendar" style="color:#5eead4;"></i> Important Dates</h3>
 
             <!-- Add Date Form -->
             <form method="post" action="{% url 'home:staff_add_date' %}" class="staff-mgmt-form">
@@ -372,7 +372,7 @@
                 </button>
             </form>
 
-            <hr style="margin:16px 0; border-color:#e5e7eb;">
+            <hr style="margin:16px 0; border-color:rgba(255,255,255,0.10);">
 
             <!-- Existing Dates List -->
             {% for d in upcoming_dates %}
@@ -415,7 +415,7 @@
 
         <!-- ===== MANAGE ANNOUNCEMENTS ===== -->
         <div class="card">
-            <h3 class="card-title"><i class="fa-solid fa-bullhorn" style="color:#1a5632;"></i> Announcements</h3>
+            <h3 class="card-title"><i class="fa-solid fa-bullhorn" style="color:#86efac;"></i> Announcements</h3>
 
             <!-- Add Announcement Form -->
             <form method="post" action="{% url 'home:staff_add_announcement' %}" enctype="multipart/form-data" class="staff-mgmt-form">
@@ -430,7 +430,17 @@
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Image (optional)</label>
-                    {{ announcement_form.image }}
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="image" id="id_image" accept="image/*">
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openStaffCamera('id_image')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="file-preview" id="preview_id_image"></div>
                 </div>
                 <div class="mb-2 form-check">
                     {{ announcement_form.is_active }}
@@ -441,7 +451,7 @@
                 </button>
             </form>
 
-            <hr style="margin:16px 0; border-color:#e5e7eb;">
+            <hr style="margin:16px 0; border-color:rgba(255,255,255,0.10);">
 
             <!-- Existing Announcements List -->
             {% for a in announcements %}
@@ -468,9 +478,19 @@
                 {% csrf_token %}
                 <input type="text" name="title" class="form-control mb-1" value="{{ a.title }}">
                 <textarea name="summary" class="form-control mb-1" rows="2">{{ a.summary }}</textarea>
-                <input type="file" name="image" class="form-control mb-1" accept="image/*">
+                <div class="input-with-camera">
+                    <div class="custom-file-upload">
+                        <input type="file" name="image" id="editAnnFileInput-{{ a.pk }}" accept="image/*">
+                        <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                        <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                    </div>
+                    <button type="button" class="btn-camera-sm" onclick="openStaffCamera('editAnnFileInput-{{ a.pk }}')">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                </div>
+                <div class="file-preview" id="preview_editAnnFileInput-{{ a.pk }}"></div>
                 {% if a.image %}
-                <p style="font-size:11px; color:#6b7280; margin:0 0 4px;">Current: {{ a.image.name }}</p>
+                <p style="font-size:11px; color:rgba(255,255,255,0.45); margin:0 0 4px;">Current: {{ a.image.name }}</p>
                 {% endif %}
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if a.is_active %}checked{% endif %}>
@@ -490,8 +510,153 @@
 
 </main>
 
+<!-- ========== CAMERA MODAL ========== -->
+<div class="modal fade" id="staffCameraModal" tabindex="-1" aria-labelledby="staffCameraModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content camera-modal-card">
+      <div class="modal-header camera-modal-header">
+        <h5 class="modal-title" id="staffCameraModalLabel">
+            <i class="fa-solid fa-camera"></i> Take a Photo
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="camera-feed-container">
+            <video id="staffCameraFeed" autoplay playsinline></video>
+            <canvas id="staffCameraCanvas" style="display:none;"></canvas>
+        </div>
+        <div class="captured-preview-container" id="staffCapturedPreview" style="display:none;">
+            <img id="staffCapturedImage" alt="Captured photo">
+        </div>
+        <p class="camera-status" id="staffCameraStatus">Starting camera...</p>
+      </div>
+      <div class="modal-footer camera-modal-footer">
+        <button type="button" class="btn-form btn-form--cancel" data-bs-dismiss="modal">
+            <i class="fa-solid fa-xmark"></i> Cancel
+        </button>
+        <button type="button" class="btn-camera-retake" id="staffBtnRetake" style="display:none;" onclick="staffRetakePhoto()">
+            <i class="fa-solid fa-arrows-rotate"></i> Retake
+        </button>
+        <button type="button" class="btn-camera-capture" id="staffBtnCapture" onclick="staffCapturePhoto()">
+            <i class="fa-solid fa-camera"></i> Capture
+        </button>
+        <button type="button" class="btn-form btn-form--submit" id="staffBtnUsePhoto" style="display:none;" onclick="staffUsePhoto()">
+            <i class="fa-solid fa-check"></i> Use Photo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+/* ── Staff Camera ── */
+var staffCameraStream = null;
+var staffCurrentField = null;
+var staffCameraModalEl = document.getElementById('staffCameraModal');
+
+function openStaffCamera(fieldId) {
+    staffCurrentField = fieldId;
+    var modal = new bootstrap.Modal(staffCameraModalEl);
+    modal.show();
+}
+
+staffCameraModalEl.addEventListener('shown.bs.modal', function() {
+    var video = document.getElementById('staffCameraFeed');
+    var status = document.getElementById('staffCameraStatus');
+    status.textContent = 'Starting camera...';
+    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'environment' } })
+        .then(function(stream) {
+            staffCameraStream = stream;
+            video.srcObject = stream;
+            status.textContent = 'Camera ready \u2014 click Capture to take a photo';
+        })
+        .catch(function(err) {
+            status.textContent = 'Could not access camera: ' + err.message;
+        });
+});
+
+staffCameraModalEl.addEventListener('hidden.bs.modal', function() {
+    if (staffCameraStream) {
+        staffCameraStream.getTracks().forEach(function(t) { t.stop(); });
+        staffCameraStream = null;
+    }
+    document.getElementById('staffCameraFeed').srcObject = null;
+    staffResetUI();
+});
+
+function staffCapturePhoto() {
+    var video = document.getElementById('staffCameraFeed');
+    var canvas = document.getElementById('staffCameraCanvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    var dataUrl = canvas.toDataURL('image/png');
+    document.getElementById('staffCapturedImage').src = dataUrl;
+    document.getElementById('staffCapturedPreview').style.display = 'block';
+    video.style.display = 'none';
+    document.getElementById('staffBtnCapture').style.display = 'none';
+    document.getElementById('staffBtnRetake').style.display = 'inline-flex';
+    document.getElementById('staffBtnUsePhoto').style.display = 'inline-flex';
+    document.getElementById('staffCameraStatus').textContent = 'Photo captured! Use it or retake.';
+}
+
+function staffRetakePhoto() {
+    document.getElementById('staffCapturedPreview').style.display = 'none';
+    document.getElementById('staffCameraFeed').style.display = 'block';
+    document.getElementById('staffBtnCapture').style.display = 'inline-flex';
+    document.getElementById('staffBtnRetake').style.display = 'none';
+    document.getElementById('staffBtnUsePhoto').style.display = 'none';
+    document.getElementById('staffCameraStatus').textContent = 'Camera ready \u2014 click Capture to take a photo';
+}
+
+function staffUsePhoto() {
+    var canvas = document.getElementById('staffCameraCanvas');
+    canvas.toBlob(function(blob) {
+        var file = new File([blob], 'camera_photo.jpg', { type: 'image/jpeg' });
+        var dt = new DataTransfer();
+        dt.items.add(file);
+        var input = document.getElementById(staffCurrentField);
+        input.files = dt.files;
+        // Trigger change to update the custom-file-text
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        bootstrap.Modal.getInstance(staffCameraModalEl).hide();
+    }, 'image/jpeg', 0.9);
+}
+
+function staffResetUI() {
+    document.getElementById('staffCapturedPreview').style.display = 'none';
+    document.getElementById('staffCameraFeed').style.display = 'block';
+    document.getElementById('staffBtnCapture').style.display = 'inline-flex';
+    document.getElementById('staffBtnRetake').style.display = 'none';
+    document.getElementById('staffBtnUsePhoto').style.display = 'none';
+    document.getElementById('staffCameraStatus').textContent = '';
+}
+
+// Show file name on file inputs
+document.querySelectorAll('input[type="file"]').forEach(function(input) {
+    input.addEventListener('change', function() {
+        var wrapper = this.closest('.custom-file-upload');
+        if (wrapper) {
+            var textSpan = wrapper.querySelector('.custom-file-text');
+            if (textSpan && this.files.length > 0) {
+                textSpan.textContent = this.files[0].name;
+                textSpan.classList.add('has-file');
+            } else if (textSpan) {
+                textSpan.textContent = textSpan.dataset.default;
+                textSpan.classList.remove('has-file');
+            }
+        }
+        var card = this.closest('.mb-2') || this.closest('.staff-edit-form');
+        if (!card) return;
+        var preview = card.querySelector('.file-preview');
+        if (preview && this.files.length > 0) {
+            preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
+            preview.style.display = 'block';
+        }
+    });
+});
+
 function toggleEditForm(id) {
     const el = document.getElementById(id);
     if (el) {
