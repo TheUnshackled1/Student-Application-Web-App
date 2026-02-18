@@ -215,6 +215,7 @@ def home(request):
         'completed_docs': completed_docs,
         'pending_docs': pending_docs,
         'has_application': application is not None,
+        'application': application,
     }
     return render(request, 'home/home.html', context)
 

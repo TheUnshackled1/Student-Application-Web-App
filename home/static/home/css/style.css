@@ -2473,6 +2473,8 @@ body {
 }
 .staff-status--pending      { background: #fef3c7; color: #92400e; }
 .staff-status--under_review { background: #dbeafe; color: #1e40af; }
+.staff-status--interview_scheduled { background: #f3e8ff; color: #6b21a8; }
+.staff-status--office_assigned     { background: #fff7ed; color: #9a3412; }
 .staff-status--approved     { background: #dcfce7; color: #166534; }
 .staff-status--rejected     { background: #fee2e2; color: #991b1b; }
 
@@ -3825,5 +3827,110 @@ button.review-doc-link:hover {
   }
   .file-preview-body {
     padding: 12px;
+  }
+}
+
+/* =========================================================
+   WORKFLOW INFO CARDS (Interview / Office / Start Date)
+   ========================================================= */
+.review-workflow-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.review-wf-card {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.review-wf-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+.review-wf-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.review-wf-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.review-wf-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+}
+.review-wf-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Interview variant */
+.review-wf--interview {
+  border-left: 4px solid #8b5cf6;
+}
+.review-wf--interview .review-wf-icon {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+/* Office variant */
+.review-wf--office {
+  border-left: 4px solid #f59e0b;
+}
+.review-wf--office .review-wf-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+/* Start date variant */
+.review-wf--start {
+  border-left: 4px solid #22c55e;
+}
+.review-wf--start .review-wf-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+/* Interview scheduling btn */
+.review-btn--interview {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+  color: #fff !important;
+  border-color: #7c3aed !important;
+}
+.review-btn--interview:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  box-shadow: 0 4px 12px rgba(124,58,237,.3);
+}
+
+@media (max-width: 768px) {
+  .review-workflow-cards {
+    flex-direction: column;
+  }
+  .review-wf-card {
+    min-width: 0;
   }
 }

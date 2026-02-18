@@ -69,6 +69,10 @@
                     <i class="fa-solid fa-circle-check"></i>
                 {% elif application_status == 'Rejected' %}
                     <i class="fa-solid fa-circle-xmark"></i>
+                {% elif application_status == 'Interview Scheduled' %}
+                    <i class="fa-solid fa-calendar-check"></i>
+                {% elif application_status == 'Office Assigned' %}
+                    <i class="fa-solid fa-building"></i>
                 {% else %}
                     <i class="fa-solid fa-hourglass-half"></i>
                 {% endif %}
@@ -92,6 +96,39 @@
             <i class="fa-solid fa-graduation-cap"></i>
         </div>
     </div>
+
+    <!-- ===== WORKFLOW INFO CARDS (interview / office / start date) ===== -->
+    {% if application.interview_date or application.assigned_office or application.start_date %}
+    <div class="review-workflow-cards">
+        {% if application.interview_date %}
+        <div class="review-wf-card review-wf--interview">
+            <div class="review-wf-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="review-wf-info">
+                <span class="review-wf-label">Interview Schedule</span>
+                <strong class="review-wf-value">{{ application.interview_date|date:"F d, Y — h:i A" }}</strong>
+            </div>
+        </div>
+        {% endif %}
+        {% if application.assigned_office %}
+        <div class="review-wf-card review-wf--office">
+            <div class="review-wf-icon"><i class="fa-solid fa-building"></i></div>
+            <div class="review-wf-info">
+                <span class="review-wf-label">Assigned Office</span>
+                <strong class="review-wf-value">{{ application.assigned_office }}</strong>
+            </div>
+        </div>
+        {% endif %}
+        {% if application.start_date %}
+        <div class="review-wf-card review-wf--start">
+            <div class="review-wf-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+            <div class="review-wf-info">
+                <span class="review-wf-label">Start Date</span>
+                <strong class="review-wf-value">{{ application.start_date|date:"F d, Y" }}</strong>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
     {% else %}
     <!-- ===== WELCOME BANNER (no application) ===== -->
     <div class="status-banner">

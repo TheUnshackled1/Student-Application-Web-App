@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Director Dashboard — CHMSU</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/css/style.css' %}?v=4">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -25,7 +25,7 @@
             <i class="fa-solid fa-house"></i>
             <span>HOME</span>
         </a>
-        <a href="#" class="btn btn-nav btn-nav--link">
+        <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link">
             <i class="fa-solid fa-building"></i>
             <span>AVAILABLE OFFICES</span>
         </a>
@@ -53,57 +53,186 @@
             </div>
             <div class="status-text">
                 <h2 class="status-title">Welcome, {{ director_name }}</h2>
-                <p class="status-message">Director Dashboard &mdash; Oversee student assistants and office assignments.</p>
+                <p class="status-message">Director Dashboard &mdash; Manage interviews, office assignments, and final approvals.</p>
             </div>
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">Total Assistants</h3>
-            <p style="font-size:36px; font-weight:700; color:#1a5632; margin:8px 0 0;">{{ stats.total_assistants }}</p>
+    <!-- Stats Row -->
+    <div class="staff-stats-row">
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #6366f1, #4f46e5);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-file-lines"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.total_applications }}</span>
+                <span class="staff-stat-lbl">Total Applications</span>
+            </div>
         </div>
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">Active</h3>
-            <p style="font-size:36px; font-weight:700; color:#22c55e; margin:8px 0 0;">{{ stats.active }}</p>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.awaiting_interview }}</span>
+                <span class="staff-stat-lbl">Awaiting Interview</span>
+            </div>
         </div>
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">On Probation</h3>
-            <p style="font-size:36px; font-weight:700; color:#f59e0b; margin:8px 0 0;">{{ stats.on_probation }}</p>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #f59e0b, #d97706);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-building"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.office_assigned }}</span>
+                <span class="staff-stat-lbl">Office Assigned</span>
+            </div>
         </div>
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">Pending Approval</h3>
-            <p style="font-size:36px; font-weight:700; color:#6366f1; margin:8px 0 0;">{{ stats.pending_approval }}</p>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #22c55e, #16a34a);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.approved }}</span>
+                <span class="staff-stat-lbl">Approved</span>
+            </div>
         </div>
     </div>
 
-    <!-- Three Column Layout -->
-    <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr 1fr;">
-
-        <!-- Student Assistants Table -->
-        <div class="card">
-            <h3 class="card-title">Student Assistants</h3>
-            <table class="dates-table" style="width:100%;">
+    <!-- ===== INTERVIEW QUEUE ===== -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon staff-panel-icon--purple"><i class="fa-solid fa-calendar-check"></i></span>
+                <h3 class="staff-panel-title">Interview Queue</h3>
+            </div>
+            <span class="staff-panel-count" style="background: #f3e8ff; color: #7c3aed;">{{ interview_apps|length }}</span>
+        </div>
+        {% if interview_apps %}
+        <div class="staff-table-wrap">
+            <table class="staff-table">
                 <thead>
-                    <tr style="border-bottom: 2px solid #e5e7eb;">
-                        <th style="text-align:left; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Name</th>
-                        <th style="text-align:left; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Office</th>
-                        <th style="text-align:center; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Hours</th>
-                        <th style="text-align:center; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Status</th>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Interview Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for sa in assistants %}
-                    <tr style="border-bottom: 1px solid #f3f4f6;">
-                        <td style="padding:12px 8px; font-size:13px; font-weight:600;">{{ sa.name }}</td>
-                        <td style="padding:12px 8px; font-size:13px; color:#6b7280;">{{ sa.office }}</td>
-                        <td style="padding:12px 8px; font-size:13px; text-align:center;">{{ sa.hours }}</td>
-                        <td style="padding:12px 8px; text-align:center;">
-                            {% if sa.status == 'active' %}
-                                <span style="display:inline-block; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background:#dcfce7; color:#166534;">Active</span>
-                            {% elif sa.status == 'probation' %}
-                                <span style="display:inline-block; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Probation</span>
+                    {% for a in interview_apps %}
+                    <tr>
+                        <td><strong>{{ a.student_id }}</strong></td>
+                        <td>{{ a.first_name }} {{ a.last_name }}</td>
+                        <td>{{ a.course }}</td>
+                        <td>
+                            {% if a.interview_date %}
+                                <span style="font-weight:600; color:#7c3aed;">{{ a.interview_date|date:"M d, Y — h:i A" }}</span>
+                            {% else %}
+                                <span style="color:#9ca3af;">Not set</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="staff-action-group">
+                                <button type="button" class="doc-action-btn doc-action-btn--view"
+                                        onclick="openOfficeModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}')">
+                                    <i class="fa-solid fa-building"></i> Assign Office
+                                </button>
+                                <a href="{% url 'home:staff_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+                                    <i class="fa-solid fa-eye"></i> Review
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="panel-empty">
+            <i class="fa-regular fa-calendar-check"></i>
+            <p>No students awaiting interview.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== OFFICE ASSIGNED — AWAITING FINAL APPROVAL ===== -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon staff-panel-icon--amber"><i class="fa-solid fa-building"></i></span>
+                <h3 class="staff-panel-title">Awaiting Final Approval</h3>
+            </div>
+            <span class="staff-panel-count" style="background: #fef3c7; color: #92400e;">{{ office_assigned_apps|length }}</span>
+        </div>
+        {% if office_assigned_apps %}
+        <div class="staff-table-wrap">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Assigned Office</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in office_assigned_apps %}
+                    <tr>
+                        <td><strong>{{ a.student_id }}</strong></td>
+                        <td>{{ a.first_name }} {{ a.last_name }}</td>
+                        <td>{{ a.course }}</td>
+                        <td><span style="font-weight:600; color:#d97706;">{{ a.assigned_office|default:"—" }}</span></td>
+                        <td>
+                            <div class="staff-action-group">
+                                <button type="button" class="doc-action-btn doc-action-btn--view" style="background: linear-gradient(135deg,#22c55e,#16a34a);"
+                                        onclick="openApproveModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}', '{{ a.assigned_office }}')">
+                                    <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start
+                                </button>
+                                <a href="{% url 'home:staff_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+                                    <i class="fa-solid fa-eye"></i> Review
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="panel-empty">
+            <i class="fa-regular fa-building"></i>
+            <p>No students awaiting final approval.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== APPROVED STUDENT ASSISTANTS ===== -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-circle-check"></i></span>
+                <h3 class="staff-panel-title">Approved Student Assistants</h3>
+            </div>
+            <span class="staff-panel-count" style="background: #dcfce7; color: #166534;">{{ approved_apps|length }}</span>
+        </div>
+        {% if approved_apps %}
+        <div class="staff-table-wrap">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Office</th>
+                        <th>Start Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in approved_apps %}
+                    <tr>
+                        <td><strong>{{ a.student_id }}</strong></td>
+                        <td>{{ a.first_name }} {{ a.last_name }}</td>
+                        <td>{{ a.course }}</td>
+                        <td>{{ a.assigned_office|default:"—" }}</td>
+                        <td>
+                            {% if a.start_date %}
+                                <span style="font-weight:600; color:#16a34a;">{{ a.start_date|date:"M d, Y" }}</span>
+                            {% else %}
+                                <span style="color:#9ca3af;">—</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -111,50 +240,126 @@
                 </tbody>
             </table>
         </div>
-
-        <!-- Office Summary -->
-        <div class="card">
-            <h3 class="card-title">Office Summary</h3>
-            <ul class="doc-list">
-                {% for office in office_summary %}
-                <li class="doc-item">
-                    <div class="doc-info">
-                        <i class="fa-solid fa-building doc-icon" style="color:#1a5632;"></i>
-                        <span class="doc-name">{{ office.name }}</span>
-                    </div>
-                    <div class="doc-status">
-                        <span style="font-size:12px; font-weight:600; color:{% if office.filled == office.slots %}#22c55e{% else %}#f59e0b{% endif %};">
-                            {{ office.filled }}/{{ office.slots }}
-                        </span>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+        {% else %}
+        <div class="panel-empty">
+            <i class="fa-regular fa-circle-check"></i>
+            <p>No approved student assistants yet.</p>
         </div>
-
-        <!-- Pending Approvals -->
-        <div class="card">
-            <h3 class="card-title">Pending Approvals</h3>
-            <ul class="doc-list">
-                {% for approval in pending_approvals %}
-                <li class="doc-item" style="flex-direction:column; align-items:flex-start; gap:4px;">
-                    <div class="doc-info">
-                        <i class="fa-solid fa-clock doc-icon" style="color:#f59e0b;"></i>
-                        <span class="doc-name" style="font-weight:600;">{{ approval.student }}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; width:100%; padding-left:22px;">
-                        <span style="font-size:12px; color:#6b7280;">{{ approval.type }}</span>
-                        <span style="font-size:11px; color:#9ca3af;">{{ approval.date }}</span>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            <button class="btn-primary" style="margin-top:12px;">Review All</button>
-        </div>
+        {% endif %}
     </div>
 
 </main>
 
+<!-- ========== OFFICE ASSIGNMENT MODAL ========== -->
+<div class="file-preview-overlay" id="officeModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
+    <div class="file-preview-modal" style="max-width: 480px;">
+        <div class="file-preview-header">
+            <div class="file-preview-title-wrap">
+                <i class="fa-solid fa-building" style="color: #d97706;"></i>
+                <span class="file-preview-title">Assign Office</span>
+            </div>
+            <div class="file-preview-actions">
+                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('officeModal').classList.remove('active');document.body.style.overflow='';">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #fff; padding: 24px;">
+            <form id="officeForm" method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'home:director_dashboard' %}">
+                <input type="hidden" name="status" value="office_assigned">
+                <p style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">
+                    Assign <strong id="officeStudentName"></strong> to an office after completing the interview.
+                </p>
+                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
+                    Office Name
+                </label>
+                <select name="assigned_office" required
+                        style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: #fff;">
+                    <option value="">Select an office…</option>
+                    <option value="Registrar's Office">Registrar's Office</option>
+                    <option value="Library">Library</option>
+                    <option value="Guidance Office">Guidance Office</option>
+                    <option value="Dean's Office">Dean's Office</option>
+                    <option value="Accounting Office">Accounting Office</option>
+                    <option value="Cashier's Office">Cashier's Office</option>
+                    <option value="Student Affairs Office">Student Affairs Office</option>
+                    <option value="ICT Office">ICT Office</option>
+                    <option value="Research Office">Research Office</option>
+                    <option value="HR Office">HR Office</option>
+                </select>
+                <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <i class="fa-solid fa-building"></i> Confirm Office Assignment
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========== FINAL APPROVAL MODAL ========== -->
+<div class="file-preview-overlay" id="approveModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
+    <div class="file-preview-modal" style="max-width: 480px;">
+        <div class="file-preview-header">
+            <div class="file-preview-title-wrap">
+                <i class="fa-solid fa-flag-checkered" style="color: #16a34a;"></i>
+                <span class="file-preview-title">Final Approval</span>
+            </div>
+            <div class="file-preview-actions">
+                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('approveModal').classList.remove('active');document.body.style.overflow='';">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #fff; padding: 24px;">
+            <form id="approveForm" method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'home:director_dashboard' %}">
+                <input type="hidden" name="status" value="approved">
+                <p style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+                    Approve <strong id="approveStudentName"></strong> and set their start date.
+                </p>
+                <p style="font-size: 12px; color: #9ca3af; margin-bottom: 16px;">
+                    Office: <strong id="approveOfficeName" style="color:#d97706;"></strong>
+                </p>
+                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
+                    Start Date
+                </label>
+                <input type="date" name="start_date" required
+                       style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px;">
+                <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #22c55e, #16a34a);">
+                    <i class="fa-solid fa-circle-check"></i> Approve Application
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function openOfficeModal(pk, name) {
+    document.getElementById('officeStudentName').textContent = name;
+    document.getElementById('officeForm').action = '/staff/applications/' + pk + '/status/';
+    document.getElementById('officeModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function openApproveModal(pk, name, office) {
+    document.getElementById('approveStudentName').textContent = name;
+    document.getElementById('approveOfficeName').textContent = office || '—';
+    document.getElementById('approveForm').action = '/staff/applications/' + pk + '/status/';
+    document.getElementById('approveModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.file-preview-overlay.active').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        document.body.style.overflow = '';
+    }
+});
+</script>
 </body>
 </html>
