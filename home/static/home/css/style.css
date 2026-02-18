@@ -4112,3 +4112,288 @@ button.review-doc-link:hover {
     display: none;
   }
 }
+
+/* ══════════════════════════════════════════════
+   Application History & Document Log Table
+   ══════════════════════════════════════════════ */
+.app-log-section {
+  margin-top: 28px;
+  margin-bottom: 20px;
+}
+.dash-section-icon--teal {
+  background: rgba(20,184,166,0.15);
+  color: #14b8a6;
+}
+
+.app-log-table-wrapper {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(30,30,42,0.50);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.app-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.app-log-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(255,255,255,0.45);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  white-space: nowrap;
+}
+.app-log-table thead th i {
+  margin-right: 4px;
+  font-size: 10px;
+  opacity: 0.6;
+}
+.app-log-table tbody .app-log-row {
+  cursor: pointer;
+  transition: background .18s ease;
+}
+.app-log-table tbody .app-log-row:hover {
+  background: rgba(255,255,255,0.04);
+}
+.app-log-table tbody td {
+  padding: 12px 16px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.85);
+}
+.app-log-num {
+  font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  font-size: 12px;
+  width: 40px;
+}
+
+/* Type badge */
+.app-log-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.app-log-type--new {
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.25);
+  color: #60a5fa;
+}
+.app-log-type--renewal {
+  background: rgba(168,85,247,0.12);
+  border: 1px solid rgba(168,85,247,0.25);
+  color: #c084fc;
+}
+
+.app-log-name {
+  font-weight: 600;
+  color: #fff;
+}
+.app-log-sid {
+  background: rgba(255,255,255,0.08);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+}
+.app-log-date {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+}
+
+/* Status badges */
+.app-log-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.app-log-status--pending {
+  background: rgba(251,191,36,0.12);
+  color: #fbbf24;
+}
+.app-log-status--under_review {
+  background: rgba(99,102,241,0.12);
+  color: #818cf8;
+}
+.app-log-status--interview_scheduled {
+  background: rgba(139,92,246,0.12);
+  color: #a78bfa;
+}
+.app-log-status--office_assigned {
+  background: rgba(245,158,11,0.12);
+  color: #f59e0b;
+}
+.app-log-status--approved {
+  background: rgba(34,197,94,0.12);
+  color: #22c55e;
+}
+.app-log-status--rejected {
+  background: rgba(239,68,68,0.12);
+  color: #ef4444;
+}
+
+.app-log-doc-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+.app-log-doc-count i {
+  color: #22c55e;
+  margin-right: 4px;
+}
+
+/* Expand chevron */
+.app-log-expand {
+  text-align: center;
+  width: 40px;
+}
+.app-log-chevron {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  transition: transform .25s ease, color .2s;
+}
+.app-log-chevron.rotated {
+  transform: rotate(180deg);
+  color: #14b8a6;
+}
+
+/* Expandable detail row */
+.app-log-detail-row td {
+  padding: 0 16px 16px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  background: rgba(20,184,166,0.03);
+}
+.app-log-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+  padding-top: 10px;
+}
+.app-log-doc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: background .15s;
+}
+.app-log-doc-item:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+/* Document status dot */
+.app-log-doc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.app-log-dot--uploaded { background: #3b82f6; }
+.app-log-dot--done     { background: #22c55e; }
+.app-log-dot--pending  { background: #fbbf24; }
+.app-log-dot--missing  { background: #ef4444; }
+
+.app-log-doc-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Document status badge */
+.app-log-doc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.app-log-badge--uploaded {
+  background: rgba(59,130,246,0.12);
+  color: #60a5fa;
+}
+.app-log-badge--done {
+  background: rgba(34,197,94,0.12);
+  color: #22c55e;
+}
+.app-log-badge--pending {
+  background: rgba(251,191,36,0.12);
+  color: #fbbf24;
+}
+.app-log-badge--missing {
+  background: rgba(239,68,68,0.12);
+  color: #ef4444;
+}
+
+/* View button in doc row */
+.app-log-doc-view {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.app-log-doc-view:hover {
+  background: rgba(20,184,166,0.15);
+  border-color: rgba(20,184,166,0.3);
+  color: #14b8a6;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app-log-table thead th,
+  .app-log-table tbody td {
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+  .app-log-doc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .app-log-table thead th:nth-child(6),
+  .app-log-table tbody td:nth-child(6) {
+    display: none;
+  }
+  .app-log-type-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
