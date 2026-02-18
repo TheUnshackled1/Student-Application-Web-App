@@ -50,8 +50,8 @@ def home(request):
     ]
 
     upcoming_dates = [
-        {'title': 'Entrance Exam', 'date': 'March 15, 2026', 'days_left': 25, 'urgency': 'normal'},
-        {'title': 'Interview', 'date': 'April 02, 2026', 'days_left': 43, 'urgency': 'normal'},
+        {'title': 'Entrance Exam', 'date': 'March 15, 2026', 'day': '15', 'month': 'MAR', 'days_left': 25, 'urgency': 'normal'},
+        {'title': 'Interview', 'date': 'April 02, 2026', 'day': '02', 'month': 'APR', 'days_left': 43, 'urgency': 'normal'},
     ]
 
     reminders = [
@@ -129,6 +129,8 @@ def home(request):
             upcoming_dates.append({
                 'title': d.title,
                 'date': d.date.strftime('%B %d, %Y'),
+                'day': d.date.strftime('%d'),
+                'month': d.date.strftime('%b').upper(),
                 'days_left': max(delta, 0),
                 'urgency': _urgency_for_days(delta),
             })
@@ -148,10 +150,14 @@ def home(request):
             for a in db_announcements
         ]
 
-    # Calculate progress percentage
+    # Calculate progress metrics
     total_steps = len(steps)
     done_steps = sum(1 for s in steps if s['status'] == 'done')
     progress_percent = int((done_steps / total_steps) * 100) if total_steps > 0 else 0
+
+    total_docs = len(documents)
+    completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
+    pending_docs = sum(1 for d in documents if d['status'] in ('pending', 'missing'))
 
     context = {
         'student_name': student.full_name if student else 'Juan Dela Cruz',
@@ -164,6 +170,11 @@ def home(request):
         'application_status': application_status,
         'status_message': status_message,
         'progress_percent': progress_percent,
+        'total_steps': total_steps,
+        'completed_steps': done_steps,
+        'total_docs': total_docs,
+        'completed_docs': completed_docs,
+        'pending_docs': pending_docs,
     }
     return render(request, 'home/home.html', context)
 

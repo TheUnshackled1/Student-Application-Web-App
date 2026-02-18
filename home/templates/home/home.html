@@ -92,6 +92,208 @@
         </div>
     </div>
 
+    <!-- ===== APPLICATION PROGRESS DASHBOARD ===== -->
+    <div class="dash-progress">
+        <div class="dash-progress-header">
+            <div class="dash-progress-header-left">
+                <span class="dash-progress-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                <div>
+                    <h3 class="dash-progress-title">Application Progress</h3>
+                    <p class="dash-progress-sub">Hello, <strong>{{ student_name }}</strong> &mdash; Application ID: <code>{{ application_id }}</code></p>
+                </div>
+            </div>
+            <div class="dash-progress-percent">
+                <svg viewBox="0 0 80 80" class="dash-ring">
+                    <circle cx="40" cy="40" r="34" pathLength="100" class="dash-ring-bg"/>
+                    <circle cx="40" cy="40" r="34" pathLength="100" class="dash-ring-fill" style="stroke-dasharray: {{ progress_percent|floatformat:0 }} 100"/>
+                </svg>
+                <span class="dash-ring-label">{{ progress_percent }}%</span>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="dash-stats-row">
+            <div class="dash-stat-card dash-stat--green">
+                <i class="fa-solid fa-circle-check"></i>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val">{{ completed_docs }}/{{ total_docs }}</span>
+                    <span class="dash-stat-lbl">Documents Uploaded</span>
+                </div>
+            </div>
+            <div class="dash-stat-card dash-stat--blue">
+                <i class="fa-solid fa-list-check"></i>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val">{{ completed_steps }}/{{ total_steps }}</span>
+                    <span class="dash-stat-lbl">Steps Completed</span>
+                </div>
+            </div>
+            <div class="dash-stat-card dash-stat--amber">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val">{{ pending_docs }}</span>
+                    <span class="dash-stat-lbl">Pending Items</span>
+                </div>
+            </div>
+            <div class="dash-stat-card dash-stat--purple">
+                <i class="fa-solid fa-calendar-check"></i>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val">{{ upcoming_dates|length }}</span>
+                    <span class="dash-stat-lbl">Upcoming Dates</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== STEP-BASED APPLICATION WORKFLOW ===== -->
+    <div class="dash-workflow">
+        <div class="dash-section-header">
+            <span class="dash-section-icon dash-section-icon--blue"><i class="fa-solid fa-route"></i></span>
+            <h3 class="dash-section-title">Application Workflow</h3>
+            <p class="dash-section-hint">Track every stage of your application journey</p>
+        </div>
+
+        <div class="workflow-timeline">
+            {% for step in steps %}
+            <div class="workflow-step workflow-step--{{ step.status }}">
+                <div class="workflow-node">
+                    <div class="workflow-node-icon">
+                        {% if step.status == 'done' %}
+                            <i class="fa-solid fa-check"></i>
+                        {% elif step.status == 'current' %}
+                            <i class="fa-solid fa-spinner fa-spin-pulse"></i>
+                        {% else %}
+                            <i class="fa-solid fa-lock"></i>
+                        {% endif %}
+                    </div>
+                    {% if not forloop.last %}
+                    <div class="workflow-connector workflow-connector--{{ step.status }}"></div>
+                    {% endif %}
+                </div>
+                <div class="workflow-body">
+                    <div class="workflow-step-badge workflow-badge--{{ step.status }}">
+                        Step {{ step.step_number }}
+                    </div>
+                    <h4 class="workflow-step-title">{{ step.title }}</h4>
+                    <span class="workflow-step-status workflow-status--{{ step.status }}">
+                        {% if step.status == 'done' %}
+                            <i class="fa-solid fa-circle-check"></i> Completed
+                        {% elif step.status == 'current' %}
+                            <i class="fa-solid fa-circle-dot"></i> In Progress
+                        {% else %}
+                            <i class="fa-solid fa-circle"></i> Pending
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== DOCUMENT SUBMISSION & TRACKING ===== -->
+    <div class="dash-documents">
+        <div class="dash-section-header">
+            <span class="dash-section-icon dash-section-icon--green"><i class="fa-solid fa-folder-open"></i></span>
+            <h3 class="dash-section-title">Document Submission &amp; Tracking</h3>
+            <p class="dash-section-hint">Monitor the status of every required document</p>
+        </div>
+
+        <!-- Document Legend -->
+        <div class="doc-legend">
+            <span class="doc-legend-item doc-legend--uploaded"><i class="fa-solid fa-circle"></i> Uploaded</span>
+            <span class="doc-legend-item doc-legend--pending"><i class="fa-solid fa-circle"></i> Pending</span>
+            <span class="doc-legend-item doc-legend--done"><i class="fa-solid fa-circle"></i> Done / Verified</span>
+            <span class="doc-legend-item doc-legend--missing"><i class="fa-solid fa-circle"></i> Missing</span>
+        </div>
+
+        <div class="doc-track-grid">
+            {% for doc in documents %}
+            <div class="doc-track-card doc-track--{{ doc.status }}">
+                <div class="doc-track-indicator doc-indicator--{{ doc.status }}"></div>
+                <div class="doc-track-icon doc-icon--{{ doc.status }}">
+                    {% if doc.status == 'done' %}
+                        <i class="fa-solid fa-file-circle-check"></i>
+                    {% elif doc.status == 'uploaded' %}
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                    {% elif doc.status == 'pending' %}
+                        <i class="fa-solid fa-file-circle-question"></i>
+                    {% else %}
+                        <i class="fa-solid fa-file-circle-xmark"></i>
+                    {% endif %}
+                </div>
+                <div class="doc-track-info">
+                    <h5 class="doc-track-name">{{ doc.name }}</h5>
+                    <span class="doc-track-tag doc-tag--{{ doc.status }}">
+                        {% if doc.status == 'done' %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% elif doc.status == 'uploaded' %}
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        {% elif doc.status == 'pending' %}
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        {% else %}
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        {% endif %}
+                        {{ doc.label }}
+                    </span>
+                </div>
+                <div class="doc-track-action">
+                    {% if doc.status == 'missing' or doc.status == 'pending' %}
+                        <a href="{% url 'home:apply_new' %}" class="doc-action-btn">
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i> Upload
+                        </a>
+                    {% elif doc.status == 'done' %}
+                        <span class="doc-verified-badge"><i class="fa-solid fa-shield-check"></i> Verified</span>
+                    {% else %}
+                        <span class="doc-waiting-badge"><i class="fa-solid fa-clock"></i> Reviewing</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="panel-empty" style="grid-column: 1/-1;">
+                <i class="fa-regular fa-folder-open"></i>
+                <p>No documents found. Submit your application to get started.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== UPCOMING DATES ===== -->
+    <div class="dash-dates">
+        <div class="dash-section-header">
+            <span class="dash-section-icon dash-section-icon--amber"><i class="fa-solid fa-calendar-days"></i></span>
+            <h3 class="dash-section-title">Upcoming Dates</h3>
+            <p class="dash-section-hint">Important deadlines and events</p>
+        </div>
+
+        <div class="dates-track-grid">
+            {% for d in upcoming_dates %}
+            <div class="date-track-card date-track--{{ d.urgency }}">
+                <div class="date-track-cal">
+                    <span class="date-cal-day">{{ d.day }}</span>
+                    <span class="date-cal-month">{{ d.month }}</span>
+                </div>
+                <div class="date-track-info">
+                    <h5 class="date-track-name">{{ d.title }}</h5>
+                    <span class="date-track-full">{{ d.date }}</span>
+                </div>
+                <div class="date-track-countdown">
+                    <span class="days-badge badge-{{ d.urgency }}">
+                        {% if d.urgency == 'passed' %}
+                            Passed
+                        {% else %}
+                            {{ d.days_left }} day{{ d.days_left|pluralize }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="panel-empty" style="grid-column: 1/-1;">
+                <i class="fa-regular fa-calendar"></i>
+                <p>No upcoming dates at this time</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
     <!-- ===== REMINDERS & ANNOUNCEMENTS TWO-COLUMN ===== -->
     <div class="home-two-col">
 
