@@ -12,6 +12,8 @@ urlpatterns = [
     path('staff/login/', views.staff_login, name='staff_login'),
     path('director/login/', views.director_login, name='director_login'),
     path('staff/', views.staff_dashboard, name='staff_dashboard'),
+    path('staff/applications/<int:pk>/review/', views.staff_review_application, name='staff_review_application'),
+    path('staff/applications/<int:pk>/status/', views.staff_update_application_status, name='staff_update_application_status'),
     path('director/', views.director_dashboard, name='director_dashboard'),
 
     # ---- Staff CRUD: Reminders ----

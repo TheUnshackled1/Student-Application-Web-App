@@ -58,83 +58,164 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">Total Applications</h3>
-            <p style="font-size:36px; font-weight:700; color:#1a5632; margin:8px 0 0;">{{ stats.total_applications }}</p>
+    <!-- ===== STATS CARDS ===== -->
+    <div class="staff-stats-row">
+        <div class="staff-stat-card staff-stat--total">
+            <div class="staff-stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.total_applications }}</span>
+                <span class="staff-stat-lbl">Total Applications</span>
+            </div>
         </div>
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">Pending Review</h3>
-            <p style="font-size:36px; font-weight:700; color:#f59e0b; margin:8px 0 0;">{{ stats.pending_review }}</p>
+        <div class="staff-stat-card staff-stat--pending">
+            <div class="staff-stat-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.pending_review }}</span>
+                <span class="staff-stat-lbl">Pending Review</span>
+            </div>
         </div>
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">Approved</h3>
-            <p style="font-size:36px; font-weight:700; color:#22c55e; margin:8px 0 0;">{{ stats.approved }}</p>
+        <div class="staff-stat-card staff-stat--approved">
+            <div class="staff-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.approved }}</span>
+                <span class="staff-stat-lbl">Approved</span>
+            </div>
         </div>
-        <div class="card" style="text-align:center;">
-            <h3 class="card-title" style="font-size:14px;">Rejected</h3>
-            <p style="font-size:36px; font-weight:700; color:#ef4444; margin:8px 0 0;">{{ stats.rejected }}</p>
+        <div class="staff-stat-card staff-stat--rejected">
+            <div class="staff-stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.rejected }}</span>
+                <span class="staff-stat-lbl">Rejected</span>
+            </div>
         </div>
     </div>
 
-    <!-- Two Column Layout -->
-    <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+    <!-- ===== ALL APPLICATIONS TABLE ===== -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-folder-open"></i></span>
+                <h3 class="staff-panel-title">All Applications</h3>
+                <span class="staff-panel-count">{{ stats.total_applications }}</span>
+            </div>
+            <div class="staff-panel-filters">
+                <button class="staff-filter-btn staff-filter--active" data-filter="all">All</button>
+                <button class="staff-filter-btn" data-filter="pending">Pending</button>
+                <button class="staff-filter-btn" data-filter="under_review">Under Review</button>
+                <button class="staff-filter-btn" data-filter="approved">Approved</button>
+                <button class="staff-filter-btn" data-filter="rejected">Rejected</button>
+            </div>
+        </div>
 
-        <!-- Pending Applications Table -->
-        <div class="card">
-            <h3 class="card-title">Pending Applications</h3>
-            <table class="dates-table" style="width:100%;">
+        <div class="staff-table-wrap">
+            <table class="staff-table" id="applicationsTable">
                 <thead>
-                    <tr style="border-bottom: 2px solid #e5e7eb;">
-                        <th style="text-align:left; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">App ID</th>
-                        <th style="text-align:left; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Student</th>
-                        <th style="text-align:left; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Date Filed</th>
-                        <th style="text-align:left; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Status</th>
-                        <th style="text-align:center; padding:10px 8px; font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">Actions</th>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th>Year</th>
+                        <th>Date Filed</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for app in pending_applications %}
-                    <tr style="border-bottom: 1px solid #f3f4f6;">
-                        <td style="padding:12px 8px; font-size:13px; font-weight:600; color:#1a5632;">{{ app.id }}</td>
-                        <td style="padding:12px 8px; font-size:13px;">{{ app.student }}</td>
-                        <td style="padding:12px 8px; font-size:13px; color:#6b7280;">{{ app.date }}</td>
-                        <td style="padding:12px 8px;">
-                            {% if app.status == 'pending' %}
-                                <span style="display:inline-block; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span>
-                            {% elif app.status == 'under_review' %}
-                                <span style="display:inline-block; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background:#dbeafe; color:#1e40af;">Under Review</span>
-                            {% endif %}
+                    {% for app in all_applications %}
+                    <tr data-status="{{ app.status }}">
+                        <td class="staff-td-id">{{ app.student_id }}</td>
+                        <td>
+                            <div class="staff-student-cell">
+                                <span class="staff-student-name">{{ app.first_name }} {{ app.middle_initial }}. {{ app.last_name }}{% if app.extension_name %} {{ app.extension_name }}{% endif %}</span>
+                                <span class="staff-student-email">{{ app.email }}</span>
+                            </div>
                         </td>
-                        <td style="padding:12px 8px; text-align:center;">
-                            <button class="btn-secondary" style="padding:5px 12px; font-size:11px; margin:0;">
-                                <i class="fa-solid fa-eye"></i> Review
-                            </button>
+                        <td class="staff-td-course">{{ app.course }}</td>
+                        <td class="staff-td-year">{{ app.get_year_level_display }}</td>
+                        <td class="staff-td-date">{{ app.submitted_at|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="staff-status-tag staff-status--{{ app.status }}">
+                                {{ app.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="staff-action-group">
+                                <a href="{% url 'home:staff_review_application' app.pk %}" class="staff-action-btn staff-action--view" title="Review">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <!-- Quick status dropdown -->
+                                <div class="staff-action-dropdown">
+                                    <button class="staff-action-btn staff-action--status" title="Update Status" onclick="this.nextElementSibling.classList.toggle('show')">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                    <div class="staff-dropdown-menu">
+                                        <form method="post" action="{% url 'home:staff_update_application_status' app.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{% url 'home:staff_dashboard' %}">
+                                            <button type="submit" name="status" value="pending" class="staff-dropdown-item">
+                                                <i class="fa-solid fa-clock"></i> Set Pending
+                                            </button>
+                                            <button type="submit" name="status" value="under_review" class="staff-dropdown-item">
+                                                <i class="fa-solid fa-magnifying-glass"></i> Under Review
+                                            </button>
+                                            <button type="submit" name="status" value="approved" class="staff-dropdown-item staff-dropdown--approve">
+                                                <i class="fa-solid fa-circle-check"></i> Approve
+                                            </button>
+                                            <button type="submit" name="status" value="rejected" class="staff-dropdown-item staff-dropdown--reject">
+                                                <i class="fa-solid fa-circle-xmark"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="staff-table-empty">
+                            <i class="fa-regular fa-folder-open"></i>
+                            <p>No applications submitted yet.</p>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+    </div>
 
-        <!-- Recent Activity -->
-        <div class="card">
-            <h3 class="card-title">Recent Activity</h3>
-            <ul class="doc-list">
-                {% for activity in recent_activity %}
-                <li class="doc-item" style="flex-direction:column; align-items:flex-start; gap:4px;">
-                    <div class="doc-info">
-                        <i class="fa-solid fa-circle-dot doc-icon" style="color:#22c55e; font-size:10px;"></i>
-                        <span class="doc-name" style="font-weight:600;">{{ activity.action }}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; width:100%; padding-left:22px;">
-                        <span style="font-size:12px; color:#6b7280;">{{ activity.student }}</span>
-                        <span style="font-size:11px; color:#9ca3af;">{{ activity.time }}</span>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+    <!-- ===== RECENT ACTIVITY ===== -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon staff-panel-icon--blue"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                <h3 class="staff-panel-title">Recently Processed</h3>
+            </div>
+        </div>
+        <div class="staff-activity-list">
+            {% for app in recent_activity %}
+            <div class="staff-activity-item">
+                <div class="staff-activity-icon staff-activity--{{ app.status }}">
+                    {% if app.status == 'approved' %}
+                        <i class="fa-solid fa-circle-check"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    {% endif %}
+                </div>
+                <div class="staff-activity-info">
+                    <span class="staff-activity-name">{{ app.first_name }} {{ app.last_name }}</span>
+                    <span class="staff-activity-detail">{{ app.get_status_display }} &mdash; {{ app.course }}</span>
+                </div>
+                <div class="staff-activity-meta">
+                    <span class="staff-activity-date">{{ app.submitted_at|date:"M d, Y" }}</span>
+                    <span class="staff-status-tag staff-status--{{ app.status }}" style="font-size:10px;">{{ app.get_status_display }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="staff-activity-empty">
+                <i class="fa-regular fa-clock"></i>
+                <p>No processed applications yet.</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -375,6 +456,36 @@ function toggleEditForm(id) {
         el.style.display = (el.style.display === 'none') ? 'block' : 'none';
     }
 }
+
+// ── Table Filter Buttons ──
+(function() {
+    var btns = document.querySelectorAll('.staff-filter-btn');
+    var rows = document.querySelectorAll('#applicationsTable tbody tr[data-status]');
+
+    btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            btns.forEach(function(b) { b.classList.remove('staff-filter--active'); });
+            btn.classList.add('staff-filter--active');
+            var filter = btn.getAttribute('data-filter');
+            rows.forEach(function(row) {
+                if (filter === 'all' || row.getAttribute('data-status') === filter) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+})();
+
+// ── Close dropdowns when clicking outside ──
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.staff-action-dropdown')) {
+        document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(m) {
+            m.classList.remove('show');
+        });
+    }
+});
 </script>
 </body>
 </html>

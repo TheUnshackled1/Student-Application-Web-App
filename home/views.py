@@ -32,98 +32,119 @@ def _urgency_for_days(days_left):
     return 'normal'
 
 
+def _build_documents_from_app(app):
+    """Build document status list from a NewApplication's file fields."""
+    doc_fields = [
+        ('application_form', 'Application Form'),
+        ('id_picture', '2x2 ID Picture'),
+        ('barangay_clearance', 'Barangay Clearance'),
+        ('parents_itr', "Parent's ITR / Certificate of Indigency"),
+        ('enrolment_form', 'Certificate of Enrolment'),
+        ('schedule_classes', 'Schedule of Classes'),
+        ('proof_insurance', 'Proof of Insurance'),
+        ('grades_last_sem', 'Grades Last Semester'),
+        ('official_time', 'Official Time'),
+    ]
+    documents = []
+    for field_name, label in doc_fields:
+        file_field = getattr(app, field_name)
+        if file_field:
+            # File was uploaded — mark as done if app is approved, otherwise uploaded
+            if app.status == 'approved':
+                documents.append({'name': label, 'status': 'done', 'label': 'Done'})
+            else:
+                documents.append({'name': label, 'status': 'uploaded', 'label': 'Uploaded'})
+        else:
+            documents.append({'name': label, 'status': 'missing', 'label': 'Missing'})
+    return documents
+
+
+def _build_steps_from_status(status):
+    """Build workflow steps based on application status."""
+    step_defs = [
+        (1, 'Application Submitted'),
+        (2, 'Document Verification'),
+        (3, 'Interview & Assessment'),
+        (4, 'Office Assignment'),
+        (5, 'Final Approval'),
+    ]
+    # Map status to the step that is currently active (1-indexed)
+    status_to_current = {
+        'pending': 2,        # submitted, now waiting for doc verification
+        'under_review': 3,   # docs verified, now interview/assessment
+        'approved': 6,       # all steps done (past the last step)
+        'rejected': 0,       # none active
+    }
+    current_step = status_to_current.get(status, 2)
+
+    steps = []
+    for num, title in step_defs:
+        if num < current_step:
+            steps.append({'step_number': num, 'title': title, 'status': 'done'})
+        elif num == current_step:
+            steps.append({'step_number': num, 'title': title, 'status': 'current'})
+        else:
+            steps.append({'step_number': num, 'title': title, 'status': 'locked'})
+    return steps
+
+
+STATUS_DISPLAY_MAP = {
+    'pending': ('Pending', 'Your application has been submitted and is awaiting review.'),
+    'under_review': ('Under Review', "Your documents are currently being verified by the Registrar's Office."),
+    'approved': ('Approved', 'Congratulations! Your application has been approved.'),
+    'rejected': ('Rejected', 'Your application was not approved. Please contact the office for details.'),
+}
+
+
 def home(request):
     """Home/dashboard view for student applicants."""
     today = _date.today()
 
-    # Default demo data for the template (no login required)
-    documents = [
-        {'name': 'Form 138', 'status': 'uploaded', 'label': 'Uploaded'},
-        {'name': 'Good Moral', 'status': 'pending', 'label': 'Pending'},
-        {'name': 'Birth Certificate', 'status': 'done', 'label': 'Done'},
-    ]
+    # ── Try to find a real application for this visitor ──
+    application = None
 
-    steps = [
-        {'step_number': 1, 'title': 'Registration', 'status': 'done'},
-        {'step_number': 2, 'title': 'Document Review', 'status': 'current'},
-        {'step_number': 3, 'title': 'Interview', 'status': 'locked'},
-    ]
+    # 1. Check session for application PK (set after successful submit)
+    app_pk = request.session.get('application_pk')
+    if app_pk:
+        application = NewApplication.objects.filter(pk=app_pk).first()
 
-    upcoming_dates = [
-        {'title': 'Entrance Exam', 'date': 'March 15, 2026', 'day': '15', 'month': 'MAR', 'days_left': 25, 'urgency': 'normal'},
-        {'title': 'Interview', 'date': 'April 02, 2026', 'day': '02', 'month': 'APR', 'days_left': 43, 'urgency': 'normal'},
-    ]
+    # 2. If authenticated, try matching by email or student profile
+    if not application and request.user.is_authenticated:
+        application = NewApplication.objects.filter(
+            email=request.user.email
+        ).order_by('-submitted_at').first()
 
-    reminders = [
-        {
-            'message': 'Please upload your Grade 12 Report Card before Friday.',
-            'priority': 'warning',
-            'created_at': 'Just now',
-            'id': 0,
-        },
-    ]
-
-    announcements = [
-        {
-            'title': 'Online Registration Now Open',
-            'summary': 'The online registration portal for S.Y. 2026-2027 is now accepting applications.',
-            'image': None,
-            'published_at': 'Feb 15, 2026',
-            'is_new': True,
-        },
-        {
-            'title': 'Campus Orientation Schedule',
-            'summary': 'New student assistants are required to attend the campus orientation on March 1.',
-            'image': None,
-            'published_at': 'Feb 10, 2026',
-            'is_new': True,
-        },
-    ]
-
-    application_status = 'Under Review'
-    status_message = "Your documents currently being verified by the Registrar's Office"
-
-    # Try to load real data if user is authenticated
-    student = None
-    if request.user.is_authenticated:
-        try:
-            student = StudentProfile.objects.get(user=request.user)
-            db_documents = Document.objects.filter(student=student)
-            if db_documents.exists():
-                documents = [
-                    {'name': d.name, 'status': d.status, 'label': d.get_status_display()}
-                    for d in db_documents
-                ]
-            db_steps = ApplicationStep.objects.filter(student=student)
-            if db_steps.exists():
-                steps = [
-                    {'step_number': s.step_number, 'title': s.title, 'status': s.status}
-                    for s in db_steps
-                ]
-        except StudentProfile.DoesNotExist:
-            pass
-
-    # --- Global + student-specific reminders (visible to everyone) ---
-    from django.db.models import Q
-    reminder_filter = Q(student__isnull=True, is_active=True)
-    if student:
-        reminder_filter |= Q(student=student, is_active=True)
-    db_reminders = Reminder.objects.filter(reminder_filter).order_by('-created_at')
-    if db_reminders.exists():
-        reminders = [
-            {
-                'message': r.message,
-                'priority': r.priority,
-                'id': r.id,
-                'created_at': r.created_at.strftime('%b %d, %Y'),
-            }
-            for r in db_reminders
+    # ── Build data from real application or fall back to defaults ──
+    if application:
+        # Real data from the submitted application
+        student_name = f"{application.first_name} {application.last_name}"
+        application_id = application.student_id
+        documents = _build_documents_from_app(application)
+        steps = _build_steps_from_status(application.status)
+        display_status, status_message = STATUS_DISPLAY_MAP.get(
+            application.status,
+            ('Under Review', "Your documents are currently being verified by the Registrar's Office.")
+        )
+        application_status = display_status
+    else:
+        # Default demo data — no application found
+        student_name = 'Guest'
+        application_id = '—'
+        documents = []
+        steps = [
+            {'step_number': 1, 'title': 'Application Submitted', 'status': 'locked'},
+            {'step_number': 2, 'title': 'Document Verification', 'status': 'locked'},
+            {'step_number': 3, 'title': 'Interview & Assessment', 'status': 'locked'},
+            {'step_number': 4, 'title': 'Office Assignment', 'status': 'locked'},
+            {'step_number': 5, 'title': 'Final Approval', 'status': 'locked'},
         ]
+        application_status = 'No Application'
+        status_message = 'You have not submitted an application yet. Click "Apply / Renew" to get started.'
 
-    # --- Upcoming Dates with countdown & urgency ---
+    # ── Upcoming dates ──
+    upcoming_dates = []
     db_dates = UpcomingDate.objects.filter(is_active=True)
     if db_dates.exists():
-        upcoming_dates = []
         for d in db_dates:
             delta = (d.date - today).days
             upcoming_dates.append({
@@ -135,22 +156,35 @@ def home(request):
                 'urgency': _urgency_for_days(delta),
             })
 
-    # --- Announcements with published date & "new" badge ---
-    db_announcements = Announcement.objects.filter(is_active=True)[:6]
-    if db_announcements.exists():
-        seven_days_ago = timezone.now() - timedelta(days=7)
-        announcements = [
-            {
-                'title': a.title,
-                'summary': a.summary,
-                'image': a.image,
-                'published_at': a.published_at.strftime('%b %d, %Y'),
-                'is_new': a.published_at >= seven_days_ago,
-            }
-            for a in db_announcements
-        ]
+    # ── Reminders ──
+    from django.db.models import Q
+    reminder_filter = Q(student__isnull=True, is_active=True)
+    db_reminders = Reminder.objects.filter(reminder_filter).order_by('-created_at')
+    reminders = [
+        {
+            'message': r.message,
+            'priority': r.priority,
+            'id': r.id,
+            'created_at': r.created_at.strftime('%b %d, %Y'),
+        }
+        for r in db_reminders
+    ]
 
-    # Calculate progress metrics
+    # ── Announcements ──
+    db_announcements = Announcement.objects.filter(is_active=True)[:6]
+    seven_days_ago = timezone.now() - timedelta(days=7)
+    announcements = [
+        {
+            'title': a.title,
+            'summary': a.summary,
+            'image': a.image,
+            'published_at': a.published_at.strftime('%b %d, %Y'),
+            'is_new': a.published_at >= seven_days_ago,
+        }
+        for a in db_announcements
+    ]
+
+    # ── Progress metrics ──
     total_steps = len(steps)
     done_steps = sum(1 for s in steps if s['status'] == 'done')
     progress_percent = int((done_steps / total_steps) * 100) if total_steps > 0 else 0
@@ -160,8 +194,8 @@ def home(request):
     pending_docs = sum(1 for d in documents if d['status'] in ('pending', 'missing'))
 
     context = {
-        'student_name': student.full_name if student else 'Juan Dela Cruz',
-        'application_id': student.application_id if student else '2024-00123',
+        'student_name': student_name,
+        'application_id': application_id,
         'documents': documents,
         'steps': steps,
         'upcoming_dates': upcoming_dates,
@@ -175,6 +209,7 @@ def home(request):
         'total_docs': total_docs,
         'completed_docs': completed_docs,
         'pending_docs': pending_docs,
+        'has_application': application is not None,
     }
     return render(request, 'home/home.html', context)
 
@@ -300,29 +335,39 @@ def staff_dashboard(request):
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('home:home')
 
-    pending_applications = [
-        {'id': 'APP-2024-001', 'student': 'Maria Santos', 'date': 'Feb 10, 2026', 'status': 'pending'},
-        {'id': 'APP-2024-002', 'student': 'Jose Rizal Jr.', 'date': 'Feb 12, 2026', 'status': 'pending'},
-        {'id': 'APP-2024-003', 'student': 'Ana Reyes', 'date': 'Feb 14, 2026', 'status': 'under_review'},
-    ]
-
-    recent_activity = [
-        {'action': 'Approved application', 'student': 'Juan Dela Cruz', 'time': '2 hours ago'},
-        {'action': 'Requested documents', 'student': 'Pedro Garcia', 'time': '5 hours ago'},
-        {'action': 'Scheduled interview', 'student': 'Rosa Flores', 'time': '1 day ago'},
-    ]
+    # ── Real application data from NewApplication model ──
+    all_apps = NewApplication.objects.all()
+    total_applications = all_apps.count()
+    pending_count = all_apps.filter(status='pending').count()
+    under_review_count = all_apps.filter(status='under_review').count()
+    approved_count = all_apps.filter(status='approved').count()
+    rejected_count = all_apps.filter(status='rejected').count()
 
     stats = {
-        'total_applications': 45,
-        'pending_review': 12,
-        'approved': 28,
-        'rejected': 5,
+        'total_applications': total_applications,
+        'pending_review': pending_count + under_review_count,
+        'approved': approved_count,
+        'rejected': rejected_count,
     }
+
+    # Applications needing attention (pending + under_review), newest first
+    pending_applications = all_apps.filter(
+        status__in=['pending', 'under_review']
+    ).order_by('-submitted_at')
+
+    # All applications for the full table
+    all_applications = all_apps.order_by('-submitted_at')
+
+    # Recent activity: last 10 approved/rejected with timestamps
+    recent_apps = all_apps.filter(
+        status__in=['approved', 'rejected']
+    ).order_by('-submitted_at')[:10]
 
     context = {
         'staff_name': request.user.get_full_name() or request.user.username,
         'pending_applications': pending_applications,
-        'recent_activity': recent_activity,
+        'all_applications': all_applications,
+        'recent_activity': recent_apps,
         'stats': stats,
         # Management data
         'reminders': Reminder.objects.all().order_by('-created_at'),
@@ -334,6 +379,65 @@ def staff_dashboard(request):
         'announcement_form': AnnouncementForm(),
     }
     return render(request, 'staff/dashboard.html', context)
+
+
+@login_required
+def staff_review_application(request, pk):
+    """View full details of a single application."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+
+    # Build document list with status for this application
+    doc_fields = [
+        ('application_form', 'Application Form'),
+        ('id_picture', '2x2 ID Picture'),
+        ('barangay_clearance', 'Barangay Clearance'),
+        ('parents_itr', "Parent's ITR / Certificate of Indigency"),
+        ('enrolment_form', 'Certificate of Enrolment'),
+        ('schedule_classes', 'Schedule of Classes'),
+        ('proof_insurance', 'Proof of Insurance'),
+        ('grades_last_sem', 'Grades Last Semester'),
+        ('official_time', 'Official Time'),
+    ]
+    documents = []
+    for field_name, label in doc_fields:
+        file_field = getattr(app, field_name)
+        documents.append({
+            'name': label,
+            'field': field_name,
+            'file': file_field if file_field else None,
+            'uploaded': bool(file_field),
+        })
+
+    total_docs = len(documents)
+    uploaded_docs = sum(1 for d in documents if d['uploaded'])
+
+    context = {
+        'app': app,
+        'documents': documents,
+        'total_docs': total_docs,
+        'uploaded_docs': uploaded_docs,
+        'staff_name': request.user.get_full_name() or request.user.username,
+    }
+    return render(request, 'staff/review_application.html', context)
+
+
+@login_required
+@require_POST
+def staff_update_application_status(request, pk):
+    """Update the status of an application."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+    new_status = request.POST.get('status')
+    if new_status in dict(NewApplication.STATUS_CHOICES):
+        app.status = new_status
+        app.save()
+    next_url = request.POST.get('next', '')
+    if next_url:
+        return redirect(next_url)
+    return redirect('home:staff_dashboard')
 
 
 # ================================================================
