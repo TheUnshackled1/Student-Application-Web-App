@@ -61,69 +61,135 @@
 
     <!-- ===== APPLICATION STATUS BANNER ===== -->
     <div class="status-banner">
-        <h2 class="status-title">Application Status: {{ application_status }}</h2>
-        <p class="status-message">{{ status_message }}</p>
-    </div>
-
-    <!-- ===== REMINDERS ===== -->
-    {% if reminders %}
-    <div class="reminders-section">
-        <h3 class="reminders-heading"><i class="fa-solid fa-bell"></i> Reminders</h3>
-        {% for reminder in reminders %}
-        <div class="reminder-banner reminder-{{ reminder.priority }}" id="reminder-{{ reminder.id }}">
-            <div class="reminder-left">
-                {% if reminder.priority == 'urgent' %}
-                    <span class="reminder-icon reminder-icon--urgent"><i class="fa-solid fa-triangle-exclamation"></i></span>
-                {% elif reminder.priority == 'warning' %}
-                    <span class="reminder-icon reminder-icon--warning"><i class="fa-solid fa-circle-exclamation"></i></span>
+        <div class="status-banner-bg"></div>
+        <div class="status-banner-content">
+            <div class="status-icon-wrap">
+                {% if application_status == 'Approved' %}
+                    <i class="fa-solid fa-circle-check"></i>
+                {% elif application_status == 'Rejected' %}
+                    <i class="fa-solid fa-circle-xmark"></i>
                 {% else %}
-                    <span class="reminder-icon reminder-icon--info"><i class="fa-solid fa-circle-info"></i></span>
+                    <i class="fa-solid fa-hourglass-half"></i>
                 {% endif %}
-                <div class="reminder-body">
-                    <span class="reminder-text">{{ reminder.message }}</span>
-                    {% if reminder.created_at %}
-                    <span class="reminder-time"><i class="fa-regular fa-clock"></i> {{ reminder.created_at }}</span>
-                    {% endif %}
-                </div>
             </div>
-            <button class="reminder-dismiss" onclick="this.closest('.reminder-banner').remove()" title="Dismiss">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            <div class="status-text">
+                <div class="status-label-row">
+                    <span class="status-label">Application Status</span>
+                    <span class="status-badge
+                        {% if application_status == 'Approved' %} status-badge--approved
+                        {% elif application_status == 'Rejected' %} status-badge--rejected
+                        {% else %} status-badge--review{% endif %}">
+                        <i class="fa-solid fa-circle" style="font-size:6px;"></i>
+                        {{ application_status }}
+                    </span>
+                </div>
+                <h2 class="status-title">{{ application_status }}</h2>
+                <p class="status-message">{{ status_message }}</p>
+            </div>
         </div>
-        {% endfor %}
+        <div class="status-decoration">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
     </div>
-    {% endif %}
 
-    <!-- ===== UNIVERSITY ANNOUNCEMENTS ===== -->
-    <div class="announcements-section">
-        <h3 class="announcements-title"><i class="fa-solid fa-bullhorn"></i> University Announcements</h3>
-        <div class="announcements-grid">
-            {% for announcement in announcements %}
-            <div class="announcement-card">
-                <div class="announcement-img">
-                    {% if announcement.image %}
-                        <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}">
-                    {% else %}
-                        <div class="announcement-placeholder">
-                            <i class="fa-solid fa-newspaper"></i>
-                        </div>
-                    {% endif %}
-                    {% if announcement.is_new %}
-                    <span class="announcement-badge-new">NEW</span>
-                    {% endif %}
+    <!-- ===== REMINDERS & ANNOUNCEMENTS TWO-COLUMN ===== -->
+    <div class="home-two-col">
+
+        <!-- LEFT: Reminders -->
+        <div class="home-panel">
+            <div class="panel-header">
+                <div class="panel-header-left">
+                    <span class="panel-icon panel-icon--gold"><i class="fa-solid fa-bell"></i></span>
+                    <h3 class="panel-title">Reminders</h3>
                 </div>
-                <div class="announcement-content">
-                    <h4 class="announcement-card-title">{{ announcement.title }}</h4>
-                    <p class="announcement-summary">{{ announcement.summary }}</p>
-                    {% if announcement.published_at %}
-                    <span class="announcement-date"><i class="fa-regular fa-clock"></i> {{ announcement.published_at }}</span>
-                    {% endif %}
+                {% if reminders %}
+                <span class="panel-count">{{ reminders|length }}</span>
+                {% endif %}
+            </div>
+            <div class="panel-body">
+                {% for reminder in reminders %}
+                <div class="rem-card rem-card--{{ reminder.priority }}" id="reminder-{{ reminder.id }}">
+                    <div class="rem-accent rem-accent--{{ reminder.priority }}"></div>
+                    <div class="rem-main">
+                        <div class="rem-top">
+                            <span class="rem-priority-tag rem-tag--{{ reminder.priority }}">
+                                {% if reminder.priority == 'urgent' %}
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Urgent
+                                {% elif reminder.priority == 'warning' %}
+                                    <i class="fa-solid fa-circle-exclamation"></i> Warning
+                                {% else %}
+                                    <i class="fa-solid fa-circle-info"></i> Info
+                                {% endif %}
+                            </span>
+                            <button class="rem-dismiss" onclick="this.closest('.rem-card').style.display='none'" title="Dismiss">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <p class="rem-message">{{ reminder.message }}</p>
+                        {% if reminder.created_at %}
+                        <span class="rem-date"><i class="fa-regular fa-clock"></i> {{ reminder.created_at }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="panel-empty">
+                    <i class="fa-regular fa-bell-slash"></i>
+                    <p>No reminders right now</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- RIGHT: Announcements -->
+        <div class="home-panel home-panel--wide">
+            <div class="panel-header">
+                <div class="panel-header-left">
+                    <span class="panel-icon panel-icon--green"><i class="fa-solid fa-bullhorn"></i></span>
+                    <h3 class="panel-title">University Announcements</h3>
+                </div>
+                {% if announcements %}
+                <span class="panel-count panel-count--green">{{ announcements|length }}</span>
+                {% endif %}
+            </div>
+            <div class="panel-body">
+                <div class="ann-list">
+                    {% for announcement in announcements %}
+                    <div class="ann-card">
+                        <div class="ann-thumb">
+                            {% if announcement.image %}
+                                <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}">
+                            {% else %}
+                                <div class="ann-thumb-placeholder">
+                                    <i class="fa-solid fa-newspaper"></i>
+                                </div>
+                            {% endif %}
+                            {% if announcement.is_new %}
+                            <span class="ann-new-badge">NEW</span>
+                            {% endif %}
+                        </div>
+                        <div class="ann-body">
+                            <h4 class="ann-title">{{ announcement.title }}</h4>
+                            <p class="ann-summary">{{ announcement.summary }}</p>
+                            <div class="ann-meta">
+                                {% if announcement.published_at %}
+                                <span class="ann-date"><i class="fa-regular fa-calendar"></i> {{ announcement.published_at }}</span>
+                                {% endif %}
+                                {% if announcement.is_new %}
+                                <span class="ann-new-text"><i class="fa-solid fa-sparkles"></i> Just posted</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="panel-empty">
+                        <i class="fa-regular fa-newspaper"></i>
+                        <p>No announcements at this time</p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% empty %}
-            <p class="empty-state"><i class="fa-solid fa-newspaper"></i> No announcements at this time.</p>
-            {% endfor %}
         </div>
+
     </div>
 
 </main>
