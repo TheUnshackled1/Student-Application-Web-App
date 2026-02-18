@@ -7,9 +7,9 @@ from django.conf import settings
 from django.utils import timezone
 from .models import (
     StudentProfile, Document, ApplicationStep,
-    UpcomingDate, Reminder, Announcement,
+    UpcomingDate, Reminder, Announcement, NewApplication,
 )
-from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm
+from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm
 from datetime import date as _date, timedelta
 import json
 import base64
@@ -175,7 +175,14 @@ def available_offices(request):
 
 def apply_new(request):
     """Application form for new student assistants."""
-    return render(request, 'home/apply_new.html')
+    if request.method == 'POST':
+        form = NewApplicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home:home')
+    else:
+        form = NewApplicationForm()
+    return render(request, 'home/apply_new.html', {'form': form})
 
 
 def apply_renew(request):

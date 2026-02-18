@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     StudentProfile, Document, ApplicationStep,
-    UpcomingDate, Reminder, Announcement,
+    UpcomingDate, Reminder, Announcement, NewApplication,
 )
 
 
@@ -37,3 +37,10 @@ class ReminderAdmin(admin.ModelAdmin):
 class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ('title', 'published_at', 'is_active')
     list_filter = ('is_active',)
+
+
+@admin.register(NewApplication)
+class NewApplicationAdmin(admin.ModelAdmin):
+    list_display = ('student_id', 'first_name', 'last_name', 'course', 'status', 'submitted_at')
+    list_filter = ('status', 'gender', 'year_level', 'semester')
+    search_fields = ('first_name', 'last_name', 'student_id', 'email')

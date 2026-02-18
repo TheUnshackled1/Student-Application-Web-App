@@ -37,101 +37,213 @@
 <!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
 
-    <div class="form-page-header">
-        <div class="form-icon-circle">
-            <i class="fa-solid fa-file-circle-plus"></i>
+    <!-- ── Page Header with Progress Steps ── -->
+    <div class="applyform-hero">
+        <div class="applyform-hero-bg"></div>
+        <div class="applyform-hero-content">
+            <div class="applyform-hero-icon">
+                <i class="fa-solid fa-file-circle-plus"></i>
+            </div>
+            <h2 class="applyform-hero-title">Apply as New Student Assistant</h2>
+            <p class="applyform-hero-sub">Fill out the form below to submit your application. All fields marked with <span style="color:#fbbf24;">*</span> are required.</p>
+            <div class="applyform-steps">
+                <div class="applyform-step applyform-step--active" data-step="1">
+                    <span class="applyform-step-num">1</span>
+                    <span class="applyform-step-label">Personal</span>
+                </div>
+                <div class="applyform-step-line"></div>
+                <div class="applyform-step" data-step="2">
+                    <span class="applyform-step-num">2</span>
+                    <span class="applyform-step-label">Academic</span>
+                </div>
+                <div class="applyform-step-line"></div>
+                <div class="applyform-step" data-step="3">
+                    <span class="applyform-step-num">3</span>
+                    <span class="applyform-step-label">Documents</span>
+                </div>
+            </div>
         </div>
-        <h2 class="form-page-title">Apply as New Student Assistant</h2>
-        <p class="form-page-subtitle">Fill out the form below to submit your application. All fields marked with <span class="text-danger">*</span> are required.</p>
     </div>
 
-    <div class="form-card">
-        <form method="post" enctype="multipart/form-data">
+    <!-- ── Form Card ── -->
+    <div class="applyform-card">
+        <form method="post" enctype="multipart/form-data" id="applyNewForm">
             {% csrf_token %}
 
-            <!-- Personal Information -->
-            <h4 class="form-section-title"><i class="fa-solid fa-user"></i> Personal Information</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <label class="form-label">First Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="first_name" required>
+            {% if form.errors %}
+            <div class="applyform-errors">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Please fix the following errors:</strong>
+                    <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    </ul>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Middle Name</label>
-                    <input type="text" class="form-control" name="middle_name">
+            </div>
+            {% endif %}
+
+            <!-- ━━━ SECTION 1: PERSONAL INFORMATION ━━━ -->
+            <div class="applyform-section" id="section-1">
+                <div class="applyform-section-head">
+                    <span class="applyform-section-badge">1</span>
+                    <div>
+                        <h4 class="applyform-section-title">Personal Information</h4>
+                        <p class="applyform-section-hint">Enter your full legal name and contact details.</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="last_name" required>
+
+                <!-- Name Row -->
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-signature"></i> Full Name</span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="first_name" maxlength="15" placeholder="Juan" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">M.I. <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control text-center" name="middle_initial" maxlength="1" placeholder="A" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="last_name" maxlength="10" placeholder="Dela Cruz" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ext.</label>
+                            <input type="text" class="form-control text-center" name="extension_name" maxlength="5" placeholder="Jr">
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" name="date_of_birth" required>
+
+                <!-- Birth & Gender Row -->
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-calendar-day"></i> Birth &amp; Identity</span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="date_of_birth" required>
+                            <small class="form-text text-muted">dd/mm/yyyy</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                            <select class="form-select" name="gender" required>
+                                <option value="" selected disabled>Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Gender <span class="text-danger">*</span></label>
-                    <select class="form-select" name="gender" required>
-                        <option value="" selected disabled>Select gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
+
+                <!-- Contact Row -->
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-phone"></i> Contact</span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Contact Number <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                                <input type="text" class="form-control" name="contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-at"></i>
+                                <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Contact Number <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="contact_number" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control" name="email" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Home Address <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="address" required>
+
+                <!-- Address -->
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-location-dot"></i> Home Address</span>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Complete Address <span class="text-danger">*</span></label>
+                            <div class="applyform-address-wrap">
+                                <textarea class="form-control" name="address" id="id_address" rows="2" placeholder="Street, Barangay, City / Municipality, Province" required></textarea>
+                                <button type="button" class="applyform-detect-btn" id="btnDetectAddress" onclick="detectAddress()">
+                                    <i class="fa-solid fa-location-crosshairs"></i>
+                                    <span>Detect Location</span>
+                                </button>
+                            </div>
+                            <small class="form-text" id="addressStatus"></small>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Academic Information -->
-            <h4 class="form-section-title"><i class="fa-solid fa-graduation-cap"></i> Academic Information</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label">Student ID <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="student_id" required>
+            <!-- ━━━ SECTION 2: ACADEMIC INFORMATION ━━━ -->
+            <div class="applyform-section" id="section-2">
+                <div class="applyform-section-head">
+                    <span class="applyform-section-badge applyform-section-badge--blue">2</span>
+                    <div>
+                        <h4 class="applyform-section-title">Academic Information</h4>
+                        <p class="applyform-section-hint">Provide your current enrollment details.</p>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Course / Program <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="course" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Year Level <span class="text-danger">*</span></label>
-                    <select class="form-select" name="year_level" required>
-                        <option value="" selected disabled>Select year</option>
-                        <option value="1">1st Year</option>
-                        <option value="2">2nd Year</option>
-                        <option value="3">3rd Year</option>
-                        <option value="4">4th Year</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Semester <span class="text-danger">*</span></label>
-                    <select class="form-select" name="semester" required>
-                        <option value="" selected disabled>Select semester</option>
-                        <option value="1st">1st Semester</option>
-                        <option value="2nd">2nd Semester</option>
-                        <option value="summer">Summer</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">GPA / GWA <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="gpa" required>
+
+                <div class="applyform-field-group">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Student ID <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-id-badge"></i>
+                                <input type="text" class="form-control" name="student_id" maxlength="8" inputmode="numeric" pattern="\d{1,8}" placeholder="12345678" title="Must be up to 8 digits" required>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Course / Program <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-book-open"></i>
+                                <input type="text" class="form-control" name="course" placeholder="e.g. BSIT, BSCS, BEED" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Year Level <span class="text-danger">*</span></label>
+                            <select class="form-select" name="year_level" required>
+                                <option value="" selected disabled>Select year</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Semester <span class="text-danger">*</span></label>
+                            <select class="form-select" name="semester" required>
+                                <option value="" selected disabled>Select semester</option>
+                                <option value="1st">1st Semester</option>
+                                <option value="2nd">2nd Semester</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Requirements for New Applicants -->
-            <h4 class="form-section-title"><i class="fa-solid fa-clipboard-list"></i> Requirements for New Applicants</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label">Application Form <span class="text-danger">*</span></label>
+            <!-- ━━━ SECTION 3: DOCUMENTS ━━━ -->
+            <div class="applyform-section" id="section-3">
+                <div class="applyform-section-head">
+                    <span class="applyform-section-badge applyform-section-badge--amber">3</span>
+                    <div>
+                        <h4 class="applyform-section-title">Requirements for New Applicants</h4>
+                        <p class="applyform-section-hint">Upload scanned copies or take photos of each requirement.</p>
+                    </div>
+                </div>
+
+            <div class="applyform-docs-grid">
+
+                <!-- Doc 1 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">1</div>
+                    <label class="applyform-doc-label">Application Form <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="application_form" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -145,8 +257,11 @@
                     <div class="file-preview" id="preview_application_form"></div>
                     <input type="hidden" name="application_form_photo" id="photo_application_form">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">(1) 1x1 ID Picture <span class="text-danger">*</span></label>
+
+                <!-- Doc 2 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">2</div>
+                    <label class="applyform-doc-label">(1) 1x1 ID Picture <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="id_picture" accept=".jpg,.png,.jpeg" required>
@@ -160,8 +275,11 @@
                     <div class="file-preview" id="preview_id_picture"></div>
                     <input type="hidden" name="id_picture_photo" id="photo_id_picture">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Barangay Clearance <span class="text-danger">*</span></label>
+
+                <!-- Doc 3 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">3</div>
+                    <label class="applyform-doc-label">Barangay Clearance <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="barangay_clearance" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -175,8 +293,11 @@
                     <div class="file-preview" id="preview_barangay_clearance"></div>
                     <input type="hidden" name="barangay_clearance_photo" id="photo_barangay_clearance">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Parents ITR / Cert. from BIR / Certificate of Indigency <span class="text-danger">*</span></label>
+
+                <!-- Doc 4 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">4</div>
+                    <label class="applyform-doc-label">Parents ITR / BIR Cert. / Cert. of Indigency <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="parents_itr" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -190,8 +311,11 @@
                     <div class="file-preview" id="preview_parents_itr"></div>
                     <input type="hidden" name="parents_itr_photo" id="photo_parents_itr">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Photocopy of Enrolment Form <span class="text-danger">*</span></label>
+
+                <!-- Doc 5 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">5</div>
+                    <label class="applyform-doc-label">Photocopy of Enrolment Form <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="enrolment_form" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -205,8 +329,11 @@
                     <div class="file-preview" id="preview_enrolment_form"></div>
                     <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Schedule of Classes <span class="text-danger">*</span></label>
+
+                <!-- Doc 6 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">6</div>
+                    <label class="applyform-doc-label">Schedule of Classes <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="schedule_classes" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -220,8 +347,11 @@
                     <div class="file-preview" id="preview_schedule_classes"></div>
                     <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Proof of Insurance (c/o OSAS) <span class="text-danger">*</span></label>
+
+                <!-- Doc 7 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">7</div>
+                    <label class="applyform-doc-label">Proof of Insurance (c/o OSAS) <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="proof_insurance" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -235,8 +365,11 @@
                     <div class="file-preview" id="preview_proof_insurance"></div>
                     <input type="hidden" name="proof_insurance_photo" id="photo_proof_insurance">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Grades for the last semester attended <span class="text-danger">*</span></label>
+
+                <!-- Doc 8 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">8</div>
+                    <label class="applyform-doc-label">Grades for the last semester attended <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="grades_last_sem" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -250,8 +383,11 @@
                     <div class="file-preview" id="preview_grades_last_sem"></div>
                     <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Filled Out Official Time <span class="text-danger">*</span></label>
+
+                <!-- Doc 9 -->
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">9</div>
+                    <label class="applyform-doc-label">Filled Out Official Time <span class="text-danger">*</span></label>
                     <div class="input-with-camera">
                         <div class="custom-file-upload">
                             <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" required>
@@ -265,16 +401,24 @@
                     <div class="file-preview" id="preview_official_time"></div>
                     <input type="hidden" name="official_time_photo" id="photo_official_time">
                 </div>
-            </div>
 
-            <!-- Submit -->
-            <div class="form-actions">
-                <a href="{% url 'home:home' %}" class="btn-form btn-form--cancel">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Home
-                </a>
-                <button type="submit" class="btn-form btn-form--submit">
-                    <i class="fa-solid fa-paper-plane"></i> Submit Application
-                </button>
+            </div>
+            </div><!-- /section-3 -->
+
+            <!-- ━━━ SUBMIT AREA ━━━ -->
+            <div class="applyform-submit-area">
+                <div class="applyform-submit-info">
+                    <i class="fa-solid fa-shield-check"></i>
+                    <span>Your information is secure and will only be used for this application.</span>
+                </div>
+                <div class="applyform-submit-actions">
+                    <a href="{% url 'home:home' %}" class="btn-form btn-form--cancel">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Home
+                    </a>
+                    <button type="submit" class="btn-form btn-form--submit">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Application
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -461,7 +605,7 @@
                     textSpan.classList.remove('has-file');
                 }
             }
-            var col = this.closest('.col-md-6');
+            var col = this.closest('.applyform-doc-card') || this.closest('.col-md-6');
             if (!col) return;
             var preview = col.querySelector('.file-preview');
             if (preview && this.files.length > 0) {
@@ -470,6 +614,92 @@
             }
         });
     });
+
+    // ── Progress Step Highlighting (scroll-based) ──
+    (function() {
+        var sections = [
+            document.getElementById('section-1'),
+            document.getElementById('section-2'),
+            document.getElementById('section-3')
+        ];
+        var steps = document.querySelectorAll('.applyform-step[data-step]');
+        var lines = document.querySelectorAll('.applyform-step-line');
+
+        function updateSteps() {
+            var scrollY = window.scrollY || window.pageYOffset;
+            var active = 0;
+            for (var i = 0; i < sections.length; i++) {
+                if (sections[i] && sections[i].getBoundingClientRect().top < window.innerHeight * 0.5) {
+                    active = i;
+                }
+            }
+            steps.forEach(function(step, idx) {
+                step.classList.toggle('applyform-step--active', idx <= active);
+            });
+            lines.forEach(function(line, idx) {
+                line.style.background = idx < active ? 'rgba(200,168,78,0.6)' : 'rgba(255,255,255,0.2)';
+            });
+        }
+        window.addEventListener('scroll', updateSteps, { passive: true });
+        updateSteps();
+    })();
+
+    // ── Address Auto-Detect via Geolocation + Reverse Geocoding ──
+    function detectAddress() {
+        var btn = document.getElementById('btnDetectAddress');
+        var status = document.getElementById('addressStatus');
+        var addrField = document.getElementById('id_address');
+
+        if (!navigator.geolocation) {
+            status.textContent = 'Geolocation is not supported by your browser.';
+            status.style.color = '#ef4444';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detecting...';
+        status.textContent = 'Getting your location...';
+        status.style.color = '#6b7280';
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+                status.textContent = 'Location found. Fetching address...';
+
+                // Reverse geocode using OpenStreetMap Nominatim (free)
+                fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon + '&addressdetails=1', {
+                    headers: { 'Accept-Language': 'en' }
+                })
+                .then(function(resp) { return resp.json(); })
+                .then(function(data) {
+                    if (data && data.display_name) {
+                        addrField.value = data.display_name;
+                        status.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Address detected successfully.';
+                        status.style.color = '#22c55e';
+                    } else {
+                        status.textContent = 'Could not determine address. Please enter manually.';
+                        status.style.color = '#f59e0b';
+                    }
+                })
+                .catch(function() {
+                    status.textContent = 'Reverse geocoding failed. Please enter manually.';
+                    status.style.color = '#ef4444';
+                })
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Detect';
+                });
+            },
+            function(err) {
+                status.textContent = 'Location access denied: ' + err.message;
+                status.style.color = '#ef4444';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Detect';
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
 </script>
 </body>
 </html>

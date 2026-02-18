@@ -89,3 +89,68 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class NewApplication(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
+    ]
+
+    YEAR_LEVEL_CHOICES = [
+        (1, '1st Year'),
+        (2, '2nd Year'),
+        (3, '3rd Year'),
+        (4, '4th Year'),
+    ]
+
+    SEMESTER_CHOICES = [
+        ('1st', '1st Semester'),
+        ('2nd', '2nd Semester'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('under_review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    # ── Personal Information ──
+    first_name = models.CharField(max_length=15)
+    middle_initial = models.CharField(max_length=1)
+    last_name = models.CharField(max_length=10)
+    extension_name = models.CharField(max_length=5, blank=True, default='')
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    contact_number = models.CharField(max_length=11)
+    email = models.EmailField()
+    address = models.TextField()
+
+    # ── Academic Information ──
+    student_id = models.CharField(max_length=8)
+    course = models.CharField(max_length=100)
+    year_level = models.IntegerField(choices=YEAR_LEVEL_CHOICES)
+    semester = models.CharField(max_length=5, choices=SEMESTER_CHOICES)
+
+    # ── Document Uploads ──
+    application_form = models.FileField(upload_to='applications/new/', blank=True)
+    id_picture = models.ImageField(upload_to='applications/new/', blank=True)
+    barangay_clearance = models.FileField(upload_to='applications/new/', blank=True)
+    parents_itr = models.FileField(upload_to='applications/new/', blank=True)
+    enrolment_form = models.FileField(upload_to='applications/new/', blank=True)
+    schedule_classes = models.FileField(upload_to='applications/new/', blank=True)
+    proof_insurance = models.FileField(upload_to='applications/new/', blank=True)
+    grades_last_sem = models.FileField(upload_to='applications/new/', blank=True)
+    official_time = models.FileField(upload_to='applications/new/', blank=True)
+
+    # ── Meta ──
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    class Meta:
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.student_id})"
