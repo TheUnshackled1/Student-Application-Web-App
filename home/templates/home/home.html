@@ -334,6 +334,91 @@
 
     {% endfor %}
 
+    <!-- ===== APPLICATION HISTORY & DOCUMENT LOG TABLE ===== -->
+    <div class="app-log-section">
+        <div class="dash-section-header">
+            <span class="dash-section-icon dash-section-icon--teal"><i class="fa-solid fa-clipboard-list"></i></span>
+            <h3 class="dash-section-title">Application History &amp; Document Log</h3>
+            <p class="dash-section-hint">Persistent record of all your applications and uploaded documents</p>
+        </div>
+
+        <div class="app-log-table-wrapper">
+            <table class="app-log-table">
+                <thead>
+                    <tr>
+                        <th><i class="fa-solid fa-hashtag"></i> #</th>
+                        <th><i class="fa-solid fa-file-lines"></i> Type</th>
+                        <th><i class="fa-solid fa-user"></i> Name</th>
+                        <th><i class="fa-solid fa-id-badge"></i> Student ID</th>
+                        <th><i class="fa-solid fa-signal"></i> Status</th>
+                        <th><i class="fa-solid fa-calendar"></i> Submitted</th>
+                        <th><i class="fa-solid fa-folder-open"></i> Documents</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr class="app-log-row" onclick="toggleDocRow('doc-detail-{{ forloop.counter }}')">
+                        <td class="app-log-num">{{ forloop.counter }}</td>
+                        <td>
+                            <span class="app-log-type-badge app-log-type--{{ app.app_type_class }}">
+                                <i class="fa-solid {{ app.app_type_icon }}"></i> {{ app.app_type }}
+                            </span>
+                        </td>
+                        <td class="app-log-name">{{ app.student_name }}</td>
+                        <td><code class="app-log-sid">{{ app.application_id }}</code></td>
+                        <td>
+                            <span class="app-log-status app-log-status--{{ app.raw_status }}">
+                                <i class="fa-solid fa-circle" style="font-size:6px;"></i>
+                                {{ app.application_status }}
+                            </span>
+                        </td>
+                        <td class="app-log-date">{{ app.submitted_at|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="app-log-doc-count">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                                {{ app.completed_docs }}/{{ app.total_docs }} uploaded
+                            </span>
+                        </td>
+                        <td class="app-log-expand">
+                            <i class="fa-solid fa-chevron-down app-log-chevron" id="chevron-doc-detail-{{ forloop.counter }}"></i>
+                        </td>
+                    </tr>
+                    <!-- Expandable Document Detail Row -->
+                    <tr class="app-log-detail-row" id="doc-detail-{{ forloop.counter }}" style="display:none;">
+                        <td colspan="8">
+                            <div class="app-log-doc-grid">
+                                {% for doc in app.documents %}
+                                <div class="app-log-doc-item app-log-doc--{{ doc.status }}">
+                                    <span class="app-log-doc-dot app-log-dot--{{ doc.status }}"></span>
+                                    <span class="app-log-doc-name">{{ doc.name }}</span>
+                                    <span class="app-log-doc-badge app-log-badge--{{ doc.status }}">
+                                        {% if doc.status == 'done' %}
+                                            <i class="fa-solid fa-circle-check"></i> Verified
+                                        {% elif doc.status == 'uploaded' %}
+                                            <i class="fa-solid fa-arrow-up-from-bracket"></i> Uploaded
+                                        {% elif doc.status == 'pending' %}
+                                            <i class="fa-solid fa-hourglass-half"></i> Pending
+                                        {% else %}
+                                            <i class="fa-solid fa-triangle-exclamation"></i> Missing
+                                        {% endif %}
+                                    </span>
+                                    {% if doc.url %}
+                                    <button type="button" class="app-log-doc-view" onclick="event.stopPropagation(); openFilePreview('{{ doc.url }}', '{{ doc.name }}')">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     {% else %}
     <!-- ===== WELCOME BANNER (no application) ===== -->
     <div class="status-banner">
@@ -596,6 +681,20 @@ function closeFilePreview(e) {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeFilePreview();
 });
+
+/* Toggle expandable document detail row */
+function toggleDocRow(id) {
+    var row = document.getElementById(id);
+    var chevron = document.getElementById('chevron-' + id);
+    if (!row) return;
+    if (row.style.display === 'none') {
+        row.style.display = 'table-row';
+        if (chevron) chevron.classList.add('rotated');
+    } else {
+        row.style.display = 'none';
+        if (chevron) chevron.classList.remove('rotated');
+    }
+}
 </script>
 </body>
 </html>
