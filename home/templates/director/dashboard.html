@@ -389,5 +389,11 @@ document.addEventListener('keydown', function(e) {
     }
 });
 </script>
+<script>
+document.getElementById('navToggle').addEventListener('click',function(){
+    document.getElementById('navMenu').classList.toggle('nav-open');
+    var i=this.querySelector('i');i.classList.toggle('fa-bars');i.classList.toggle('fa-xmark');
+});
+</script>
 </body>
 </html>
