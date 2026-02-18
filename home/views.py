@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseForbidden, JsonResponse
@@ -9,6 +9,7 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement,
 )
+from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm
 from datetime import date as _date, timedelta
 import json
 import base64
@@ -295,12 +296,128 @@ def staff_dashboard(request):
     }
 
     context = {
-        'staff_name': 'Staff Member',
+        'staff_name': request.user.get_full_name() or request.user.username,
         'pending_applications': pending_applications,
         'recent_activity': recent_activity,
         'stats': stats,
+        # Management data
+        'reminders': Reminder.objects.all().order_by('-created_at'),
+        'upcoming_dates': UpcomingDate.objects.all().order_by('date'),
+        'announcements': Announcement.objects.all().order_by('-published_at'),
+        # Forms
+        'reminder_form': ReminderForm(),
+        'date_form': UpcomingDateForm(),
+        'announcement_form': AnnouncementForm(),
     }
     return render(request, 'staff/dashboard.html', context)
+
+
+# ================================================================
+#  STAFF CRUD — Reminders
+# ================================================================
+
+@login_required
+@require_POST
+def staff_add_reminder(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    form = ReminderForm(request.POST)
+    if form.is_valid():
+        form.save()
+    return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_edit_reminder(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    reminder = get_object_or_404(Reminder, pk=pk)
+    form = ReminderForm(request.POST, instance=reminder)
+    if form.is_valid():
+        form.save()
+    return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_delete_reminder(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    get_object_or_404(Reminder, pk=pk).delete()
+    return redirect('home:staff_dashboard')
+
+
+# ================================================================
+#  STAFF CRUD — Upcoming Dates
+# ================================================================
+
+@login_required
+@require_POST
+def staff_add_date(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    form = UpcomingDateForm(request.POST)
+    if form.is_valid():
+        form.save()
+    return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_edit_date(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    obj = get_object_or_404(UpcomingDate, pk=pk)
+    form = UpcomingDateForm(request.POST, instance=obj)
+    if form.is_valid():
+        form.save()
+    return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_delete_date(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    get_object_or_404(UpcomingDate, pk=pk).delete()
+    return redirect('home:staff_dashboard')
+
+
+# ================================================================
+#  STAFF CRUD — Announcements
+# ================================================================
+
+@login_required
+@require_POST
+def staff_add_announcement(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    form = AnnouncementForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+    return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_edit_announcement(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    obj = get_object_or_404(Announcement, pk=pk)
+    form = AnnouncementForm(request.POST, request.FILES, instance=obj)
+    if form.is_valid():
+        form.save()
+    return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_delete_announcement(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    get_object_or_404(Announcement, pk=pk).delete()
+    return redirect('home:staff_dashboard')
 
 
 @login_required
