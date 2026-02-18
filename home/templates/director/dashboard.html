@@ -130,7 +130,7 @@
                                         onclick="openOfficeModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}')">
                                     <i class="fa-solid fa-building"></i> Assign Office
                                 </button>
-                                <a href="{% url 'home:staff_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+                                <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
                                     <i class="fa-solid fa-eye"></i> Review
                                 </a>
                             </div>
@@ -182,7 +182,7 @@
                                         onclick="openApproveModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}', '{{ a.assigned_office }}')">
                                     <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start
                                 </button>
-                                <a href="{% url 'home:staff_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+                                <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:#f3f4f6; color:#374151; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
                                     <i class="fa-solid fa-eye"></i> Review
                                 </a>
                             </div>
@@ -339,7 +339,7 @@
 <script>
 function openOfficeModal(pk, name) {
     document.getElementById('officeStudentName').textContent = name;
-    document.getElementById('officeForm').action = '/staff/applications/' + pk + '/status/';
+    document.getElementById('officeForm').action = '/director/applications/' + pk + '/status/';
     document.getElementById('officeModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
@@ -347,7 +347,7 @@ function openOfficeModal(pk, name) {
 function openApproveModal(pk, name, office) {
     document.getElementById('approveStudentName').textContent = name;
     document.getElementById('approveOfficeName').textContent = office || '—';
-    document.getElementById('approveForm').action = '/staff/applications/' + pk + '/status/';
+    document.getElementById('approveForm').action = '/director/applications/' + pk + '/status/';
     document.getElementById('approveModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }

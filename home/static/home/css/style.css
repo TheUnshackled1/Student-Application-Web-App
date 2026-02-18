@@ -4002,3 +4002,90 @@ button.review-doc-link:hover {
   background: rgba(251,191,36,0.30);
   color: #78350f;
 }
+
+/* ══════════════════════════════════════════════
+   Multi-Application Card Wrappers
+   ══════════════════════════════════════════════ */
+.app-card-wrapper {
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 28px 24px 24px;
+  margin-bottom: 16px;
+  background: rgba(30,30,42,0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.app-card-wrapper .status-banner {
+  margin-bottom: 0;
+}
+.app-card-wrapper .dash-progress,
+.app-card-wrapper .dash-workflow,
+.app-card-wrapper .dash-documents {
+  margin-top: 20px;
+}
+
+/* ── App Type Ribbon ── */
+.app-type-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+}
+.app-type-ribbon--new {
+  background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.08));
+  border: 1px solid rgba(59,130,246,0.25);
+  color: #60a5fa;
+}
+.app-type-ribbon--renewal {
+  background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(168,85,247,0.08));
+  border: 1px solid rgba(168,85,247,0.25);
+  color: #c084fc;
+}
+.app-type-ribbon i {
+  font-size: 14px;
+}
+.app-type-date {
+  opacity: 0.6;
+  font-weight: 400;
+  font-size: 12px;
+  margin-left: 6px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ── Divider Between Applications ── */
+.app-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0;
+}
+.app-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,168,78,0.25), transparent);
+}
+.app-divider-dot {
+  color: rgba(200,168,78,0.4);
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .app-card-wrapper {
+    padding: 18px 14px 16px;
+    border-radius: 14px;
+  }
+  .app-type-ribbon {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+  .app-type-date {
+    display: none;
+  }
+}

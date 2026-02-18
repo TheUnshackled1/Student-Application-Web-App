@@ -49,7 +49,30 @@ def _build_documents_from_app(app):
     for field_name, label in doc_fields:
         file_field = getattr(app, field_name)
         if file_field:
-            # File was uploaded — mark as done if app is approved/office_assigned, otherwise uploaded
+            url = file_field.url
+            if app.status in ('approved', 'office_assigned'):
+                documents.append({'name': label, 'status': 'done', 'label': 'Done', 'url': url})
+            else:
+                documents.append({'name': label, 'status': 'uploaded', 'label': 'Uploaded', 'url': url})
+        else:
+            documents.append({'name': label, 'status': 'missing', 'label': 'Missing', 'url': ''})
+    return documents
+
+
+def _build_documents_from_renewal(app):
+    """Build document status list from a RenewalApplication's file fields."""
+    doc_fields = [
+        ('enrolment_form', 'Photocopy of Enrolment Form'),
+        ('schedule_classes', 'Schedule of Classes'),
+        ('grades_last_sem', 'Grades Last Semester'),
+        ('official_time', 'Filled Out Official Time'),
+        ('recommendation_letter', 'Recommendation Letter & Budget Allocation'),
+        ('evaluation_form', 'Evaluation Form'),
+    ]
+    documents = []
+    for field_name, label in doc_fields:
+        file_field = getattr(app, field_name)
+        if file_field:
             url = file_field.url
             if app.status in ('approved', 'office_assigned'):
                 documents.append({'name': label, 'status': 'done', 'label': 'Done', 'url': url})
@@ -105,46 +128,145 @@ def home(request):
     """Home/dashboard view for student applicants."""
     today = _date.today()
 
-    # ── Try to find a real application for this visitor ──
-    application = None
+    # ── Collect ALL applications for this visitor ──
+    new_apps = []
+    renewal_apps = []
 
-    # 1. Check session for application PK (set after successful submit)
+    # 1. Check session PKs
     app_pk = request.session.get('application_pk')
     if app_pk:
-        application = NewApplication.objects.filter(pk=app_pk).first()
+        obj = NewApplication.objects.filter(pk=app_pk).first()
+        if obj:
+            new_apps.append(obj)
 
-    # 2. If authenticated, try matching by email or student profile
-    if not application and request.user.is_authenticated:
-        application = NewApplication.objects.filter(
+    renewal_pk = request.session.get('renewal_pk')
+    if renewal_pk:
+        obj = RenewalApplication.objects.filter(pk=renewal_pk).first()
+        if obj:
+            renewal_apps.append(obj)
+
+    # 2. If authenticated, also find by email
+    if request.user.is_authenticated:
+        email_new = NewApplication.objects.filter(
             email=request.user.email
-        ).order_by('-submitted_at').first()
+        ).order_by('-submitted_at')
+        for a in email_new:
+            if a not in new_apps:
+                new_apps.append(a)
 
-    # ── Build data from real application or fall back to defaults ──
-    if application:
-        # Real data from the submitted application
-        student_name = f"{application.first_name} {application.last_name}"
-        application_id = application.student_id
-        documents = _build_documents_from_app(application)
-        steps = _build_steps_from_status(application.status)
+        email_renewal = RenewalApplication.objects.filter(
+            email=request.user.email
+        ).order_by('-submitted_at')
+        for a in email_renewal:
+            if a not in renewal_apps:
+                renewal_apps.append(a)
+
+    # 3. If a session-based new app exists, find matching renewals & vice-versa
+    session_student_ids = set()
+    session_emails = set()
+    for a in new_apps:
+        session_student_ids.add(a.student_id)
+        session_emails.add(a.email)
+    for a in renewal_apps:
+        session_student_ids.add(a.student_id)
+        session_emails.add(a.email)
+
+    if session_student_ids:
+        for a in NewApplication.objects.filter(student_id__in=session_student_ids).order_by('-submitted_at'):
+            if a not in new_apps:
+                new_apps.append(a)
+        for a in RenewalApplication.objects.filter(student_id__in=session_student_ids).order_by('-submitted_at'):
+            if a not in renewal_apps:
+                renewal_apps.append(a)
+
+    if session_emails:
+        for a in NewApplication.objects.filter(email__in=session_emails).order_by('-submitted_at'):
+            if a not in new_apps:
+                new_apps.append(a)
+        for a in RenewalApplication.objects.filter(email__in=session_emails).order_by('-submitted_at'):
+            if a not in renewal_apps:
+                renewal_apps.append(a)
+
+    # ── Build unified application cards ──
+    applications = []
+
+    for app in new_apps:
+        student_name = f"{app.first_name} {app.last_name}"
+        documents = _build_documents_from_app(app)
+        steps = _build_steps_from_status(app.status)
         display_status, status_message = STATUS_DISPLAY_MAP.get(
-            application.status,
-            ('Under Review', "Your documents are currently being verified by the Registrar's Office.")
+            app.status,
+            ('Under Review', "Your documents are currently being verified.")
         )
-        application_status = display_status
-    else:
-        # Default demo data — no application found
-        student_name = 'Guest'
-        application_id = '—'
-        documents = []
-        steps = [
-            {'step_number': 1, 'title': 'Application Submitted', 'status': 'locked'},
-            {'step_number': 2, 'title': 'Document Verification', 'status': 'locked'},
-            {'step_number': 3, 'title': 'Interview & Assessment', 'status': 'locked'},
-            {'step_number': 4, 'title': 'Office Assignment', 'status': 'locked'},
-            {'step_number': 5, 'title': 'Final Approval', 'status': 'locked'},
-        ]
-        application_status = 'No Application'
-        status_message = 'You have not submitted an application yet. Click "Apply / Renew" to get started.'
+
+        total_steps = len(steps)
+        done_steps = sum(1 for s in steps if s['status'] == 'done')
+        progress_pct = int((done_steps / total_steps) * 100) if total_steps else 0
+        total_docs = len(documents)
+        completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
+        pending_docs = sum(1 for d in documents if d['status'] in ('pending', 'missing'))
+
+        applications.append({
+            'obj': app,
+            'app_type': 'New Application',
+            'app_type_icon': 'fa-file-circle-plus',
+            'app_type_class': 'new',
+            'student_name': student_name,
+            'application_id': app.student_id,
+            'documents': documents,
+            'steps': steps,
+            'application_status': display_status,
+            'status_message': status_message,
+            'raw_status': app.status,
+            'progress_percent': progress_pct,
+            'total_steps': total_steps,
+            'completed_steps': done_steps,
+            'total_docs': total_docs,
+            'completed_docs': completed_docs,
+            'pending_docs': pending_docs,
+            'submitted_at': app.submitted_at,
+        })
+
+    for app in renewal_apps:
+        documents = _build_documents_from_renewal(app)
+        steps = _build_steps_from_status(app.status)
+        display_status, status_message = STATUS_DISPLAY_MAP.get(
+            app.status,
+            ('Under Review', "Your documents are currently being verified.")
+        )
+
+        total_steps = len(steps)
+        done_steps = sum(1 for s in steps if s['status'] == 'done')
+        progress_pct = int((done_steps / total_steps) * 100) if total_steps else 0
+        total_docs = len(documents)
+        completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
+        pending_docs = sum(1 for d in documents if d['status'] in ('pending', 'missing'))
+
+        applications.append({
+            'obj': app,
+            'app_type': 'Renewal Application',
+            'app_type_icon': 'fa-arrows-rotate',
+            'app_type_class': 'renewal',
+            'student_name': app.full_name,
+            'application_id': app.student_id,
+            'documents': documents,
+            'steps': steps,
+            'application_status': display_status,
+            'status_message': status_message,
+            'raw_status': app.status,
+            'progress_percent': progress_pct,
+            'total_steps': total_steps,
+            'completed_steps': done_steps,
+            'total_docs': total_docs,
+            'completed_docs': completed_docs,
+            'pending_docs': pending_docs,
+            'submitted_at': app.submitted_at,
+        })
+
+    # Sort all applications by submitted date descending
+    applications.sort(key=lambda x: x['submitted_at'], reverse=True)
+
+    has_application = len(applications) > 0
 
     # ── Upcoming dates ──
     upcoming_dates = []
@@ -189,33 +311,12 @@ def home(request):
         for a in db_announcements
     ]
 
-    # ── Progress metrics ──
-    total_steps = len(steps)
-    done_steps = sum(1 for s in steps if s['status'] == 'done')
-    progress_percent = int((done_steps / total_steps) * 100) if total_steps > 0 else 0
-
-    total_docs = len(documents)
-    completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
-    pending_docs = sum(1 for d in documents if d['status'] in ('pending', 'missing'))
-
     context = {
-        'student_name': student_name,
-        'application_id': application_id,
-        'documents': documents,
-        'steps': steps,
+        'applications': applications,
+        'has_application': has_application,
         'upcoming_dates': upcoming_dates,
         'reminders': reminders,
         'announcements': announcements,
-        'application_status': application_status,
-        'status_message': status_message,
-        'progress_percent': progress_percent,
-        'total_steps': total_steps,
-        'completed_steps': done_steps,
-        'total_docs': total_docs,
-        'completed_docs': completed_docs,
-        'pending_docs': pending_docs,
-        'has_application': application is not None,
-        'application': application,
     }
     return render(request, 'home/home.html', context)
 
@@ -693,3 +794,81 @@ def director_dashboard(request):
         'stats': stats,
     }
     return render(request, 'director/dashboard.html', context)
+
+
+@login_required
+def director_review_application(request, pk):
+    """Director's view of a single application — read-only review with director actions."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+
+    doc_fields = [
+        ('application_form', 'Application Form'),
+        ('id_picture', '2x2 ID Picture'),
+        ('barangay_clearance', 'Barangay Clearance'),
+        ('parents_itr', "Parent's ITR / Certificate of Indigency"),
+        ('enrolment_form', 'Certificate of Enrolment'),
+        ('schedule_classes', 'Schedule of Classes'),
+        ('proof_insurance', 'Proof of Insurance'),
+        ('grades_last_sem', 'Grades Last Semester'),
+        ('official_time', 'Official Time'),
+    ]
+    documents = []
+    for field_name, label in doc_fields:
+        file_field = getattr(app, field_name)
+        documents.append({
+            'name': label,
+            'field': field_name,
+            'file': file_field if file_field else None,
+            'uploaded': bool(file_field),
+        })
+
+    total_docs = len(documents)
+    uploaded_docs = sum(1 for d in documents if d['uploaded'])
+
+    context = {
+        'app': app,
+        'documents': documents,
+        'total_docs': total_docs,
+        'uploaded_docs': uploaded_docs,
+        'director_name': request.user.get_full_name() or 'Director',
+    }
+    return render(request, 'director/review_application.html', context)
+
+
+@login_required
+@require_POST
+def director_update_application_status(request, pk):
+    """Director-specific status update (office assignment, approval, etc.)."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+    new_status = request.POST.get('status')
+    if new_status in dict(NewApplication.STATUS_CHOICES):
+        app.status = new_status
+
+        if new_status == 'office_assigned':
+            office = request.POST.get('assigned_office', '').strip()
+            if office:
+                app.assigned_office = office
+
+        if new_status == 'approved':
+            start = request.POST.get('start_date')
+            if start:
+                app.start_date = start
+
+        if new_status == 'interview_scheduled':
+            interview_dt = request.POST.get('interview_date')
+            if interview_dt:
+                from datetime import datetime as _dt
+                try:
+                    app.interview_date = _dt.fromisoformat(interview_dt)
+                except (ValueError, TypeError):
+                    pass
+
+        app.save()
+    next_url = request.POST.get('next', '')
+    if next_url:
+        return redirect(next_url)
+    return redirect('home:director_dashboard')
