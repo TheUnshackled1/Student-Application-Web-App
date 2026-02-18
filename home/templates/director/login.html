@@ -54,13 +54,13 @@
             <i class="fa-solid fa-building"></i>
             <span>AVAILABLE OFFICES</span>
         </a>
+        <button class="navbar-toggle" id="navToggle"><i class="fa-solid fa-bars"></i></button>
     </div>
-    <div class="navbar-right d-flex align-items-center gap-2">
-        <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--apply">
-            <i class="fa-solid fa-paper-plane"></i>
-            <span>Apply / Renew as Student Assistant</span>
-        </a>
-        <a href="{% url 'home:staff_login' %}" class="btn btn-nav btn-nav--staff">
+    <div class="navbar-right d-flex align-items-center gap-2" id="navMenu">
+        <div class="mobile-nav-links">
+            <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-house"></i><span>HOME</span></a>
+            <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-building"></i><span>AVAILABLE OFFICES</span></a>
+        </div>
             <i class="fa-solid fa-user-tie"></i>
             <span>Log in as Staff</span>
         </a>
