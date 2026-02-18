@@ -513,15 +513,38 @@ def staff_dashboard(request):
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('home:home')
 
-    # ── Real application data from NewApplication model ──
-    all_apps = NewApplication.objects.all()
-    total_applications = all_apps.count()
-    pending_count = all_apps.filter(status='pending').count()
-    under_review_count = all_apps.filter(status='under_review').count()
-    interview_count = all_apps.filter(status='interview_scheduled').count()
-    office_assigned_count = all_apps.filter(status='office_assigned').count()
-    approved_count = all_apps.filter(status='approved').count()
-    rejected_count = all_apps.filter(status='rejected').count()
+    # ── Real application data from NewApplication + RenewalApplication ──
+    new_apps = NewApplication.objects.all()
+    renewal_apps = RenewalApplication.objects.all()
+
+    total_new = new_apps.count()
+    total_renewal = renewal_apps.count()
+    total_applications = total_new + total_renewal
+
+    pending_count = (
+        new_apps.filter(status='pending').count()
+        + renewal_apps.filter(status='pending').count()
+    )
+    under_review_count = (
+        new_apps.filter(status='under_review').count()
+        + renewal_apps.filter(status='under_review').count()
+    )
+    interview_count = (
+        new_apps.filter(status='interview_scheduled').count()
+        + renewal_apps.filter(status='interview_scheduled').count()
+    )
+    office_assigned_count = (
+        new_apps.filter(status='office_assigned').count()
+        + renewal_apps.filter(status='office_assigned').count()
+    )
+    approved_count = (
+        new_apps.filter(status='approved').count()
+        + renewal_apps.filter(status='approved').count()
+    )
+    rejected_count = (
+        new_apps.filter(status='rejected').count()
+        + renewal_apps.filter(status='rejected').count()
+    )
 
     stats = {
         'total_applications': total_applications,
@@ -532,24 +555,88 @@ def staff_dashboard(request):
         'rejected': rejected_count,
     }
 
+    # ── Build unified list of ALL students (new + renewal) ──
+    all_students = []
+
+    for app in new_apps.order_by('-submitted_at'):
+        all_students.append({
+            'pk': app.pk,
+            'app_type': 'New',
+            'app_type_class': 'new',
+            'student_id': app.student_id,
+            'first_name': app.first_name,
+            'last_name': app.last_name,
+            'middle_initial': app.middle_initial,
+            'extension_name': app.extension_name,
+            'full_name': f"{app.first_name} {app.middle_initial}. {app.last_name}" + (f" {app.extension_name}" if app.extension_name else ""),
+            'email': app.email,
+            'course': app.course,
+            'year_level_display': app.get_year_level_display(),
+            'semester_display': app.get_semester_display(),
+            'submitted_at': app.submitted_at,
+            'status': app.status,
+            'status_display': app.get_status_display(),
+            'review_url_name': 'home:staff_review_application',
+            'status_url_name': 'home:staff_update_application_status',
+        })
+
+    for app in renewal_apps.order_by('-submitted_at'):
+        all_students.append({
+            'pk': app.pk,
+            'app_type': 'Renewal',
+            'app_type_class': 'renewal',
+            'student_id': app.student_id,
+            'first_name': app.full_name.split()[0] if app.full_name else '',
+            'last_name': ' '.join(app.full_name.split()[1:]) if app.full_name else '',
+            'middle_initial': '',
+            'extension_name': '',
+            'full_name': app.full_name,
+            'email': app.email,
+            'course': app.course,
+            'year_level_display': app.get_year_level_display(),
+            'semester_display': app.get_semester_display(),
+            'submitted_at': app.submitted_at,
+            'status': app.status,
+            'status_display': app.get_status_display(),
+            'review_url_name': 'home:staff_review_application',
+            'status_url_name': 'home:staff_update_application_status',
+            'is_renewal': True,
+        })
+
+    # Sort all by submitted_at descending
+    all_students.sort(key=lambda x: x['submitted_at'], reverse=True)
+
     # Applications needing attention (pending + under_review), newest first
-    pending_applications = all_apps.filter(
+    pending_applications = new_apps.filter(
         status__in=['pending', 'under_review']
     ).order_by('-submitted_at')
 
-    # All applications for the full table
-    all_applications = all_apps.order_by('-submitted_at')
+    # All applications for the full table (keeping for backward compat)
+    all_applications = new_apps.order_by('-submitted_at')
 
-    # Recent activity: last 10 approved/rejected with timestamps
-    recent_apps = all_apps.filter(
-        status__in=['approved', 'rejected']
-    ).order_by('-submitted_at')[:10]
+    # Recent activity: last 10 approved/rejected with timestamps (both types)
+    recent_new = list(new_apps.filter(status__in=['approved', 'rejected']).order_by('-submitted_at')[:10])
+    recent_renewal = list(renewal_apps.filter(status__in=['approved', 'rejected']).order_by('-submitted_at')[:10])
+
+    # Normalize renewal apps to have first_name/last_name for template
+    for r in recent_renewal:
+        r.first_name = r.full_name.split()[0] if r.full_name else ''
+        r.last_name = ' '.join(r.full_name.split()[1:]) if r.full_name else ''
+        r.app_type = 'Renewal'
+
+    for n in recent_new:
+        n.app_type = 'New'
+
+    recent_combined = recent_new + recent_renewal
+    recent_combined.sort(key=lambda x: x.submitted_at, reverse=True)
+    recent_activity = recent_combined[:10]
 
     context = {
         'staff_name': request.user.get_full_name() or request.user.username,
         'pending_applications': pending_applications,
         'all_applications': all_applications,
-        'recent_activity': recent_apps,
+        'all_students': all_students,
+        'recent_activity': recent_activity,
         'stats': stats,
         # Management data
         'reminders': Reminder.objects.all().order_by('-created_at'),

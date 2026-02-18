@@ -90,12 +90,12 @@
         </div>
     </div>
 
-    <!-- ===== ALL APPLICATIONS TABLE ===== -->
+    <!-- ===== ALL STUDENTS TABLE ===== -->
     <div class="staff-panel">
         <div class="staff-panel-header">
             <div class="staff-panel-header-left">
-                <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-folder-open"></i></span>
-                <h3 class="staff-panel-title">All Applications</h3>
+                <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-users"></i></span>
+                <h3 class="staff-panel-title">All Students</h3>
                 <span class="staff-panel-count">{{ stats.total_applications }}</span>
             </div>
             <div class="staff-panel-filters">
@@ -109,12 +109,24 @@
             </div>
         </div>
 
+        <!-- Search bar -->
+        <div style="padding: 0 20px 12px;">
+            <div style="position: relative;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 13px;"></i>
+                <input type="text" id="studentSearchInput" placeholder="Search by name, student ID, or email…"
+                       style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 13px; font-family: 'Inter', sans-serif; background: #f9fafb; transition: all .2s;"
+                       onfocus="this.style.borderColor='#1a5632'; this.style.background='#fff';"
+                       onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb';">
+            </div>
+        </div>
+
         <div class="staff-table-wrap">
             <table class="staff-table" id="applicationsTable">
                 <thead>
                     <tr>
                         <th>Student ID</th>
                         <th>Student Name</th>
+                        <th>Type</th>
                         <th>Course</th>
                         <th>Year</th>
                         <th>Date Filed</th>
@@ -123,35 +135,52 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for app in all_applications %}
-                    <tr data-status="{{ app.status }}">
-                        <td class="staff-td-id">{{ app.student_id }}</td>
+                    {% for s in all_students %}
+                    <tr data-status="{{ s.status }}" data-search="{{ s.student_id }} {{ s.full_name }} {{ s.email }}">
+                        <td class="staff-td-id">{{ s.student_id }}</td>
                         <td>
                             <div class="staff-student-cell">
-                                <span class="staff-student-name">{{ app.first_name }} {{ app.middle_initial }}. {{ app.last_name }}{% if app.extension_name %} {{ app.extension_name }}{% endif %}</span>
-                                <span class="staff-student-email">{{ app.email }}</span>
+                                <span class="staff-student-name">{{ s.full_name }}</span>
+                                <span class="staff-student-email">{{ s.email }}</span>
                             </div>
                         </td>
-                        <td class="staff-td-course">{{ app.course }}</td>
-                        <td class="staff-td-year">{{ app.get_year_level_display }}</td>
-                        <td class="staff-td-date">{{ app.submitted_at|date:"M d, Y" }}</td>
                         <td>
-                            <span class="staff-status-tag staff-status--{{ app.status }}">
-                                {{ app.get_status_display }}
+                            <span class="staff-app-type-tag staff-app-type--{{ s.app_type_class }}">
+                                {% if s.app_type_class == 'new' %}
+                                    <i class="fa-solid fa-file-circle-plus"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                {% endif %}
+                                {{ s.app_type }}
+                            </span>
+                        </td>
+                        <td class="staff-td-course">{{ s.course }}</td>
+                        <td class="staff-td-year">{{ s.year_level_display }}</td>
+                        <td class="staff-td-date">{{ s.submitted_at|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="staff-status-tag staff-status--{{ s.status }}">
+                                {{ s.status_display }}
                             </span>
                         </td>
                         <td class="text-center">
                             <div class="staff-action-group">
-                                <a href="{% url 'home:staff_review_application' app.pk %}" class="staff-action-btn staff-action--view" title="Review">
+                                {% if s.is_renewal %}
+                                <a href="#" class="staff-action-btn staff-action--view" title="Review (Renewal)" style="opacity:0.6; cursor:default;">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
+                                {% else %}
+                                <a href="{% url 'home:staff_review_application' s.pk %}" class="staff-action-btn staff-action--view" title="Review">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                {% endif %}
                                 <!-- Quick status dropdown -->
+                                {% if not s.is_renewal %}
                                 <div class="staff-action-dropdown">
                                     <button class="staff-action-btn staff-action--status" title="Update Status" onclick="this.nextElementSibling.classList.toggle('show')">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <div class="staff-dropdown-menu">
-                                        <form method="post" action="{% url 'home:staff_update_application_status' app.pk %}">
+                                        <form method="post" action="{% url 'home:staff_update_application_status' s.pk %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{% url 'home:staff_dashboard' %}">
                                             <button type="submit" name="status" value="pending" class="staff-dropdown-item">
@@ -169,14 +198,15 @@
                                         </form>
                                     </div>
                                 </div>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="staff-table-empty">
+                        <td colspan="8" class="staff-table-empty">
                             <i class="fa-regular fa-folder-open"></i>
-                            <p>No applications submitted yet.</p>
+                            <p>No students have signed into the system yet.</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -209,7 +239,12 @@
                 </div>
                 <div class="staff-activity-meta">
                     <span class="staff-activity-date">{{ app.submitted_at|date:"M d, Y" }}</span>
-                    <span class="staff-status-tag staff-status--{{ app.status }}" style="font-size:10px;">{{ app.get_status_display }}</span>
+                    <div style="display:flex; gap:4px; align-items:center;">
+                        <span class="staff-app-type-tag staff-app-type--{% if app.app_type == 'Renewal' %}renewal{% else %}new{% endif %}" style="font-size:9px; padding:2px 8px;">
+                            {{ app.app_type }}
+                        </span>
+                        <span class="staff-status-tag staff-status--{{ app.status }}" style="font-size:10px;">{{ app.get_status_display }}</span>
+                    </div>
                 </div>
             </div>
             {% empty %}
@@ -463,21 +498,37 @@ function toggleEditForm(id) {
 (function() {
     var btns = document.querySelectorAll('.staff-filter-btn');
     var rows = document.querySelectorAll('#applicationsTable tbody tr[data-status]');
+    var currentFilter = 'all';
 
     btns.forEach(function(btn) {
         btn.addEventListener('click', function() {
             btns.forEach(function(b) { b.classList.remove('staff-filter--active'); });
             btn.classList.add('staff-filter--active');
-            var filter = btn.getAttribute('data-filter');
-            rows.forEach(function(row) {
-                if (filter === 'all' || row.getAttribute('data-status') === filter) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+            currentFilter = btn.getAttribute('data-filter');
+            applyFilters();
         });
     });
+
+    // ── Search bar ──
+    var searchInput = document.getElementById('studentSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            applyFilters();
+        });
+    }
+
+    function applyFilters() {
+        var search = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        rows.forEach(function(row) {
+            var matchFilter = (currentFilter === 'all' || row.getAttribute('data-status') === currentFilter);
+            var matchSearch = true;
+            if (search) {
+                var searchText = (row.getAttribute('data-search') || '').toLowerCase();
+                matchSearch = searchText.indexOf(search) !== -1;
+            }
+            row.style.display = (matchFilter && matchSearch) ? '' : 'none';
+        });
+    }
 })();
 
 // ── Close dropdowns when clicking outside ──
