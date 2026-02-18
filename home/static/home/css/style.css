@@ -4915,6 +4915,11 @@ button.review-doc-link:hover {
   background: rgba(255,255,255,0.08);
 }
 
+/* Hidden on desktop, shown on mobile */
+.mobile-nav-links {
+  display: none;
+}
+
 /* 3-column variant for dashboard content management grid */
 .dashboard-grid--3col {
   grid-template-columns: 1fr 1fr 1fr;
