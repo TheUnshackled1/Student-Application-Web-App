@@ -55,14 +55,14 @@
             <div class="logo-circle" style="width:64px; height:64px; margin:0 auto 16px;">
                 <span class="logo-text" style="font-size:14px;">CHMSU</span>
             </div>
-            <h2 style="font-size:22px; font-weight:700; color:#1a5632; margin:0 0 4px;">Welcome Back</h2>
-            <p style="font-size:13px; color:#6b7280; margin:0;">Sign in to access your dashboard</p>
+            <h2 style="font-size:22px; font-weight:700; color:#5eead4; margin:0 0 4px;">Welcome Back</h2>
+            <p style="font-size:13px; color:rgba(255,255,255,0.55); margin:0;">Sign in to access your dashboard</p>
         </div>
 
         <!-- Error Messages -->
         {% if form.errors %}
-        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:12px 16px; margin-bottom:20px;">
-            <p style="font-size:13px; color:#dc2626; margin:0; font-weight:600;">
+        <div style="background:rgba(220,38,38,0.15); border:1px solid rgba(248,113,113,0.3); border-radius:8px; padding:12px 16px; margin-bottom:20px;">
+            <p style="font-size:13px; color:#f87171; margin:0; font-weight:600;">
                 <i class="fa-solid fa-circle-exclamation"></i>
                 Invalid username or password. Please try again.
             </p>
@@ -76,24 +76,24 @@
 
             <!-- Username -->
             <div style="margin-bottom:16px;">
-                <label for="id_username" style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">Username</label>
+                <label for="id_username" style="display:block; font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:6px;">Username</label>
                 <div style="position:relative;">
-                    <i class="fa-solid fa-user" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:14px;"></i>
+                    <i class="fa-solid fa-user" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.4); font-size:14px;"></i>
                     <input type="text" name="username" id="id_username" autofocus required
-                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s;"
-                        onfocus="this.style.borderColor='#1a5632'" onblur="this.style.borderColor='#d1d5db'"
+                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid rgba(255,255,255,0.15); border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s; background:rgba(255,255,255,0.06); color:#ffffff;"
+                        onfocus="this.style.borderColor='#5eead4'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
                         placeholder="Enter your username">
                 </div>
             </div>
 
             <!-- Password -->
             <div style="margin-bottom:24px;">
-                <label for="id_password" style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">Password</label>
+                <label for="id_password" style="display:block; font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:6px;">Password</label>
                 <div style="position:relative;">
-                    <i class="fa-solid fa-lock" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:14px;"></i>
+                    <i class="fa-solid fa-lock" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.4); font-size:14px;"></i>
                     <input type="password" name="password" id="id_password" required
-                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s;"
-                        onfocus="this.style.borderColor='#1a5632'" onblur="this.style.borderColor='#d1d5db'"
+                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid rgba(255,255,255,0.15); border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s; background:rgba(255,255,255,0.06); color:#ffffff;"
+                        onfocus="this.style.borderColor='#5eead4'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
                         placeholder="Enter your password">
                 </div>
             </div>
@@ -107,7 +107,7 @@
 
         <!-- Back Link -->
         <div style="text-align:center; margin-top:20px;">
-            <a href="{% url 'home:home' %}" style="font-size:13px; color:#6b7280; text-decoration:none;">
+            <a href="{% url 'home:home' %}" style="font-size:13px; color:rgba(255,255,255,0.55); text-decoration:none;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Home
             </a>
         </div>

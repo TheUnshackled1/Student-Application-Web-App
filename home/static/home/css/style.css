@@ -369,9 +369,9 @@ body {
   border: 2px solid #f59e0b;
 }
 .thumb-icon.locked {
-  background: #f3f4f6;
-  color: #9ca3af;
-  border: 2px solid #d1d5db;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.35);
+  border: 2px solid rgba(255,255,255,0.12);
 }
 
 .thumb-label {
@@ -420,10 +420,10 @@ body {
   flex-shrink: 0;
 }
 .date-icon--normal  { background: rgba(13, 148, 136, 0.15); color: #5eead4; }
-.date-icon--soon    { background: #fef9c3; color: #92400e; }
-.date-icon--urgent  { background: #fee2e2; color: #b91c1c; }
-.date-icon--critical{ background: #fecaca; color: #991b1b; }
-.date-icon--passed  { background: #f3f4f6; color: #9ca3af; }
+.date-icon--soon    { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.date-icon--urgent  { background: rgba(220, 38, 38, 0.15); color: #f87171; }
+.date-icon--critical{ background: rgba(220, 38, 38, 0.25); color: #fca5a5; }
+.date-icon--passed  { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); }
 
 .date-details {
   display: flex;
@@ -434,12 +434,12 @@ body {
 .date-event-name {
   font-size: 13px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
 }
 
 .date-full {
   font-size: 11px;
-  color: #6b7280;
+  color: rgba(255,255,255,0.55);
 }
 
 .days-badge {
@@ -450,11 +450,11 @@ body {
   font-weight: 700;
   white-space: nowrap;
 }
-.badge-normal   { background: #dcfce7; color: #166534; }
-.badge-soon     { background: #fef9c3; color: #92400e; }
-.badge-urgent   { background: #fee2e2; color: #b91c1c; }
-.badge-critical { background: #fecaca; color: #991b1b; animation: pulse-badge 1.2s infinite; }
-.badge-passed   { background: #f3f4f6; color: #9ca3af; text-decoration: line-through; }
+.badge-normal   { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+.badge-soon     { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.badge-urgent   { background: rgba(220, 38, 38, 0.15); color: #f87171; }
+.badge-critical { background: rgba(220, 38, 38, 0.25); color: #fca5a5; animation: pulse-badge 1.2s infinite; }
+.badge-passed   { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); text-decoration: line-through; }
 
 @keyframes pulse-badge {
   0%, 100% { opacity: 1; }
@@ -1244,16 +1244,16 @@ body {
 
 /* ── Field Groups ── */
 .applyform-field-group {
-  background: #f9fafb;
-  border: 1px solid #f0f1f3;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
   border-radius: 14px;
   padding: 20px 24px;
   margin-bottom: 16px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .applyform-field-group:focus-within {
-  border-color: rgba(26, 86, 50, 0.25);
-  box-shadow: 0 0 0 3px rgba(26, 86, 50, 0.06);
+  border-color: rgba(94, 234, 212, 0.35);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.08);
 }
 .applyform-field-group-label {
   display: inline-flex;
@@ -1332,16 +1332,16 @@ body {
   gap: 16px;
 }
 .applyform-doc-card {
-  background: #f9fafb;
-  border: 1.5px solid #e5e7eb;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.10);
   border-radius: 14px;
   padding: 18px 20px;
   position: relative;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .applyform-doc-card:hover {
-  border-color: #93c5fd;
-  box-shadow: 0 2px 12px rgba(200, 168, 78, 0.12);
+  border-color: #5eead4;
+  box-shadow: 0 2px 12px rgba(94, 234, 212, 0.12);
 }
 .applyform-doc-num {
   position: absolute;
@@ -1531,8 +1531,8 @@ body {
    REQUIREMENT ITEMS (APPLY NEW)
    ========================================== */
 .requirement-item {
-  background: #f9fafb;
-  border: 1.5px solid #e5e7eb;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.10);
   border-radius: 10px;
   padding: 16px 20px;
   margin-bottom: 12px;
@@ -1785,8 +1785,8 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: #f3f4f6;
-  color: #374151;
+  background: rgba(255,255,255,0.10);
+  color: #e2e8f0;
   border: none;
   border-radius: 10px;
   font-size: 14px;
@@ -1795,7 +1795,7 @@ body {
   transition: all 0.2s;
 }
 .btn-camera-retake:hover {
-  background: #e5e7eb;
+  background: rgba(255,255,255,0.18);
 }
 
 /* ==========================================
@@ -2605,7 +2605,7 @@ body {
   align-items: center;
   gap: 14px;
   padding: 14px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .staff-activity-item:last-child {
   border-bottom: none;
@@ -2621,12 +2621,12 @@ body {
   flex-shrink: 0;
 }
 .staff-activity--approved {
-  background: #dcfce7;
-  color: #16a34a;
+  background: rgba(22, 163, 74, 0.15);
+  color: #4ade80;
 }
 .staff-activity--rejected {
-  background: #fee2e2;
-  color: #dc2626;
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
 }
 .staff-activity-info {
   flex: 1;
@@ -2638,11 +2638,11 @@ body {
 .staff-activity-name {
   font-size: 14px;
   font-weight: 700;
-  color: #1f2937;
+  color: #ffffff;
 }
 .staff-activity-detail {
   font-size: 12px;
-  color: #6b7280;
+  color: rgba(255,255,255,0.55);
 }
 .staff-activity-meta {
   display: flex;
@@ -2682,17 +2682,17 @@ body {
   align-items: center;
   gap: 14px;
   padding: 16px 24px;
-  background: #ffffff;
+  background: rgba(255,255,255,0.06);
   border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
 .review-action-label {
   font-size: 13px;
   font-weight: 700;
-  color: #374151;
+  color: #e2e8f0;
   white-space: nowrap;
 }
 .review-action-form {
@@ -2706,48 +2706,48 @@ body {
   gap: 6px;
   padding: 8px 16px;
   border-radius: 10px;
-  border: 2px solid #e5e7eb;
-  background: #ffffff;
+  border: 2px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
 }
 .review-btn--pending {
-  color: #92400e;
+  color: #fbbf24;
 }
 .review-btn--pending:hover,
 .review-btn--pending.review-btn--current {
-  background: #fef3c7;
+  background: rgba(251, 191, 36, 0.15);
   border-color: #fbbf24;
-  color: #92400e;
+  color: #fbbf24;
 }
 .review-btn--under_review {
-  color: #1e40af;
+  color: #93c5fd;
 }
 .review-btn--under_review:hover,
 .review-btn--under_review.review-btn--current {
-  background: #dbeafe;
+  background: rgba(96, 165, 250, 0.15);
   border-color: #60a5fa;
-  color: #1e40af;
+  color: #93c5fd;
 }
 .review-btn--approved {
-  color: #166534;
+  color: #4ade80;
 }
 .review-btn--approved:hover,
 .review-btn--approved.review-btn--current {
-  background: #dcfce7;
+  background: rgba(74, 222, 128, 0.15);
   border-color: #4ade80;
-  color: #166534;
+  color: #4ade80;
 }
 .review-btn--rejected {
-  color: #991b1b;
+  color: #f87171;
 }
 .review-btn--rejected:hover,
 .review-btn--rejected.review-btn--current {
-  background: #fee2e2;
+  background: rgba(248, 113, 113, 0.15);
   border-color: #f87171;
-  color: #991b1b;
+  color: #f87171;
 }
 
 /* ── Review Grid ── */
@@ -2783,13 +2783,13 @@ body {
 .review-field-value {
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
 }
 
 /* ── Document list on review page ── */
 .review-doc-progress {
   height: 6px;
-  background: #e5e7eb;
+  background: rgba(255,255,255,0.10);
   border-radius: 3px;
   margin: 0 24px 16px;
   overflow: hidden;
@@ -2808,7 +2808,7 @@ body {
   align-items: center;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .review-doc-item:last-child {
   border-bottom: none;
@@ -2827,7 +2827,7 @@ body {
 .review-doc-name {
   font-size: 13px;
   font-weight: 600;
-  color: #1f2937;
+  color: #e2e8f0;
 }
 .review-doc-link {
   font-size: 11px;
@@ -2895,7 +2895,7 @@ body {
 .staff-mgmt-form .form-label {
   font-size: 12px;
   font-weight: 600;
-  color: #374151;
+  color: #e2e8f0;
   margin-bottom: 3px;
 }
 
@@ -2905,7 +2905,7 @@ body {
   justify-content: space-between;
   gap: 8px;
   padding: 10px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .staff-item-row:last-of-type {
   border-bottom: none;
@@ -2921,7 +2921,7 @@ body {
 
 .staff-item-text {
   font-size: 13px;
-  color: #374151;
+  color: #e2e8f0;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -2933,7 +2933,7 @@ body {
   font-weight: 700;
   color: #5eead4;
   white-space: nowrap;
-  background: #f0fdf4;
+  background: rgba(13, 148, 136, 0.15);
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -2953,9 +2953,9 @@ body {
   letter-spacing: 0.3px;
   white-space: nowrap;
 }
-.staff-badge--info    { background: #dbeafe; color: #1e40af; }
-.staff-badge--warning { background: #fef3c7; color: #92400e; }
-.staff-badge--urgent  { background: #fecaca; color: #991b1b; }
+.staff-badge--info    { background: rgba(96, 165, 250, 0.15); color: #93c5fd; }
+.staff-badge--warning { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.staff-badge--urgent  { background: rgba(248, 113, 113, 0.15); color: #f87171; }
 
 .staff-item-actions {
   display: flex;
@@ -2979,8 +2979,8 @@ body {
 }
 
 .staff-btn-edit {
-  background: #eff6ff;
-  color: #2563eb;
+  background: rgba(37, 99, 235, 0.15);
+  color: #93c5fd;
 }
 .staff-btn-edit:hover {
   background: #2563eb;
@@ -2988,8 +2988,8 @@ body {
 }
 
 .staff-btn-delete {
-  background: #fef2f2;
-  color: #dc2626;
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
 }
 .staff-btn-delete:hover {
   background: #dc2626;
@@ -2997,8 +2997,8 @@ body {
 }
 
 .staff-edit-form {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
   border-radius: 8px;
   padding: 12px;
   margin: 8px 0 12px;
