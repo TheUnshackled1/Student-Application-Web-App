@@ -9,7 +9,7 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
 )
-from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm, RenewalApplicationForm
+from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm, RenewalApplicationForm, OfficeForm
 from datetime import date as _date, timedelta
 import json
 import base64
@@ -395,6 +395,13 @@ def available_offices(request):
         'total_limited': sum(1 for o in offices_data if o['status'] == 'limited'),
         'total_full': sum(1 for o in offices_data if o['status'] == 'full'),
     }
+
+    # If staff is logged in, include the office form for management
+    is_staff_user = request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser)
+    if is_staff_user:
+        context['is_staff_user'] = True
+        context['office_form'] = OfficeForm()
+
     return render(request, 'home/available_offices.html', context)
 
 
@@ -1037,3 +1044,66 @@ def director_update_application_status(request, pk):
     if next_url:
         return redirect(next_url)
     return redirect('home:director_dashboard')
+
+
+# ================================================================
+#  STAFF CRUD — Offices
+# ================================================================
+
+@login_required
+@require_POST
+def staff_add_office(request):
+    """Create a new office. Staff only."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    form = OfficeForm(request.POST)
+    if form.is_valid():
+        form.save()
+    return redirect('home:available_offices')
+
+
+@login_required
+@require_POST
+def staff_edit_office(request, pk):
+    """Edit an existing office. Staff only."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    office = get_object_or_404(Office, pk=pk)
+    form = OfficeForm(request.POST, instance=office)
+    if form.is_valid():
+        form.save()
+    return redirect('home:available_offices')
+
+
+@login_required
+@require_POST
+def staff_delete_office(request, pk):
+    """Deactivate (soft-delete) an office. Staff only."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    office = get_object_or_404(Office, pk=pk)
+    office.is_active = False
+    office.save()
+    return redirect('home:available_offices')
+
+
+@login_required
+def staff_get_office_json(request, pk):
+    """Return a single office as JSON (for populating edit forms)."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return JsonResponse({'error': 'forbidden'}, status=403)
+    office = get_object_or_404(Office, pk=pk)
+    return JsonResponse({
+        'id': office.pk,
+        'name': office.name,
+        'building': office.building,
+        'room': office.room,
+        'hours': office.hours,
+        'head': office.head,
+        'total_slots': office.total_slots,
+        'latitude': office.latitude,
+        'longitude': office.longitude,
+        'icon': office.icon,
+        'description': office.description,
+        'is_active': office.is_active,
+    })

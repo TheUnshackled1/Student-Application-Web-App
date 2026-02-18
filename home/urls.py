@@ -33,4 +33,10 @@ urlpatterns = [
     path('staff/announcements/add/', views.staff_add_announcement, name='staff_add_announcement'),
     path('staff/announcements/<int:pk>/edit/', views.staff_edit_announcement, name='staff_edit_announcement'),
     path('staff/announcements/<int:pk>/delete/', views.staff_delete_announcement, name='staff_delete_announcement'),
+
+    # ---- Staff CRUD: Offices ----
+    path('staff/offices/add/', views.staff_add_office, name='staff_add_office'),
+    path('staff/offices/<int:pk>/edit/', views.staff_edit_office, name='staff_edit_office'),
+    path('staff/offices/<int:pk>/delete/', views.staff_delete_office, name='staff_delete_office'),
+    path('staff/offices/<int:pk>/json/', views.staff_get_office_json, name='staff_get_office_json'),
 ]

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication
+from .models import Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication, Office
 
 
 class ReminderForm(forms.ModelForm):
@@ -190,3 +190,82 @@ class RenewalApplicationForm(forms.ModelForm):
         if len(val) > 8:
             raise forms.ValidationError('Student ID must be at most 8 digits.')
         return val
+
+
+# ================================================================
+#  OFFICE FORM
+# ================================================================
+
+ICON_CHOICES = [
+    ('fa-solid fa-building', 'Building'),
+    ('fa-solid fa-book', 'Book / Library'),
+    ('fa-solid fa-user-tie', 'User / Office Head'),
+    ('fa-solid fa-gavel', 'Gavel / Dean'),
+    ('fa-solid fa-calculator', 'Calculator / Accounting'),
+    ('fa-solid fa-cash-register', 'Cash Register / Cashier'),
+    ('fa-solid fa-users', 'Users / Student Affairs'),
+    ('fa-solid fa-laptop-code', 'Laptop / ICT'),
+    ('fa-solid fa-flask', 'Flask / Research'),
+    ('fa-solid fa-id-card', 'ID Card / HR'),
+    ('fa-solid fa-hand-holding-heart', 'Heart / Guidance'),
+    ('fa-solid fa-graduation-cap', 'Grad Cap / Academic'),
+    ('fa-solid fa-clipboard-list', 'Clipboard / Registrar'),
+    ('fa-solid fa-shield-halved', 'Shield / Security'),
+    ('fa-solid fa-stethoscope', 'Stethoscope / Clinic'),
+    ('fa-solid fa-tools', 'Tools / Maintenance'),
+]
+
+
+class OfficeForm(forms.ModelForm):
+    class Meta:
+        model = Office
+        fields = [
+            'name', 'building', 'room', 'hours', 'head',
+            'total_slots', 'latitude', 'longitude', 'icon', 'description', 'is_active',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Registrar\u2019s Office',
+            }),
+            'building': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Administration Building',
+            }),
+            'room': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Ground Floor, Room 101',
+            }),
+            'hours': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Mon\u2013Fri, 8:00 AM \u2013 5:00 PM',
+            }),
+            'head': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Head / Supervisor name',
+            }),
+            'total_slots': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1', 'max': '50',
+                'placeholder': '3',
+            }),
+            'latitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.00001', 'id': 'id_latitude',
+            }),
+            'longitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.00001', 'id': 'id_longitude',
+            }),
+            'icon': forms.Select(attrs={'class': 'form-select'}),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Brief description of the office\u2026',
+            }),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['icon'].choices = ICON_CHOICES
