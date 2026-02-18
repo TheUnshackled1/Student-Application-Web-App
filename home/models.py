@@ -61,13 +61,20 @@ class UpcomingDate(models.Model):
 
 
 class Reminder(models.Model):
+    PRIORITY_CHOICES = [
+        ('info', 'Info'),
+        ('warning', 'Warning'),
+        ('urgent', 'Urgent'),
+    ]
+
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='reminders', null=True, blank=True)
     message = models.TextField()
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='info')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.message[:50]
+        return f"[{self.get_priority_display()}] {self.message[:50]}"
 
 
 class Announcement(models.Model):

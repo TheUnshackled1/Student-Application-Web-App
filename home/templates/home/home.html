@@ -145,18 +145,44 @@
 
         <!-- ===== COLUMN 3: DEADLINES & HELP ===== -->
         <div class="card deadlines-help">
-            <h3 class="card-title">Upcoming Dates</h3>
-            <table class="dates-table">
-                <tbody>
-                    {% for date in upcoming_dates %}
-                    <tr>
-                        <td class="date-event">{{ date.title }}</td>
-                        <td class="date-value">{{ date.date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <button class="btn-primary">Chat with Admissions</button>
+            <h3 class="card-title"><i class="fa-regular fa-calendar"></i> Upcoming Dates</h3>
+            <div class="dates-list">
+                {% for date in upcoming_dates %}
+                <div class="date-item date-{{ date.urgency }}">
+                    <div class="date-left">
+                        <div class="date-icon-wrap date-icon--{{ date.urgency }}">
+                            {% if date.urgency == 'critical' or date.urgency == 'urgent' %}
+                                <i class="fa-solid fa-fire"></i>
+                            {% elif date.urgency == 'passed' %}
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                            {% else %}
+                                <i class="fa-regular fa-calendar-check"></i>
+                            {% endif %}
+                        </div>
+                        <div class="date-details">
+                            <span class="date-event-name">{{ date.title }}</span>
+                            <span class="date-full">{{ date.date }}</span>
+                        </div>
+                    </div>
+                    <div class="date-right">
+                        {% if date.urgency == 'passed' %}
+                            <span class="days-badge badge-passed">Passed</span>
+                        {% elif date.urgency == 'critical' %}
+                            <span class="days-badge badge-critical">{{ date.days_left }}d left</span>
+                        {% elif date.urgency == 'urgent' %}
+                            <span class="days-badge badge-urgent">{{ date.days_left }}d left</span>
+                        {% elif date.urgency == 'soon' %}
+                            <span class="days-badge badge-soon">{{ date.days_left }}d left</span>
+                        {% else %}
+                            <span class="days-badge badge-normal">{{ date.days_left }}d left</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="empty-state"><i class="fa-regular fa-calendar"></i> No upcoming dates</p>
+                {% endfor %}
+            </div>
+            <button class="btn-primary"><i class="fa-solid fa-comments"></i> Chat with Admissions</button>
         </div>
     </div>
 
@@ -167,16 +193,37 @@
     </div>
 
     <!-- ===== REMINDERS ===== -->
-    {% for reminder in reminders %}
-    <div class="reminder-banner">
-        <span class="reminder-icon">⚙️</span>
-        <span class="reminder-text">{{ reminder.message }}</span>
+    {% if reminders %}
+    <div class="reminders-section">
+        <h3 class="reminders-heading"><i class="fa-solid fa-bell"></i> Reminders</h3>
+        {% for reminder in reminders %}
+        <div class="reminder-banner reminder-{{ reminder.priority }}" id="reminder-{{ reminder.id }}">
+            <div class="reminder-left">
+                {% if reminder.priority == 'urgent' %}
+                    <span class="reminder-icon reminder-icon--urgent"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                {% elif reminder.priority == 'warning' %}
+                    <span class="reminder-icon reminder-icon--warning"><i class="fa-solid fa-circle-exclamation"></i></span>
+                {% else %}
+                    <span class="reminder-icon reminder-icon--info"><i class="fa-solid fa-circle-info"></i></span>
+                {% endif %}
+                <div class="reminder-body">
+                    <span class="reminder-text">{{ reminder.message }}</span>
+                    {% if reminder.created_at %}
+                    <span class="reminder-time"><i class="fa-regular fa-clock"></i> {{ reminder.created_at }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <button class="reminder-dismiss" onclick="this.closest('.reminder-banner').remove()" title="Dismiss">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+    {% endif %}
 
     <!-- ===== UNIVERSITY ANNOUNCEMENTS ===== -->
     <div class="announcements-section">
-        <h3 class="announcements-title">University Announcements</h3>
+        <h3 class="announcements-title"><i class="fa-solid fa-bullhorn"></i> University Announcements</h3>
         <div class="announcements-grid">
             {% for announcement in announcements %}
             <div class="announcement-card">
@@ -188,12 +235,20 @@
                             <i class="fa-solid fa-newspaper"></i>
                         </div>
                     {% endif %}
+                    {% if announcement.is_new %}
+                    <span class="announcement-badge-new">NEW</span>
+                    {% endif %}
                 </div>
                 <div class="announcement-content">
                     <h4 class="announcement-card-title">{{ announcement.title }}</h4>
                     <p class="announcement-summary">{{ announcement.summary }}</p>
+                    {% if announcement.published_at %}
+                    <span class="announcement-date"><i class="fa-regular fa-clock"></i> {{ announcement.published_at }}</span>
+                    {% endif %}
                 </div>
             </div>
+            {% empty %}
+            <p class="empty-state"><i class="fa-solid fa-newspaper"></i> No announcements at this time.</p>
             {% endfor %}
         </div>
     </div>

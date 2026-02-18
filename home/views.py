@@ -4,10 +4,12 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseForbidden, JsonResponse
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from django.utils import timezone
 from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement,
 )
+from datetime import date as _date, timedelta
 import json
 import base64
 import os
@@ -16,8 +18,23 @@ import cv2
 import numpy as np
 
 
+def _urgency_for_days(days_left):
+    """Return urgency level string based on days remaining."""
+    if days_left < 0:
+        return 'passed'
+    elif days_left <= 3:
+        return 'critical'
+    elif days_left <= 7:
+        return 'urgent'
+    elif days_left <= 14:
+        return 'soon'
+    return 'normal'
+
+
 def home(request):
     """Home/dashboard view for student applicants."""
+    today = _date.today()
+
     # Default demo data for the template (no login required)
     documents = [
         {'name': 'Form 138', 'status': 'uploaded', 'label': 'Uploaded'},
@@ -32,22 +49,33 @@ def home(request):
     ]
 
     upcoming_dates = [
-        {'title': 'Entrance Exam', 'date': 'March 15'},
-        {'title': 'Interview', 'date': 'April 02'},
+        {'title': 'Entrance Exam', 'date': 'March 15, 2026', 'days_left': 25, 'urgency': 'normal'},
+        {'title': 'Interview', 'date': 'April 02, 2026', 'days_left': 43, 'urgency': 'normal'},
     ]
 
     reminders = [
-        {'message': 'Reminder! Please upload your Grade 12 Report Card before Friday'},
+        {
+            'message': 'Please upload your Grade 12 Report Card before Friday.',
+            'priority': 'warning',
+            'created_at': 'Just now',
+            'id': 0,
+        },
     ]
 
     announcements = [
         {
-            'title': 'Online Registration',
-            'summary': 'Campus Expo: Intra-Year Agency of Asia & Europe, Sorting the next 2019 Council Crisis.',
+            'title': 'Online Registration Now Open',
+            'summary': 'The online registration portal for S.Y. 2026-2027 is now accepting applications.',
+            'image': None,
+            'published_at': 'Feb 15, 2026',
+            'is_new': True,
         },
         {
-            'title': 'More Announcements',
-            'summary': "CenterFresh's also light Delu, Home of Malaysia tali Energyshare, Diploma 101 Provisions.",
+            'title': 'Campus Orientation Schedule',
+            'summary': 'New student assistants are required to attend the campus orientation on March 1.',
+            'image': None,
+            'published_at': 'Feb 10, 2026',
+            'is_new': True,
         },
     ]
 
@@ -73,21 +101,43 @@ def home(request):
                 ]
             db_reminders = Reminder.objects.filter(student=student, is_active=True)
             if db_reminders.exists():
-                reminders = [{'message': r.message} for r in db_reminders]
+                reminders = [
+                    {
+                        'message': r.message,
+                        'priority': getattr(r, 'priority', 'info'),
+                        'id': r.id,
+                        'created_at': r.created_at.strftime('%b %d, %Y'),
+                    }
+                    for r in db_reminders
+                ]
         except StudentProfile.DoesNotExist:
             pass
 
+    # --- Upcoming Dates with countdown & urgency ---
     db_dates = UpcomingDate.objects.filter(is_active=True)
     if db_dates.exists():
-        upcoming_dates = [
-            {'title': d.title, 'date': d.date.strftime('%B %d')}
-            for d in db_dates
-        ]
+        upcoming_dates = []
+        for d in db_dates:
+            delta = (d.date - today).days
+            upcoming_dates.append({
+                'title': d.title,
+                'date': d.date.strftime('%B %d, %Y'),
+                'days_left': max(delta, 0),
+                'urgency': _urgency_for_days(delta),
+            })
 
-    db_announcements = Announcement.objects.filter(is_active=True)[:4]
+    # --- Announcements with published date & "new" badge ---
+    db_announcements = Announcement.objects.filter(is_active=True)[:6]
     if db_announcements.exists():
+        seven_days_ago = timezone.now() - timedelta(days=7)
         announcements = [
-            {'title': a.title, 'summary': a.summary, 'image': a.image}
+            {
+                'title': a.title,
+                'summary': a.summary,
+                'image': a.image,
+                'published_at': a.published_at.strftime('%b %d, %Y'),
+                'is_new': a.published_at >= seven_days_ago,
+            }
             for a in db_announcements
         ]
 
