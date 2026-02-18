@@ -196,7 +196,18 @@
                             <label class="form-label">Student ID <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-id-badge"></i>
-                                <input type="text" class="form-control" name="student_id" maxlength="8" inputmode="numeric" pattern="\d{1,8}" placeholder="12345678" title="Must be up to 8 digits" required>
+                                <input type="text" class="form-control" name="student_id" id="id_student_id_new" maxlength="8" inputmode="numeric" pattern="\d{1,8}" placeholder="12345678" title="Must be up to 8 digits" required>
+                            </div>
+                            <!-- Detection banner (hidden by default) -->
+                            <div class="student-id-alert student-id-alert--warning" id="studentIdWarning" style="display:none;">
+                                <div class="student-id-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                <div class="student-id-alert-body">
+                                    <strong>Student ID already registered!</strong>
+                                    <p id="studentIdWarningText">This student ID is already in the system.</p>
+                                    <a href="{% url 'home:apply_renew' %}" class="student-id-alert-link">
+                                        <i class="fa-solid fa-arrows-rotate"></i> Go to Renewal Form instead
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -700,6 +711,40 @@
             { enableHighAccuracy: true, timeout: 10000 }
         );
     }
+
+    // ── Student ID Auto-Detection (warn if already registered) ──
+    (function() {
+        var sidInput = document.getElementById('id_student_id_new');
+        var warningBox = document.getElementById('studentIdWarning');
+        var warningText = document.getElementById('studentIdWarningText');
+        var checkTimer = null;
+
+        if (!sidInput) return;
+
+        sidInput.addEventListener('input', function() {
+            clearTimeout(checkTimer);
+            var val = this.value.trim();
+            if (val.length < 3) {
+                warningBox.style.display = 'none';
+                return;
+            }
+            checkTimer = setTimeout(function() {
+                fetch("{% url 'home:check_student_id' %}?student_id=" + encodeURIComponent(val))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.exists) {
+                            warningText.textContent = 'Student ID "' + val + '" belongs to ' + data.data.full_name + ' (' + data.data.status + '). If you are renewing, please use the Renewal form.';
+                            warningBox.style.display = 'flex';
+                        } else {
+                            warningBox.style.display = 'none';
+                        }
+                    })
+                    .catch(function() {
+                        warningBox.style.display = 'none';
+                    });
+            }, 400);
+        });
+    })();
 </script>
 </body>
 </html>

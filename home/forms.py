@@ -1,5 +1,5 @@
 from django import forms
-from .models import Reminder, UpcomingDate, Announcement, NewApplication
+from .models import Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication
 
 
 class ReminderForm(forms.ModelForm):
@@ -107,6 +107,72 @@ class NewApplicationForm(forms.ModelForm):
             }),
             'year_level': forms.Select(attrs={'class': 'form-select'}),
             'semester': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def clean_contact_number(self):
+        val = self.cleaned_data['contact_number']
+        if not val.isdigit():
+            raise forms.ValidationError('Contact number must contain only digits.')
+        if len(val) != 11:
+            raise forms.ValidationError('Contact number must be exactly 11 digits.')
+        return val
+
+    def clean_student_id(self):
+        val = self.cleaned_data['student_id']
+        if not val.isdigit():
+            raise forms.ValidationError('Student ID must contain only digits.')
+        if len(val) > 8:
+            raise forms.ValidationError('Student ID must be at most 8 digits.')
+        return val
+
+
+class RenewalApplicationForm(forms.ModelForm):
+    class Meta:
+        model = RenewalApplication
+        fields = [
+            'student_id', 'full_name', 'email', 'contact_number', 'address',
+            'course', 'year_level', 'semester',
+            'previous_office', 'preferred_office', 'hours_rendered', 'supervisor_name',
+            'enrolment_form', 'schedule_classes', 'grades_last_sem',
+            'official_time', 'recommendation_letter', 'evaluation_form',
+        ]
+        widgets = {
+            'student_id': forms.TextInput(attrs={
+                'class': 'form-control', 'maxlength': 8,
+                'placeholder': '12345678', 'inputmode': 'numeric',
+            }),
+            'full_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Juan A. Dela Cruz',
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'name@example.com',
+            }),
+            'contact_number': forms.TextInput(attrs={
+                'class': 'form-control', 'maxlength': 11,
+                'placeholder': '09XXXXXXXXX', 'inputmode': 'numeric',
+            }),
+            'address': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Street, Barangay, City / Municipality, Province',
+            }),
+            'course': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. BSIT, BSCS, BEED',
+            }),
+            'year_level': forms.Select(attrs={'class': 'form-select'}),
+            'semester': forms.Select(attrs={'class': 'form-select'}),
+            'previous_office': forms.Select(attrs={'class': 'form-select'}),
+            'preferred_office': forms.Select(attrs={'class': 'form-select'}),
+            'hours_rendered': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. 120',
+            }),
+            'supervisor_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Full name of your previous supervisor',
+            }),
         }
 
     def clean_contact_number(self):

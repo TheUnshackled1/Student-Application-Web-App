@@ -161,3 +161,61 @@ class NewApplication(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.student_id})"
+
+
+class RenewalApplication(models.Model):
+    """Renewal application for returning student assistants."""
+
+    YEAR_LEVEL_CHOICES = NewApplication.YEAR_LEVEL_CHOICES
+    SEMESTER_CHOICES = NewApplication.SEMESTER_CHOICES
+    STATUS_CHOICES = NewApplication.STATUS_CHOICES
+
+    OFFICE_CHOICES = [
+        ('registrar', 'Registrar'),
+        ('library', 'Library'),
+        ('guidance', 'Guidance Office'),
+        ('deans', "Dean's Office"),
+        ('cashier', 'Cashier'),
+        ('osa', 'Office of Student Affairs'),
+    ]
+
+    # ── Identity ──
+    student_id = models.CharField(max_length=8)
+    full_name = models.CharField(max_length=200)
+    email = models.EmailField()
+    contact_number = models.CharField(max_length=11)
+    address = models.TextField()
+
+    # ── Academic ──
+    course = models.CharField(max_length=100)
+    year_level = models.IntegerField(choices=YEAR_LEVEL_CHOICES)
+    semester = models.CharField(max_length=5, choices=SEMESTER_CHOICES)
+
+    # ── Previous & Preferred Assignment ──
+    previous_office = models.CharField(max_length=50, choices=OFFICE_CHOICES)
+    preferred_office = models.CharField(max_length=50, choices=OFFICE_CHOICES)
+    hours_rendered = models.PositiveIntegerField()
+    supervisor_name = models.CharField(max_length=200, blank=True, default='')
+
+    # ── Renewal Documents ──
+    enrolment_form = models.FileField(upload_to='applications/renewal/', blank=True)
+    schedule_classes = models.FileField(upload_to='applications/renewal/', blank=True)
+    grades_last_sem = models.FileField(upload_to='applications/renewal/', blank=True)
+    official_time = models.FileField(upload_to='applications/renewal/', blank=True)
+    recommendation_letter = models.FileField(upload_to='applications/renewal/', blank=True)
+    evaluation_form = models.FileField(upload_to='applications/renewal/', blank=True)
+
+    # ── Workflow / Scheduling ──
+    interview_date = models.DateTimeField(null=True, blank=True)
+    assigned_office = models.CharField(max_length=200, blank=True, default='')
+    start_date = models.DateField(null=True, blank=True)
+
+    # ── Meta ──
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    class Meta:
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        return f"[Renewal] {self.full_name} ({self.student_id})"

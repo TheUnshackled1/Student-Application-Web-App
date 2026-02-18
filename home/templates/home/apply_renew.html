@@ -81,7 +81,23 @@
                     <span class="applyform-section-badge">1</span>
                     <div>
                         <h4 class="applyform-section-title">Student Identification</h4>
-                        <p class="applyform-section-hint">Verify your identity and contact details.</p>
+                        <p class="applyform-section-hint">Enter your Student ID to auto-fill your information, then verify your details.</p>
+                    </div>
+                </div>
+
+                <!-- Auto-detect banner (hidden by default) -->
+                <div class="student-id-alert student-id-alert--success" id="studentIdFound" style="display:none;">
+                    <div class="student-id-alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="student-id-alert-body">
+                        <strong>Student found!</strong>
+                        <p id="studentIdFoundText">Your information has been pre-filled from your previous application. Please verify and update if needed.</p>
+                    </div>
+                </div>
+                <div class="student-id-alert student-id-alert--danger" id="studentIdNotFound" style="display:none;">
+                    <div class="student-id-alert-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                    <div class="student-id-alert-body">
+                        <strong>Student ID not found!</strong>
+                        <p>This Student ID is not yet registered in the system. If you are a new applicant, please use the <a href="{% url 'home:apply_new' %}" style="color:#fbbf24;font-weight:600;">New Application</a> form instead.</p>
                     </div>
                 </div>
 
@@ -92,21 +108,22 @@
                             <label class="form-label">Student ID <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-id-badge"></i>
-                                <input type="text" class="form-control" name="student_id" maxlength="8" inputmode="numeric" placeholder="12345678" required>
+                                <input type="text" class="form-control" name="student_id" id="id_student_id_renew" maxlength="8" inputmode="numeric" placeholder="12345678" required>
                             </div>
+                            <small class="form-text text-muted" id="studentIdStatus">Type your Student ID to auto-detect</small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-user"></i>
-                                <input type="text" class="form-control" name="full_name" placeholder="Juan A. Dela Cruz" required>
+                                <input type="text" class="form-control" name="full_name" id="id_full_name" placeholder="Juan A. Dela Cruz" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-at"></i>
-                                <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
+                                <input type="email" class="form-control" name="email" id="id_email" placeholder="name@example.com" required>
                             </div>
                         </div>
                     </div>
@@ -119,14 +136,14 @@
                             <label class="form-label">Contact Number <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-mobile-screen-button"></i>
-                                <input type="text" class="form-control" name="contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" required>
+                                <input type="text" class="form-control" name="contact_number" id="id_contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" required>
                             </div>
                         </div>
                         <div class="col-md-8">
                             <label class="form-label">Home Address <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-location-dot"></i>
-                                <input type="text" class="form-control" name="address" placeholder="Street, Barangay, City / Municipality, Province" required>
+                                <input type="text" class="form-control" name="address" id="id_address" placeholder="Street, Barangay, City / Municipality, Province" required>
                             </div>
                         </div>
                     </div>
@@ -150,12 +167,12 @@
                             <label class="form-label">Course / Program <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-book-open"></i>
-                                <input type="text" class="form-control" name="course" placeholder="e.g. BSIT, BSCS, BEED" required>
+                                <input type="text" class="form-control" name="course" id="id_course" placeholder="e.g. BSIT, BSCS, BEED" required>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Year Level <span class="text-danger">*</span></label>
-                            <select class="form-select" name="year_level" required>
+                            <select class="form-select" name="year_level" id="id_year_level" required>
                                 <option value="" selected disabled>Select year</option>
                                 <option value="1">1st Year</option>
                                 <option value="2">2nd Year</option>
@@ -165,7 +182,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Semester <span class="text-danger">*</span></label>
-                            <select class="form-select" name="semester" required>
+                            <select class="form-select" name="semester" id="id_semester" required>
                                 <option value="" selected disabled>Select semester</option>
                                 <option value="1st">1st Semester</option>
                                 <option value="2nd">2nd Semester</option>
@@ -583,6 +600,100 @@
         }
         window.addEventListener('scroll', updateSteps, { passive: true });
         updateSteps();
+    })();
+
+    // ── Student ID Auto-Detect & Auto-Fill ──
+    (function() {
+        var sidInput = document.getElementById('id_student_id_renew');
+        var foundBox = document.getElementById('studentIdFound');
+        var foundText = document.getElementById('studentIdFoundText');
+        var notFoundBox = document.getElementById('studentIdNotFound');
+        var statusText = document.getElementById('studentIdStatus');
+        var checkTimer = null;
+
+        if (!sidInput) return;
+
+        function fillField(id, value) {
+            var el = document.getElementById(id);
+            if (el && value) {
+                el.value = value;
+                // Highlight briefly
+                el.style.transition = 'box-shadow 0.3s ease';
+                el.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.3)';
+                setTimeout(function() { el.style.boxShadow = ''; }, 1500);
+            }
+        }
+
+        sidInput.addEventListener('input', function() {
+            clearTimeout(checkTimer);
+            var val = this.value.trim();
+
+            // Hide banners while typing
+            foundBox.style.display = 'none';
+            notFoundBox.style.display = 'none';
+
+            if (val.length < 3) {
+                statusText.textContent = 'Type your Student ID to auto-detect';
+                statusText.style.color = '';
+                return;
+            }
+
+            statusText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking...';
+            statusText.style.color = '#6b7280';
+
+            checkTimer = setTimeout(function() {
+                fetch("{% url 'home:check_student_id' %}?student_id=" + encodeURIComponent(val))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.exists) {
+                            var d = data.data;
+                            // Auto-fill fields
+                            fillField('id_full_name', d.full_name);
+                            fillField('id_email', d.email);
+                            fillField('id_contact_number', d.contact_number);
+                            fillField('id_address', d.address);
+                            fillField('id_course', d.course);
+                            fillField('id_year_level', d.year_level);
+                            fillField('id_semester', d.semester);
+
+                            // If previous office info exists, fill it
+                            if (d.assigned_office) {
+                                var prevOffice = document.querySelector('[name="previous_office"]');
+                                if (prevOffice) {
+                                    // Try to match the select option
+                                    for (var i = 0; i < prevOffice.options.length; i++) {
+                                        if (prevOffice.options[i].text.toLowerCase().indexOf(d.assigned_office.toLowerCase()) >= 0 ||
+                                            prevOffice.options[i].value.toLowerCase() === d.assigned_office.toLowerCase()) {
+                                            prevOffice.selectedIndex = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            foundText.textContent = 'Welcome back, ' + d.full_name + '! Your information has been pre-filled from your previous application. Please verify and update as needed.';
+                            foundBox.style.display = 'flex';
+                            notFoundBox.style.display = 'none';
+                            statusText.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Student found';
+                            statusText.style.color = '#22c55e';
+                        } else {
+                            foundBox.style.display = 'none';
+                            if (val.length >= 5) {
+                                notFoundBox.style.display = 'flex';
+                                statusText.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> Not found';
+                                statusText.style.color = '#ef4444';
+                            } else {
+                                statusText.textContent = 'Type your Student ID to auto-detect';
+                                statusText.style.color = '';
+                            }
+                        }
+                    })
+                    .catch(function() {
+                        statusText.textContent = 'Could not check. Please fill in manually.';
+                        statusText.style.color = '#f59e0b';
+                    });
+            }, 400);
+        });
     })();
 </script>
 </body>

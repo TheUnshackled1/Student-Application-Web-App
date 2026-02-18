@@ -7,9 +7,9 @@ from django.conf import settings
 from django.utils import timezone
 from .models import (
     StudentProfile, Document, ApplicationStep,
-    UpcomingDate, Reminder, Announcement, NewApplication,
+    UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication,
 )
-from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm
+from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm, RenewalApplicationForm
 from datetime import date as _date, timedelta
 import json
 import base64
@@ -240,7 +240,77 @@ def apply_new(request):
 
 def apply_renew(request):
     """Renewal form for existing student assistants."""
-    return render(request, 'home/apply_renew.html')
+    if request.method == 'POST':
+        form = RenewalApplicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            application = form.save()
+            request.session['renewal_pk'] = application.pk
+            return redirect('home:home')
+    else:
+        form = RenewalApplicationForm()
+    return render(request, 'home/apply_renew.html', {'form': form})
+
+
+def check_student_id(request):
+    """AJAX endpoint — check if a student_id already exists in the database."""
+    student_id = request.GET.get('student_id', '').strip()
+    if not student_id or not student_id.isdigit():
+        return JsonResponse({'exists': False})
+
+    # Look up in NewApplication (the most recent matching record)
+    app = NewApplication.objects.filter(student_id=student_id).order_by('-submitted_at').first()
+
+    if app:
+        # Build a full name from separate fields
+        full_name_parts = [app.first_name]
+        if app.middle_initial:
+            full_name_parts.append(app.middle_initial + '.')
+        full_name_parts.append(app.last_name)
+        if app.extension_name:
+            full_name_parts.append(app.extension_name)
+        full_name = ' '.join(full_name_parts)
+
+        return JsonResponse({
+            'exists': True,
+            'source': 'new',
+            'data': {
+                'full_name': full_name,
+                'first_name': app.first_name,
+                'middle_initial': app.middle_initial,
+                'last_name': app.last_name,
+                'extension_name': app.extension_name or '',
+                'email': app.email,
+                'contact_number': app.contact_number,
+                'address': app.address,
+                'course': app.course,
+                'year_level': str(app.year_level),
+                'semester': app.semester,
+                'status': app.get_status_display(),
+                'assigned_office': app.assigned_office or '',
+            },
+        })
+
+    # Also check RenewalApplication
+    renewal = RenewalApplication.objects.filter(student_id=student_id).order_by('-submitted_at').first()
+    if renewal:
+        return JsonResponse({
+            'exists': True,
+            'source': 'renewal',
+            'data': {
+                'full_name': renewal.full_name,
+                'email': renewal.email,
+                'contact_number': renewal.contact_number,
+                'address': renewal.address,
+                'course': renewal.course,
+                'year_level': str(renewal.year_level),
+                'semester': renewal.semester,
+                'status': renewal.get_status_display(),
+                'assigned_office': renewal.assigned_office or '',
+                'previous_office': renewal.previous_office or '',
+            },
+        })
+
+    return JsonResponse({'exists': False})
 
 
 @require_POST
