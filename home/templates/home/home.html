@@ -443,6 +443,30 @@
             <i class="fa-solid fa-graduation-cap"></i>
         </div>
     </div>
+
+    <!-- ===== TRACK YOUR APPLICATION ===== -->
+    <div class="track-app-section">
+        <div class="track-app-card">
+            <div class="track-app-icon">
+                <i class="fa-solid fa-magnifying-glass-location"></i>
+            </div>
+            <div class="track-app-content">
+                <h3 class="track-app-title">Track Your Application</h3>
+                <p class="track-app-desc">Already applied? Enter your Student ID to retrieve your application status and document records.</p>
+                <form method="post" action="{% url 'home:home' %}" class="track-app-form">
+                    {% csrf_token %}
+                    <div class="track-app-input-wrap">
+                        <i class="fa-solid fa-id-badge"></i>
+                        <input type="text" name="track_student_id" placeholder="Enter your Student ID (e.g. 20230321)" class="track-app-input" maxlength="8" pattern="\d{8}" required>
+                    </div>
+                    <button type="submit" class="track-app-btn">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        <span>Track</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
     <!-- ===== UPCOMING DATES ===== -->

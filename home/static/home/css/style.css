@@ -4397,3 +4397,128 @@ button.review-doc-link:hover {
     padding: 3px 8px;
   }
 }
+
+/* ══════════════════════════════════════════════
+   Track Your Application Section
+   ══════════════════════════════════════════════ */
+.track-app-section {
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+.track-app-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  background: rgba(30,30,42,0.50);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.track-app-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(20,184,166,0.18), rgba(20,184,166,0.08));
+  border: 1px solid rgba(20,184,166,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #14b8a6;
+  flex-shrink: 0;
+}
+.track-app-content {
+  flex: 1;
+  min-width: 0;
+}
+.track-app-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px;
+}
+.track-app-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+.track-app-form {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.track-app-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 0 14px;
+  transition: border-color .2s, background .2s;
+}
+.track-app-input-wrap:focus-within {
+  border-color: rgba(20,184,166,0.5);
+  background: rgba(20,184,166,0.05);
+}
+.track-app-input-wrap i {
+  color: rgba(255,255,255,0.3);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.track-app-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 0;
+  font-family: inherit;
+}
+.track-app-input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+.track-app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .2s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.track-app-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(20,184,166,0.3);
+}
+
+@media (max-width: 768px) {
+  .track-app-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 16px;
+  }
+  .track-app-form {
+    flex-direction: column;
+    width: 100%;
+  }
+  .track-app-btn {
+    padding: 12px 20px;
+    justify-content: center;
+  }
+}

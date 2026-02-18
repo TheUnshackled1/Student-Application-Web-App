@@ -128,6 +128,19 @@ def home(request):
     """Home/dashboard view for student applicants."""
     today = _date.today()
 
+    # ── Handle "Track Application" form submission ──
+    if request.method == 'POST' and 'track_student_id' in request.POST:
+        track_sid = request.POST.get('track_student_id', '').strip()
+        if track_sid:
+            # Verify the student ID actually exists before storing
+            exists_new = NewApplication.objects.filter(student_id=track_sid).exists()
+            exists_renew = RenewalApplication.objects.filter(student_id=track_sid).exists()
+            if exists_new or exists_renew:
+                tracked = request.session.get('tracked_student_ids', [])
+                if track_sid not in tracked:
+                    tracked.append(track_sid)
+                request.session['tracked_student_ids'] = tracked
+
     # ── Collect ALL applications for this visitor ──
     new_apps = []
     renewal_apps = []
@@ -170,6 +183,11 @@ def home(request):
     for a in renewal_apps:
         session_student_ids.add(a.student_id)
         session_emails.add(a.email)
+
+    # 4. Also include any tracked student IDs from session
+    tracked_ids = request.session.get('tracked_student_ids', [])
+    for sid in tracked_ids:
+        session_student_ids.add(sid)
 
     if session_student_ids:
         for a in NewApplication.objects.filter(student_id__in=session_student_ids).order_by('-submitted_at'):
@@ -412,6 +430,11 @@ def apply_new(request):
         if form.is_valid():
             application = form.save()
             request.session['application_pk'] = application.pk
+            # Persist student_id in session for reliable lookup
+            tracked = request.session.get('tracked_student_ids', [])
+            if application.student_id not in tracked:
+                tracked.append(application.student_id)
+            request.session['tracked_student_ids'] = tracked
             return redirect('home:home')
     else:
         form = NewApplicationForm()
@@ -425,6 +448,11 @@ def apply_renew(request):
         if form.is_valid():
             application = form.save()
             request.session['renewal_pk'] = application.pk
+            # Persist student_id in session for reliable lookup
+            tracked = request.session.get('tracked_student_ids', [])
+            if application.student_id not in tracked:
+                tracked.append(application.student_id)
+            request.session['tracked_student_ids'] = tracked
             return redirect('home:home')
     else:
         form = RenewalApplicationForm()
