@@ -255,14 +255,27 @@
         </span>
     </div>
     <div class="navbar-right d-flex align-items-center gap-2">
+        {% if not user.is_staff and not user.is_superuser %}
         <a href="#" class="btn btn-nav btn-nav--apply" data-bs-toggle="modal" data-bs-target="#applyRenewModal">
             <i class="fa-solid fa-paper-plane"></i>
             <span>Apply / Renew as Student Assistant</span>
         </a>
+        {% endif %}
         {% if user.is_authenticated %}
+        {% if user.is_superuser %}
+        <a href="{% url 'home:director_dashboard' %}" class="btn btn-nav btn-nav--director">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>Back to Dashboard</span>
+        </a>
+        {% elif user.is_staff %}
+        <a href="{% url 'home:staff_dashboard' %}" class="btn btn-nav btn-nav--staff">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>Back to Dashboard</span>
+        </a>
+        {% endif %}
         <form method="post" action="{% url 'logout' %}" style="margin:0;">
             {% csrf_token %}
-            <button type="submit" class="btn btn-nav btn-nav--staff" style="border:none; cursor:pointer;">
+            <button type="submit" class="btn btn-nav btn-nav--link" style="border:none; cursor:pointer;">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Logout</span>
             </button>
