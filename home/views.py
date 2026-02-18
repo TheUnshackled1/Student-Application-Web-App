@@ -49,13 +49,14 @@ def _build_documents_from_app(app):
     for field_name, label in doc_fields:
         file_field = getattr(app, field_name)
         if file_field:
-            # File was uploaded — mark as done if app is approved, otherwise uploaded
-            if app.status == 'approved':
-                documents.append({'name': label, 'status': 'done', 'label': 'Done'})
+            # File was uploaded — mark as done if app is approved/office_assigned, otherwise uploaded
+            url = file_field.url
+            if app.status in ('approved', 'office_assigned'):
+                documents.append({'name': label, 'status': 'done', 'label': 'Done', 'url': url})
             else:
-                documents.append({'name': label, 'status': 'uploaded', 'label': 'Uploaded'})
+                documents.append({'name': label, 'status': 'uploaded', 'label': 'Uploaded', 'url': url})
         else:
-            documents.append({'name': label, 'status': 'missing', 'label': 'Missing'})
+            documents.append({'name': label, 'status': 'missing', 'label': 'Missing', 'url': ''})
     return documents
 
 
@@ -70,10 +71,12 @@ def _build_steps_from_status(status):
     ]
     # Map status to the step that is currently active (1-indexed)
     status_to_current = {
-        'pending': 2,        # submitted, now waiting for doc verification
-        'under_review': 3,   # docs verified, now interview/assessment
-        'approved': 6,       # all steps done (past the last step)
-        'rejected': 0,       # none active
+        'pending': 2,                # submitted, now waiting for doc verification
+        'under_review': 3,           # docs verified, now interview/assessment
+        'interview_scheduled': 3,    # interview date set, awaiting interview
+        'office_assigned': 5,        # office given, waiting for final approval / start date
+        'approved': 6,               # all steps done (past the last step)
+        'rejected': 0,               # none active
     }
     current_step = status_to_current.get(status, 2)
 
@@ -91,7 +94,9 @@ def _build_steps_from_status(status):
 STATUS_DISPLAY_MAP = {
     'pending': ('Pending', 'Your application has been submitted and is awaiting review.'),
     'under_review': ('Under Review', "Your documents are currently being verified by the Registrar's Office."),
-    'approved': ('Approved', 'Congratulations! Your application has been approved.'),
+    'interview_scheduled': ('Interview Scheduled', 'Your documents have been verified. Please check your scheduled interview date below.'),
+    'office_assigned': ('Office Assigned', 'Your interview is complete and you have been assigned to an office. Awaiting final approval with your start date.'),
+    'approved': ('Approved', 'Congratulations! Your application has been approved. Check your start date below.'),
     'rejected': ('Rejected', 'Your application was not approved. Please contact the office for details.'),
 }
 
@@ -341,12 +346,16 @@ def staff_dashboard(request):
     total_applications = all_apps.count()
     pending_count = all_apps.filter(status='pending').count()
     under_review_count = all_apps.filter(status='under_review').count()
+    interview_count = all_apps.filter(status='interview_scheduled').count()
+    office_assigned_count = all_apps.filter(status='office_assigned').count()
     approved_count = all_apps.filter(status='approved').count()
     rejected_count = all_apps.filter(status='rejected').count()
 
     stats = {
         'total_applications': total_applications,
         'pending_review': pending_count + under_review_count,
+        'interview_scheduled': interview_count,
+        'office_assigned': office_assigned_count,
         'approved': approved_count,
         'rejected': rejected_count,
     }
@@ -427,13 +436,36 @@ def staff_review_application(request, pk):
 @login_required
 @require_POST
 def staff_update_application_status(request, pk):
-    """Update the status of an application."""
+    """Update the status of an application, optionally with scheduling data."""
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('home:home')
     app = get_object_or_404(NewApplication, pk=pk)
     new_status = request.POST.get('status')
     if new_status in dict(NewApplication.STATUS_CHOICES):
         app.status = new_status
+
+        # Handle interview scheduling
+        if new_status == 'interview_scheduled':
+            interview_dt = request.POST.get('interview_date')
+            if interview_dt:
+                from datetime import datetime as _dt
+                try:
+                    app.interview_date = _dt.fromisoformat(interview_dt)
+                except (ValueError, TypeError):
+                    pass
+
+        # Handle office assignment
+        if new_status == 'office_assigned':
+            office = request.POST.get('assigned_office', '').strip()
+            if office:
+                app.assigned_office = office
+
+        # Handle final approval with start date
+        if new_status == 'approved':
+            start = request.POST.get('start_date')
+            if start:
+                app.start_date = start
+
         app.save()
     next_url = request.POST.get('next', '')
     if next_url:
@@ -555,36 +587,38 @@ def director_dashboard(request):
     if not request.user.is_superuser:
         return redirect('home:home')
 
-    assistants = [
-        {'name': 'Juan Dela Cruz', 'office': 'Registrar', 'hours': 120, 'status': 'active'},
-        {'name': 'Maria Santos', 'office': 'Library', 'hours': 95, 'status': 'active'},
-        {'name': 'Pedro Garcia', 'office': 'Guidance', 'hours': 80, 'status': 'probation'},
-    ]
+    all_apps = NewApplication.objects.all()
 
-    office_summary = [
-        {'name': 'Registrar', 'slots': 5, 'filled': 4},
-        {'name': 'Library', 'slots': 3, 'filled': 2},
-        {'name': 'Guidance Office', 'slots': 4, 'filled': 3},
-        {'name': 'Dean\'s Office', 'slots': 2, 'filled': 1},
-    ]
+    # Applications awaiting interview (interview_scheduled)
+    interview_apps = all_apps.filter(
+        status='interview_scheduled'
+    ).order_by('interview_date')
 
-    pending_approvals = [
-        {'student': 'Ana Reyes', 'type': 'New Application', 'date': 'Feb 15, 2026'},
-        {'student': 'Rosa Flores', 'type': 'Renewal', 'date': 'Feb 14, 2026'},
-    ]
+    # Applications awaiting office assignment (after interview, director assigns)
+    # These are still interview_scheduled until director moves them forward
+    # Applications that have been assigned an office but not yet approved
+    office_assigned_apps = all_apps.filter(
+        status='office_assigned'
+    ).order_by('-submitted_at')
 
+    # Approved student assistants
+    approved_apps = all_apps.filter(status='approved').order_by('-submitted_at')
+
+    # Stats
     stats = {
-        'total_assistants': 24,
-        'active': 20,
-        'on_probation': 3,
-        'pending_approval': 4,
+        'total_applications': all_apps.count(),
+        'awaiting_interview': interview_apps.count(),
+        'office_assigned': office_assigned_apps.count(),
+        'approved': approved_apps.count(),
+        'rejected': all_apps.filter(status='rejected').count(),
     }
 
     context = {
-        'director_name': 'Director',
-        'assistants': assistants,
-        'office_summary': office_summary,
-        'pending_approvals': pending_approvals,
+        'director_name': request.user.get_full_name() or 'Director',
+        'interview_apps': interview_apps,
+        'office_assigned_apps': office_assigned_apps,
+        'approved_apps': approved_apps,
+        'all_apps': all_apps.order_by('-submitted_at'),
         'stats': stats,
     }
     return render(request, 'director/dashboard.html', context)

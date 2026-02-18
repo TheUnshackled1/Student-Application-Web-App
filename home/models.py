@@ -113,6 +113,8 @@ class NewApplication(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('under_review', 'Under Review'),
+        ('interview_scheduled', 'Interview Scheduled'),
+        ('office_assigned', 'Office Assigned'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
@@ -144,6 +146,11 @@ class NewApplication(models.Model):
     proof_insurance = models.FileField(upload_to='applications/new/', blank=True)
     grades_last_sem = models.FileField(upload_to='applications/new/', blank=True)
     official_time = models.FileField(upload_to='applications/new/', blank=True)
+
+    # ── Workflow / Scheduling ──
+    interview_date = models.DateTimeField(null=True, blank=True)
+    assigned_office = models.CharField(max_length=200, blank=True, default='')
+    start_date = models.DateField(null=True, blank=True)
 
     # ── Meta ──
     submitted_at = models.DateTimeField(auto_now_add=True)
