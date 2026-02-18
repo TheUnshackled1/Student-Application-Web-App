@@ -50,8 +50,12 @@
             <i class="fa-solid fa-house"></i>
             <span>HOME</span>
         </a>
+        <button class="navbar-toggle" id="navToggle"><i class="fa-solid fa-bars"></i></button>
     </div>
-    <div class="navbar-right d-flex align-items-center gap-2">
+    <div class="navbar-right d-flex align-items-center gap-2" id="navMenu">
+        <div class="mobile-nav-links">
+            <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-house"></i><span>HOME</span></a>
+        </div>
         <span class="btn btn-nav btn-nav--active" style="cursor: default;">
             <i class="fa-solid fa-arrows-rotate"></i>
             <span>Renewal</span>

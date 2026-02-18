@@ -54,8 +54,13 @@
             <i class="fa-solid fa-building"></i>
             <span>AVAILABLE OFFICES</span>
         </a>
+        <button class="navbar-toggle" id="navToggle"><i class="fa-solid fa-bars"></i></button>
     </div>
-    <div class="navbar-right d-flex align-items-center gap-2">
+    <div class="navbar-right d-flex align-items-center gap-2" id="navMenu">
+        <div class="mobile-nav-links">
+            <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-house"></i><span>HOME</span></a>
+            <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-building"></i><span>AVAILABLE OFFICES</span></a>
+        </div>
         <form method="post" action="{% url 'logout' %}" style="margin:0;">
             {% csrf_token %}
             <button type="submit" class="btn btn-nav btn-nav--link" style="border:none; cursor:pointer;">
