@@ -1,0 +1,1126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Offices - CHMSU Campus Map</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'home/css/style.css' %}?v=6">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="" />
+    <!-- Leaflet Marker Cluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+    <style>
+    /* ── Staff Office Management Styles ── */
+    .office-mgmt-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, rgba(26,86,50,0.06), rgba(200,168,78,0.06));
+        border: 1px solid rgba(26,86,50,0.12);
+        border-radius: 14px;
+    }
+    .office-mgmt-toolbar .mgmt-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+    .office-mgmt-toolbar .mgmt-label i {
+        color: #1a5632;
+        margin-right: 6px;
+    }
+    .btn-add-office {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 18px;
+        background: linear-gradient(135deg, #1a5632, #2d7a4a);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .btn-add-office:hover {
+        background: linear-gradient(135deg, #145228, #1a5632);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26,86,50,0.3);
+        color: #fff;
+    }
+    .office-card-actions {
+        display: flex;
+        gap: 4px;
+        margin-top: 8px;
+    }
+    .office-card-actions .oact-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: 'Inter', sans-serif;
+        background: #fff;
+    }
+    .oact-btn--edit {
+        color: #2563eb;
+    }
+    .oact-btn--edit:hover {
+        background: #2563eb;
+        color: #fff;
+        border-color: #2563eb;
+    }
+    .oact-btn--delete {
+        color: #dc2626;
+    }
+    .oact-btn--delete:hover {
+        background: #dc2626;
+        color: #fff;
+        border-color: #dc2626;
+    }
+    .oact-btn--slots {
+        color: #7c3aed;
+    }
+    .oact-btn--slots:hover {
+        background: #7c3aed;
+        color: #fff;
+        border-color: #7c3aed;
+    }
+
+    /* ── Office Form Modal ── */
+    .office-modal .modal-content {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .office-modal .modal-header {
+        background: linear-gradient(135deg, #1a5632, #2d7a4a);
+        color: #fff;
+        border: none;
+        padding: 20px 24px;
+    }
+    .office-modal .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    .office-modal .modal-body {
+        padding: 24px;
+    }
+    .office-modal .form-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 4px;
+    }
+    .office-modal .form-control,
+    .office-modal .form-select {
+        border-radius: 10px;
+        font-size: 13px;
+        font-family: 'Inter', sans-serif;
+        border: 1px solid #d1d5db;
+        padding: 8px 12px;
+    }
+    .office-modal .form-control:focus,
+    .office-modal .form-select:focus {
+        border-color: #1a5632;
+        box-shadow: 0 0 0 3px rgba(26,86,50,0.1);
+    }
+    .office-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .office-form-row .full-width {
+        grid-column: 1 / -1;
+    }
+
+    /* Mini Map for Pin Picking */
+    .pin-picker-wrap {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid #d1d5db;
+        margin-top: 4px;
+        position: relative;
+    }
+    .pin-picker-map {
+        width: 100%;
+        height: 200px;
+    }
+    .pin-picker-help {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        z-index: 1000;
+        background: rgba(26,86,50,0.9);
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        pointer-events: none;
+    }
+    .coords-display {
+        display: flex;
+        gap: 8px;
+        margin-top: 6px;
+        font-size: 11px;
+        color: #6b7280;
+    }
+    .coords-display code {
+        background: #f3f4f6;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+    }
+
+    /* SA needed badge */
+    .sa-needed-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        color: #92400e;
+        border: 1px solid #fcd34d;
+    }
+
+    /* Delete confirmation */
+    .delete-modal .modal-content {
+        border: none;
+        border-radius: 16px;
+    }
+    .delete-modal .modal-header {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #fff;
+        border: none;
+        padding: 16px 24px;
+    }
+    .delete-modal .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    .btn-confirm-delete {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-confirm-delete:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: #fff;
+    }
+    </style>
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar">
+    <div class="navbar-left d-flex align-items-center gap-2">
+        <div class="logo">
+            <div class="logo-circle">
+                <span class="logo-text">CHMSU</span>
+            </div>
+        </div>
+        <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--link">
+            <i class="fa-solid fa-house"></i>
+            <span>HOME</span>
+        </a>
+        <span class="btn btn-nav btn-nav--active" style="cursor: default;">
+            <i class="fa-solid fa-building"></i>
+            <span>AVAILABLE OFFICES</span>
+        </span>
+    </div>
+    <div class="navbar-right d-flex align-items-center gap-2">
+        <a href="#" class="btn btn-nav btn-nav--apply" data-bs-toggle="modal" data-bs-target="#applyRenewModal">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Apply / Renew as Student Assistant</span>
+        </a>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-nav btn-nav--staff" style="border:none; cursor:pointer;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </button>
+        </form>
+        {% else %}
+        <a href="{% url 'home:staff_login' %}" class="btn btn-nav btn-nav--staff">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Log in as Staff</span>
+        </a>
+        <a href="{% url 'home:director_login' %}" class="btn btn-nav btn-nav--director">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Log in as Student Director</span>
+        </a>
+        {% endif %}
+    </div>
+</nav>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="main-content" style="padding: 20px 24px;">
+
+    <!-- Page Header -->
+    <div class="form-page-header">
+        <div class="form-icon-circle">
+            <i class="fa-solid fa-map-location-dot"></i>
+        </div>
+        <h2 class="form-page-title">Available Offices &amp; Campus Map</h2>
+        <p class="form-page-subtitle">Explore the CHMSU Talisay Campus. Click on a building or office marker to view details and availability for student assistants.</p>
+    </div>
+
+    {% if is_staff_user %}
+    <!-- ===== STAFF: Office Management Toolbar ===== -->
+    <div class="office-mgmt-toolbar">
+        <span class="mgmt-label"><i class="fa-solid fa-shield-halved"></i> Staff Office Management</span>
+        <button class="btn-add-office" data-bs-toggle="modal" data-bs-target="#addOfficeModal">
+            <i class="fa-solid fa-plus"></i> Add New Office
+        </button>
+        <span style="margin-left:auto; font-size:12px; color:#6b7280;">
+            <i class="fa-solid fa-info-circle"></i> Edit or delete offices from the sidebar cards below
+        </span>
+    </div>
+    {% endif %}
+
+    <!-- Office Stats Summary -->
+    <div class="staff-stats-row" style="margin-bottom: 16px;">
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #6366f1, #4f46e5);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-building"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ total_offices }}</span>
+                <span class="staff-stat-lbl">Total Offices</span>
+            </div>
+        </div>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #22c55e, #16a34a);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-door-open"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ total_open }}</span>
+                <span class="staff-stat-lbl">Open &mdash; Accepting SA</span>
+            </div>
+        </div>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #f59e0b, #d97706);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ total_limited }}</span>
+                <span class="staff-stat-lbl">Limited Slots</span>
+            </div>
+        </div>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #ef4444, #dc2626);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-ban"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ total_full }}</span>
+                <span class="staff-stat-lbl">Full &mdash; No Slots</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map & Sidebar Layout -->
+    <div class="map-layout">
+        <!-- Sidebar: Office List -->
+        <div class="map-sidebar">
+            <div class="map-sidebar-header">
+                <h4><i class="fa-solid fa-list-check"></i> Offices Accepting SA</h4>
+                <div class="map-search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="officeSearch" placeholder="Search offices..." autocomplete="off">
+                </div>
+            </div>
+            <div class="office-list" id="officeList">
+                <!-- Populated by JS from real data -->
+            </div>
+            <div class="map-sidebar-footer">
+                <div class="map-legend">
+                    <h5><i class="fa-solid fa-palette"></i> Legend</h5>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #22c55e;"></span>
+                            <span>Open &mdash; Accepting SA</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #f59e0b;"></span>
+                            <span>Limited Slots</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #ef4444;"></span>
+                            <span>Full &mdash; No Slots</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #6366f1;"></span>
+                            <span>Campus Building</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container-wrapper">
+            <div class="map-toolbar">
+                <button class="map-tool-btn active" onclick="setMapView('standard')" title="Standard View">
+                    <i class="fa-solid fa-map"></i> Standard
+                </button>
+                <button class="map-tool-btn" onclick="setMapView('satellite')" title="Satellite View">
+                    <i class="fa-solid fa-satellite"></i> Satellite
+                </button>
+                <button class="map-tool-btn" onclick="resetMapView()" title="Reset View">
+                    <i class="fa-solid fa-arrows-to-dot"></i> Reset
+                </button>
+                <button class="map-tool-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                    <i class="fa-solid fa-expand"></i> Fullscreen
+                </button>
+            </div>
+            <div id="campusMap"></div>
+        </div>
+    </div>
+
+    <!-- Office Details Panel (hidden by default) -->
+    <div class="office-detail-panel" id="officeDetailPanel" style="display:none;">
+        <div class="office-detail-header">
+            <h3 id="detailOfficeName"></h3>
+            <button class="office-detail-close" onclick="closeDetailPanel()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="office-detail-body">
+            <div class="detail-row">
+                <i class="fa-solid fa-building"></i>
+                <div>
+                    <span class="detail-label">Building</span>
+                    <span class="detail-value" id="detailBuilding"></span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <i class="fa-solid fa-location-dot"></i>
+                <div>
+                    <span class="detail-label">Floor / Room</span>
+                    <span class="detail-value" id="detailRoom"></span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <i class="fa-solid fa-clock"></i>
+                <div>
+                    <span class="detail-label">Office Hours</span>
+                    <span class="detail-value" id="detailHours"></span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <i class="fa-solid fa-user-tie"></i>
+                <div>
+                    <span class="detail-label">Head / Supervisor</span>
+                    <span class="detail-value" id="detailHead"></span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <i class="fa-solid fa-users"></i>
+                <div>
+                    <span class="detail-label">SA Slots</span>
+                    <span class="detail-value" id="detailSlots"></span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <i class="fa-solid fa-user-graduate"></i>
+                <div>
+                    <span class="detail-label">SA Needed</span>
+                    <span class="detail-value" id="detailNeeded"></span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" id="detailStatus"></span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <i class="fa-solid fa-align-left"></i>
+                <div>
+                    <span class="detail-label">Description</span>
+                    <span class="detail-value" id="detailDescription"></span>
+                </div>
+            </div>
+
+            <!-- Assigned Students List -->
+            <div class="detail-students-section" id="detailStudentsSection" style="display:none;">
+                <h5 style="font-size:13px; font-weight:700; color:#374151; margin:16px 0 10px; padding-top:14px; border-top:1px solid #e5e7eb;">
+                    <i class="fa-solid fa-user-graduate" style="color:#1a5632; margin-right:6px;"></i>
+                    Assigned Student Assistants
+                </h5>
+                <div class="detail-student-list" id="detailStudentList"></div>
+            </div>
+        </div>
+        <div class="office-detail-actions">
+            <a href="{% url 'home:apply_new' %}" class="btn-form btn-form--submit">
+                <i class="fa-solid fa-paper-plane"></i> Apply Here
+            </a>
+            {% if is_staff_user %}
+            <button class="btn-form btn-form--submit" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);" id="detailEditBtn" onclick="openEditFromDetail()">
+                <i class="fa-solid fa-pen-to-square"></i> Edit Office
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+</main>
+
+<!-- ========== APPLY / RENEW MODAL ========== -->
+<div class="modal fade" id="applyRenewModal" tabindex="-1" aria-labelledby="applyRenewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content apply-renew-card">
+      <div class="modal-body text-center">
+        <div class="modal-icon-circle">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <h3 class="modal-heading" id="applyRenewModalLabel">Student Assistant Portal</h3>
+        <p class="modal-subtext">What would you like to do?</p>
+        <div class="modal-btn-group">
+          <a href="{% url 'home:apply_new' %}" class="btn-modal btn-modal--apply">
+            <i class="fa-solid fa-file-circle-plus"></i>
+            <span>Apply as New Student Assistant</span>
+          </a>
+          <a href="{% url 'home:apply_renew' %}" class="btn-modal btn-modal--renew">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Renew as Student Assistant</span>
+          </a>
+        </div>
+        <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if is_staff_user %}
+<!-- ========== ADD OFFICE MODAL ========== -->
+<div class="modal fade office-modal" id="addOfficeModal" tabindex="-1" aria-labelledby="addOfficeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addOfficeModalLabel">
+            <i class="fa-solid fa-plus-circle" style="margin-right:8px;"></i> Add New Office
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'home:staff_add_office' %}" id="addOfficeForm">
+            {% csrf_token %}
+            <div class="office-form-row">
+                <div>
+                    <label class="form-label">Office Name *</label>
+                    {{ office_form.name }}
+                </div>
+                <div>
+                    <label class="form-label">Building *</label>
+                    {{ office_form.building }}
+                </div>
+                <div>
+                    <label class="form-label">Room / Floor</label>
+                    {{ office_form.room }}
+                </div>
+                <div>
+                    <label class="form-label">Office Hours</label>
+                    {{ office_form.hours }}
+                </div>
+                <div>
+                    <label class="form-label">Head / Supervisor</label>
+                    {{ office_form.head }}
+                </div>
+                <div>
+                    <label class="form-label">Maximum SA Slots *</label>
+                    {{ office_form.total_slots }}
+                </div>
+                <div>
+                    <label class="form-label">Icon</label>
+                    {{ office_form.icon }}
+                </div>
+                <div>
+                    <label class="form-label d-flex align-items-center gap-2">
+                        {{ office_form.is_active }} Active
+                    </label>
+                </div>
+                <div class="full-width">
+                    <label class="form-label">Description</label>
+                    {{ office_form.description }}
+                </div>
+                <div class="full-width">
+                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#1a5632; margin-right:4px;"></i> Location &mdash; Click on the map to set pin</label>
+                    <div class="pin-picker-wrap">
+                        <div class="pin-picker-help"><i class="fa-solid fa-crosshairs"></i> Click to place pin</div>
+                        <div class="pin-picker-map" id="addPinMap"></div>
+                    </div>
+                    <div class="coords-display">
+                        Lat: <code id="addLatDisplay">10.64320</code> &nbsp;
+                        Lng: <code id="addLngDisplay">122.93940</code>
+                    </div>
+                    <input type="hidden" name="latitude" id="addLatInput" value="10.6432">
+                    <input type="hidden" name="longitude" id="addLngInput" value="122.9394">
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:10px; font-family:'Inter',sans-serif;">Cancel</button>
+                <button type="submit" class="btn-add-office">
+                    <i class="fa-solid fa-plus"></i> Create Office
+                </button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== EDIT OFFICE MODAL ========== -->
+<div class="modal fade office-modal" id="editOfficeModal" tabindex="-1" aria-labelledby="editOfficeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editOfficeModalLabel">
+            <i class="fa-solid fa-pen-to-square" style="margin-right:8px;"></i> Edit Office
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" id="editOfficeForm" action="">
+            {% csrf_token %}
+            <div class="office-form-row">
+                <div>
+                    <label class="form-label">Office Name *</label>
+                    <input type="text" name="name" class="form-control" id="editName" required>
+                </div>
+                <div>
+                    <label class="form-label">Building *</label>
+                    <input type="text" name="building" class="form-control" id="editBuilding" required>
+                </div>
+                <div>
+                    <label class="form-label">Room / Floor</label>
+                    <input type="text" name="room" class="form-control" id="editRoom">
+                </div>
+                <div>
+                    <label class="form-label">Office Hours</label>
+                    <input type="text" name="hours" class="form-control" id="editHours">
+                </div>
+                <div>
+                    <label class="form-label">Head / Supervisor</label>
+                    <input type="text" name="head" class="form-control" id="editHead">
+                </div>
+                <div>
+                    <label class="form-label">Maximum SA Slots *</label>
+                    <input type="number" name="total_slots" class="form-control" id="editTotalSlots" min="1" max="50" required>
+                </div>
+                <div>
+                    <label class="form-label">Icon</label>
+                    <select name="icon" class="form-select" id="editIcon">
+                        <option value="fa-solid fa-building">Building</option>
+                        <option value="fa-solid fa-book">Book / Library</option>
+                        <option value="fa-solid fa-user-tie">User / Office Head</option>
+                        <option value="fa-solid fa-gavel">Gavel / Dean</option>
+                        <option value="fa-solid fa-calculator">Calculator / Accounting</option>
+                        <option value="fa-solid fa-cash-register">Cash Register / Cashier</option>
+                        <option value="fa-solid fa-users">Users / Student Affairs</option>
+                        <option value="fa-solid fa-laptop-code">Laptop / ICT</option>
+                        <option value="fa-solid fa-flask">Flask / Research</option>
+                        <option value="fa-solid fa-id-card">ID Card / HR</option>
+                        <option value="fa-solid fa-hand-holding-heart">Heart / Guidance</option>
+                        <option value="fa-solid fa-graduation-cap">Grad Cap / Academic</option>
+                        <option value="fa-solid fa-clipboard-list">Clipboard / Registrar</option>
+                        <option value="fa-solid fa-shield-halved">Shield / Security</option>
+                        <option value="fa-solid fa-stethoscope">Stethoscope / Clinic</option>
+                        <option value="fa-solid fa-tools">Tools / Maintenance</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label d-flex align-items-center gap-2">
+                        <input type="checkbox" name="is_active" class="form-check-input" id="editIsActive"> Active
+                    </label>
+                </div>
+                <div class="full-width">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" id="editDescription" rows="3"></textarea>
+                </div>
+                <div class="full-width">
+                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#1a5632; margin-right:4px;"></i> Location &mdash; Click on the map to move pin</label>
+                    <div class="pin-picker-wrap">
+                        <div class="pin-picker-help"><i class="fa-solid fa-crosshairs"></i> Click to move pin</div>
+                        <div class="pin-picker-map" id="editPinMap"></div>
+                    </div>
+                    <div class="coords-display">
+                        Lat: <code id="editLatDisplay">—</code> &nbsp;
+                        Lng: <code id="editLngDisplay">—</code>
+                    </div>
+                    <input type="hidden" name="latitude" id="editLatInput">
+                    <input type="hidden" name="longitude" id="editLngInput">
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:10px; font-family:'Inter',sans-serif;">Cancel</button>
+                <button type="submit" class="btn-add-office" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                    <i class="fa-solid fa-check"></i> Save Changes
+                </button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== DELETE CONFIRMATION MODAL ========== -->
+<div class="modal fade delete-modal" id="deleteOfficeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i> Delete Office</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center" style="padding:20px;">
+        <p style="font-size:14px; color:#374151; margin-bottom:4px;">Are you sure you want to remove</p>
+        <p style="font-size:15px; font-weight:700; color:#1f2937;" id="deleteOfficeName"></p>
+        <p style="font-size:12px; color:#6b7280;">This will deactivate the office. It can be reactivated later.</p>
+      </div>
+      <div class="modal-footer justify-content-center" style="border:none; padding-top:0;">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:10px; font-family:'Inter',sans-serif;">Cancel</button>
+        <form method="post" id="deleteOfficeForm" action="" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-confirm-delete">
+                <i class="fa-solid fa-trash"></i> Yes, Delete
+            </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+<!-- Leaflet Marker Cluster -->
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ========== REAL OFFICE DATA FROM DATABASE ==========
+var offices = {{ offices_json|safe }};
+var IS_STAFF = {{ is_staff_user|yesno:"true,false,false" }};
+
+var CAMPUS_CENTER = [10.6432, 122.9394];
+var CAMPUS_ZOOM = 18;
+
+// Campus buildings (static — non-office structures)
+var buildings = [
+    { name: 'College of Engineering', lat: 10.64270, lng: 122.93880, icon: 'fa-solid fa-gears' },
+    { name: 'College of Education', lat: 10.64370, lng: 122.93935, icon: 'fa-solid fa-chalkboard-user' },
+    { name: 'Gymnasium / Covered Court', lat: 10.64260, lng: 122.93950, icon: 'fa-solid fa-volleyball' },
+    { name: 'Canteen', lat: 10.64280, lng: 122.93860, icon: 'fa-solid fa-utensils' },
+    { name: 'Main Gate & Guard House', lat: 10.64380, lng: 122.93945, icon: 'fa-solid fa-dungeon' }
+];
+
+// ========== HELPER FUNCTIONS ==========
+function createIcon(color, iconClass) {
+    return L.divIcon({
+        className: 'custom-map-marker',
+        html: '<div class="marker-pin" style="background:' + color + ';"><i class="' + iconClass + '" style="color:#fff;font-size:14px;"></i></div>',
+        iconSize: [36, 46],
+        iconAnchor: [18, 46],
+        popupAnchor: [0, -42]
+    });
+}
+
+function statusColor(status) {
+    if (status === 'open') return '#22c55e';
+    if (status === 'limited') return '#f59e0b';
+    return '#ef4444';
+}
+
+function statusLabel(status) {
+    if (status === 'open') return 'Open \u2014 Accepting SA';
+    if (status === 'limited') return 'Limited Slots';
+    return 'Full \u2014 No Slots';
+}
+
+// ========== MAP INITIALIZATION ==========
+var standardTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 22,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
+var satelliteTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 22,
+    attribution: '&copy; Esri'
+});
+
+var satelliteLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 22
+});
+
+var map = L.map('campusMap', {
+    center: CAMPUS_CENTER,
+    zoom: CAMPUS_ZOOM,
+    layers: [standardTile],
+    zoomControl: false
+});
+
+L.control.zoom({ position: 'topright' }).addTo(map);
+L.control.scale({ position: 'bottomright', imperial: false }).addTo(map);
+
+var currentTileMode = 'standard';
+
+function setMapView(mode) {
+    document.querySelectorAll('.map-tool-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (mode === 'satellite') {
+        map.removeLayer(standardTile);
+        map.addLayer(satelliteTile);
+        map.addLayer(satelliteLabels);
+        document.querySelectorAll('.map-tool-btn')[1].classList.add('active');
+    } else {
+        map.removeLayer(satelliteTile);
+        map.removeLayer(satelliteLabels);
+        map.addLayer(standardTile);
+        document.querySelectorAll('.map-tool-btn')[0].classList.add('active');
+    }
+    currentTileMode = mode;
+}
+
+function resetMapView() {
+    map.setView(CAMPUS_CENTER, CAMPUS_ZOOM);
+}
+
+function toggleFullscreen() {
+    var wrapper = document.querySelector('.map-container-wrapper');
+    wrapper.classList.toggle('map-fullscreen');
+    setTimeout(function() { map.invalidateSize(); }, 300);
+}
+
+// ========== ADD OFFICE MARKERS (from real DB data) ==========
+offices.forEach(function(office) {
+    var color = statusColor(office.status);
+    var icon = createIcon(color, office.icon);
+
+    // Build student list HTML for popup
+    var studentsHtml = '';
+    if (office.students && office.students.length > 0) {
+        studentsHtml = '<div style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;">' +
+            '<strong style="font-size:11px;color:#374151;">Assigned SAs:</strong>';
+        office.students.forEach(function(s) {
+            var sColor = s.status_key === 'approved' ? '#16a34a' : '#d97706';
+            studentsHtml += '<div style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:11px;">' +
+                '<i class="fa-solid fa-user" style="color:' + sColor + ';font-size:9px;"></i>' +
+                '<span>' + s.name + ' (' + s.student_id + ')</span>' +
+                '</div>';
+        });
+        studentsHtml += '</div>';
+    }
+
+    var neededCount = office.available;
+    var neededHtml = neededCount > 0
+        ? '<p style="margin:6px 0 0;font-size:11px;"><span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px;font-weight:700;font-size:10px;"><i class="fa-solid fa-user-plus" style="margin-right:3px;"></i>' + neededCount + ' SA needed</span></p>'
+        : '';
+
+    var popupHtml =
+        '<div class="map-popup">' +
+            '<h4>' + office.name + '</h4>' +
+            '<p class="popup-building"><i class="fa-solid fa-building"></i> ' + office.building + '</p>' +
+            '<p class="popup-room"><i class="fa-solid fa-door-open"></i> ' + office.room + '</p>' +
+            '<p class="popup-hours"><i class="fa-solid fa-clock"></i> ' + office.hours + '</p>' +
+            '<p class="popup-slots"><i class="fa-solid fa-users"></i> ' + office.available + ' of ' + office.total_slots + ' slots available (' + office.filled + ' filled)</p>' +
+            '<span class="popup-status" style="background:' + color + ';">' + statusLabel(office.status) + '</span>' +
+            neededHtml +
+            '<p class="popup-desc">' + office.description + '</p>' +
+            studentsHtml +
+            '<button class="popup-detail-btn" onclick="showOfficeDetail(' + office.id + ')">View Full Details</button>' +
+        '</div>';
+
+    var marker = L.marker([office.lat, office.lng], { icon: icon }).addTo(map);
+    marker.bindPopup(popupHtml, { maxWidth: 320 });
+    office._marker = marker;
+});
+
+// ========== ADD BUILDING MARKERS (static) ==========
+buildings.forEach(function(bldg) {
+    var icon = createIcon('#6366f1', bldg.icon);
+    var popupHtml =
+        '<div class="map-popup">' +
+            '<h4>' + bldg.name + '</h4>' +
+            '<span class="popup-status" style="background:#6366f1;">Campus Building</span>' +
+        '</div>';
+    L.marker([bldg.lat, bldg.lng], { icon: icon }).addTo(map).bindPopup(popupHtml, { maxWidth: 280 });
+});
+
+// Campus boundary circle
+L.circle(CAMPUS_CENTER, {
+    radius: 120,
+    color: '#1a5632',
+    fillColor: '#1a563220',
+    fillOpacity: 0.1,
+    weight: 2,
+    dashArray: '8,6'
+}).addTo(map);
+
+// ========== SIDEBAR OFFICE LIST ==========
+function renderOfficeList(filter) {
+    var list = document.getElementById('officeList');
+    list.innerHTML = '';
+    var filtered = offices.filter(function(o) {
+        if (!filter) return true;
+        return o.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
+               o.building.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+    });
+
+    filtered.forEach(function(office) {
+        var color = statusColor(office.status);
+        var neededCount = office.available;
+        var card = document.createElement('div');
+        card.className = 'office-list-card';
+        card.setAttribute('data-id', office.id);
+
+        var staffBtns = '';
+        if (IS_STAFF) {
+            staffBtns =
+                '<div class="office-card-actions">' +
+                    '<button class="oact-btn oact-btn--edit" onclick="event.stopPropagation(); openEditOffice(' + office.id + ');" title="Edit Office">' +
+                        '<i class="fa-solid fa-pen"></i> Edit' +
+                    '</button>' +
+                    '<button class="oact-btn oact-btn--slots" onclick="event.stopPropagation(); openEditOffice(' + office.id + ');" title="Change Slots">' +
+                        '<i class="fa-solid fa-sliders"></i> Slots: ' + office.total_slots +
+                    '</button>' +
+                    '<button class="oact-btn oact-btn--delete" onclick="event.stopPropagation(); openDeleteOffice(' + office.id + ', \'' + office.name.replace(/'/g, "\\'") + '\');" title="Delete Office">' +
+                        '<i class="fa-solid fa-trash"></i>' +
+                    '</button>' +
+                '</div>';
+        }
+
+        var neededBadgeHtml = neededCount > 0
+            ? '<span class="sa-needed-badge"><i class="fa-solid fa-user-plus"></i> ' + neededCount + ' SA needed</span>'
+            : '';
+
+        card.innerHTML =
+            '<div class="office-list-icon" style="background:' + color + '20; color:' + color + ';">' +
+                '<i class="' + office.icon + '"></i>' +
+            '</div>' +
+            '<div class="office-list-info">' +
+                '<h5>' + office.name + '</h5>' +
+                '<p><i class="fa-solid fa-building"></i> ' + office.building + '</p>' +
+                '<div class="office-list-meta">' +
+                    '<span class="office-slots"><i class="fa-solid fa-users"></i> ' + office.available + '/' + office.total_slots + ' slots</span>' +
+                    '<span class="office-status-badge" style="background:' + color + ';">' + statusLabel(office.status) + '</span>' +
+                '</div>' +
+                (office.students.length > 0 ?
+                    '<div style="margin-top:6px;font-size:11px;color:#6b7280;">' +
+                        '<i class="fa-solid fa-user-graduate" style="margin-right:4px;"></i>' +
+                        office.filled + ' student' + (office.filled !== 1 ? 's' : '') + ' assigned' +
+                    '</div>' : '') +
+                (neededBadgeHtml ? '<div style="margin-top:6px;">' + neededBadgeHtml + '</div>' : '') +
+                staffBtns +
+            '</div>';
+        card.addEventListener('click', function() {
+            map.setView([office.lat, office.lng], 20);
+            office._marker.openPopup();
+            document.querySelectorAll('.office-list-card').forEach(function(c){ c.classList.remove('active'); });
+            card.classList.add('active');
+        });
+        list.appendChild(card);
+    });
+
+    if (filtered.length === 0) {
+        list.innerHTML = '<div class="office-list-empty"><i class="fa-solid fa-magnifying-glass"></i><p>No offices found</p></div>';
+    }
+}
+
+renderOfficeList('');
+
+document.getElementById('officeSearch').addEventListener('input', function() {
+    renderOfficeList(this.value);
+});
+
+// ========== DETAIL PANEL ==========
+var currentDetailOfficeId = null;
+
+function showOfficeDetail(officeId) {
+    var office = offices.find(function(o){ return o.id === officeId; });
+    if (!office) return;
+    currentDetailOfficeId = officeId;
+
+    var color = statusColor(office.status);
+    var neededCount = office.available;
+
+    document.getElementById('detailOfficeName').textContent = office.name;
+    document.getElementById('detailBuilding').textContent = office.building;
+    document.getElementById('detailRoom').textContent = office.room || '\u2014';
+    document.getElementById('detailHours').textContent = office.hours;
+    document.getElementById('detailHead').textContent = office.head || '\u2014';
+    document.getElementById('detailSlots').innerHTML =
+        '<strong style="color:' + color + ';">' + office.available + '</strong> of ' +
+        office.total_slots + ' available \u2014 ' + office.filled + ' filled';
+    document.getElementById('detailNeeded').innerHTML = neededCount > 0
+        ? '<span class="sa-needed-badge"><i class="fa-solid fa-user-plus"></i> ' + neededCount + ' SA needed</span>'
+        : '<span style="color:#16a34a;font-weight:600;font-size:13px;">Fully staffed</span>';
+    document.getElementById('detailStatus').innerHTML =
+        '<span class="office-status-badge" style="background:' + color + ';">' + statusLabel(office.status) + '</span>';
+    document.getElementById('detailDescription').textContent = office.description || '\u2014';
+
+    // Assigned students
+    var studentsSection = document.getElementById('detailStudentsSection');
+    var studentList = document.getElementById('detailStudentList');
+    if (office.students && office.students.length > 0) {
+        studentsSection.style.display = 'block';
+        studentList.innerHTML = '';
+        office.students.forEach(function(s) {
+            var sColor = s.status_key === 'approved' ? '#16a34a' : '#d97706';
+            var sBg = s.status_key === 'approved' ? '#dcfce7' : '#fef3c7';
+            studentList.innerHTML +=
+                '<div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f9fafb; border-radius:10px; margin-bottom:6px;">' +
+                    '<div style="width:32px;height:32px;border-radius:50%;background:' + sBg + ';display:flex;align-items:center;justify-content:center;">' +
+                        '<i class="fa-solid fa-user" style="color:' + sColor + ';font-size:12px;"></i>' +
+                    '</div>' +
+                    '<div style="flex:1;">' +
+                        '<div style="font-size:13px;font-weight:600;color:#1f2937;">' + s.name + '</div>' +
+                        '<div style="font-size:11px;color:#6b7280;">ID: ' + s.student_id + '</div>' +
+                    '</div>' +
+                    '<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:' + sBg + ';color:' + sColor + ';">' + s.status + '</span>' +
+                '</div>';
+        });
+    } else {
+        studentsSection.style.display = 'block';
+        studentList.innerHTML =
+            '<div style="text-align:center;padding:12px;color:#9ca3af;font-size:12px;">' +
+                '<i class="fa-regular fa-user" style="font-size:18px;margin-bottom:4px;display:block;"></i>' +
+                'No student assistants assigned yet' +
+            '</div>';
+    }
+
+    document.getElementById('officeDetailPanel').style.display = 'block';
+    document.getElementById('officeDetailPanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeDetailPanel() {
+    document.getElementById('officeDetailPanel').style.display = 'none';
+    currentDetailOfficeId = null;
+}
+
+function openEditFromDetail() {
+    if (currentDetailOfficeId) openEditOffice(currentDetailOfficeId);
+}
+
+// ========== STAFF: EDIT / DELETE FUNCTIONS ==========
+if (IS_STAFF) {
+
+    var addPinMap = null, addPinMarker = null;
+    var editPinMap = null, editPinMarker = null;
+
+    // Initialize Add Office mini-map when modal opens
+    document.getElementById('addOfficeModal').addEventListener('shown.bs.modal', function() {
+        if (!addPinMap) {
+            addPinMap = L.map('addPinMap', { center: CAMPUS_CENTER, zoom: 17, zoomControl: false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(addPinMap);
+            addPinMarker = L.marker(CAMPUS_CENTER, { draggable: true }).addTo(addPinMap);
+
+            addPinMap.on('click', function(e) {
+                addPinMarker.setLatLng(e.latlng);
+                updateAddCoords(e.latlng.lat, e.latlng.lng);
+            });
+            addPinMarker.on('dragend', function() {
+                var pos = addPinMarker.getLatLng();
+                updateAddCoords(pos.lat, pos.lng);
+            });
+        }
+        setTimeout(function(){ addPinMap.invalidateSize(); }, 200);
+    });
+
+    function updateAddCoords(lat, lng) {
+        document.getElementById('addLatInput').value = lat.toFixed(5);
+        document.getElementById('addLngInput').value = lng.toFixed(5);
+        document.getElementById('addLatDisplay').textContent = lat.toFixed(5);
+        document.getElementById('addLngDisplay').textContent = lng.toFixed(5);
+    }
+
+    // Edit Office: fetch data and populate form
+    function openEditOffice(officeId) {
+        fetch('/staff/offices/' + officeId + '/json/')
+            .then(function(r){ return r.json(); })
+            .then(function(data) {
+                document.getElementById('editName').value = data.name;
+                document.getElementById('editBuilding').value = data.building;
+                document.getElementById('editRoom').value = data.room || '';
+                document.getElementById('editHours').value = data.hours || '';
+                document.getElementById('editHead').value = data.head || '';
+                document.getElementById('editTotalSlots').value = data.total_slots;
+                document.getElementById('editIcon').value = data.icon;
+                document.getElementById('editIsActive').checked = data.is_active;
+                document.getElementById('editDescription').value = data.description || '';
+                document.getElementById('editLatInput').value = data.latitude;
+                document.getElementById('editLngInput').value = data.longitude;
+                document.getElementById('editLatDisplay').textContent = parseFloat(data.latitude).toFixed(5);
+                document.getElementById('editLngDisplay').textContent = parseFloat(data.longitude).toFixed(5);
+
+                // Set the form action URL
+                document.getElementById('editOfficeForm').action = '/staff/offices/' + officeId + '/edit/';
+                document.getElementById('editOfficeModalLabel').innerHTML =
+                    '<i class="fa-solid fa-pen-to-square" style="margin-right:8px;"></i> Edit: ' + data.name;
+
+                var modal = new bootstrap.Modal(document.getElementById('editOfficeModal'));
+                modal.show();
+
+                // Initialize or update the edit pin map after modal is shown
+                setTimeout(function() {
+                    var latLng = [parseFloat(data.latitude), parseFloat(data.longitude)];
+                    if (!editPinMap) {
+                        editPinMap = L.map('editPinMap', { center: latLng, zoom: 17, zoomControl: false });
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(editPinMap);
+                        editPinMarker = L.marker(latLng, { draggable: true }).addTo(editPinMap);
+
+                        editPinMap.on('click', function(e) {
+                            editPinMarker.setLatLng(e.latlng);
+                            updateEditCoords(e.latlng.lat, e.latlng.lng);
+                        });
+                        editPinMarker.on('dragend', function() {
+                            var pos = editPinMarker.getLatLng();
+                            updateEditCoords(pos.lat, pos.lng);
+                        });
+                    } else {
+                        editPinMap.setView(latLng, 17);
+                        editPinMarker.setLatLng(latLng);
+                    }
+                    editPinMap.invalidateSize();
+                }, 300);
+            });
+    }
+
+    function updateEditCoords(lat, lng) {
+        document.getElementById('editLatInput').value = lat.toFixed(5);
+        document.getElementById('editLngInput').value = lng.toFixed(5);
+        document.getElementById('editLatDisplay').textContent = lat.toFixed(5);
+        document.getElementById('editLngDisplay').textContent = lng.toFixed(5);
+    }
+
+    // Delete Office
+    function openDeleteOffice(officeId, officeName) {
+        document.getElementById('deleteOfficeName').textContent = officeName;
+        document.getElementById('deleteOfficeForm').action = '/staff/offices/' + officeId + '/delete/';
+        var modal = new bootstrap.Modal(document.getElementById('deleteOfficeModal'));
+        modal.show();
+    }
+
+} // end IS_STAFF
+</script>
+</body>
+</html>
