@@ -1,6 +1,89 @@
 /* ==========================================
    CHMEU Student Application Portal - Styles
    ========================================== */
+
+/* ── Page Loading Screen ── */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #060e18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+.page-loader.loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-text {
+  font-family: 'Inter', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #5eead4;
+  margin-bottom: 18px;
+  text-shadow: 0 0 18px rgba(94, 234, 212, 0.35);
+}
+
+.loader-bar-wrapper {
+  width: 320px;
+  height: 28px;
+  background: #0b1a2a;
+  border: 2px solid #14b8a6;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.12), inset 0 0 8px rgba(0,0,0,0.4);
+}
+
+.loader-bar-fill {
+  height: 100%;
+  width: 0%;
+  display: flex;
+  align-items: stretch;
+  transition: width 0.15s linear;
+}
+
+.loader-bar-fill .bar-stripe {
+  width: 6px;
+  margin-right: 3px;
+  background: linear-gradient(180deg, #5eead4 0%, #14b8a6 50%, #0d9488 100%);
+  border-radius: 1px;
+  flex-shrink: 0;
+  box-shadow: 0 0 4px rgba(94, 234, 212, 0.4);
+}
+
+.loader-percent {
+  font-family: 'Inter', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5eead4;
+  margin-top: 12px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(94, 234, 212, 0.3);
+}
+
+/* Glow pulse on wrapper */
+@keyframes loaderGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.12), inset 0 0 8px rgba(0,0,0,0.4); }
+  50% { box-shadow: 0 0 30px rgba(20, 184, 166, 0.25), inset 0 0 8px rgba(0,0,0,0.4); }
+}
+.loader-bar-wrapper {
+  animation: loaderGlow 1.5s ease-in-out infinite;
+}
+
+@media (max-width: 480px) {
+  .loader-bar-wrapper { width: 260px; height: 24px; }
+  .loader-text { font-size: 13px; letter-spacing: 3px; }
+  .loader-bar-fill .bar-stripe { width: 5px; margin-right: 2px; }
+}
+
+/* ── End Loading Screen ── */
 * {
   margin: 0;
   padding: 0;

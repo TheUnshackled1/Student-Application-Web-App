@@ -263,6 +263,25 @@
 </head>
 <body>
 
+<!-- ========== PAGE LOADER ========== -->
+<div class="page-loader" id="pageLoader">
+    <span class="loader-text">LOADING...</span>
+    <div class="loader-bar-wrapper">
+        <div class="loader-bar-fill" id="loaderFill"></div>
+    </div>
+    <span class="loader-percent" id="loaderPercent">0%</span>
+</div>
+<script>
+(function(){
+    var fill=document.getElementById('loaderFill'),pct=document.getElementById('loaderPercent'),loader=document.getElementById('pageLoader');
+    var w=0,stripes='',cols=Math.floor(320/9);
+    for(var i=0;i<cols;i++) stripes+='<span class="bar-stripe"></span>';
+    fill.innerHTML=stripes;
+    var iv=setInterval(function(){w+=Math.random()*3+1;if(w>90)w=90;fill.style.width=w+'%';pct.textContent=Math.floor(w)+'%';},40);
+    window.addEventListener('load',function(){clearInterval(iv);fill.style.width='100%';pct.textContent='100%';setTimeout(function(){loader.classList.add('loader-hidden');},200);setTimeout(function(){loader.remove();},700);});
+})();
+</script>
+
 <!-- ========== NAVBAR ========== -->
 <nav class="navbar">
     <div class="navbar-left d-flex align-items-center gap-2">
