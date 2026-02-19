@@ -229,7 +229,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Year Level <span class="text-danger">*</span></label>
-                            <select class="form-select" name="year_level" required>
+                            <select class="form-select" name="year_level" id="id_year_level" required>
                                 <option value="" selected disabled>Select year</option>
                                 <option value="1">1st Year</option>
                                 <option value="2">2nd Year</option>
@@ -239,11 +239,19 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Semester <span class="text-danger">*</span></label>
-                            <select class="form-select" name="semester" required>
+                            <select class="form-select" name="semester" id="id_semester" required>
                                 <option value="" selected disabled>Select semester</option>
                                 <option value="1st">1st Semester</option>
                                 <option value="2nd">2nd Semester</option>
                             </select>
+                        </div>
+                    </div>
+                    <!-- Eligibility alert (hidden by default) -->
+                    <div class="student-id-alert student-id-alert--danger" id="eligibilityAlert" style="display:none;">
+                        <div class="student-id-alert-icon"><i class="fa-solid fa-ban"></i></div>
+                        <div class="student-id-alert-body">
+                            <strong>Not Eligible for Student Assistant</strong>
+                            <p id="eligibilityAlertText"></p>
                         </div>
                     </div>
                     <!-- Detection banner (hidden by default) -->
@@ -765,6 +773,43 @@
                     });
             }, 400);
         });
+    })();
+
+    // ── Year Level / Semester Eligibility Check ──
+    (function() {
+        var yearSel = document.getElementById('id_year_level');
+        var semSel = document.getElementById('id_semester');
+        var alertBox = document.getElementById('eligibilityAlert');
+        var alertText = document.getElementById('eligibilityAlertText');
+        var submitBtn = document.querySelector('.btn-form--submit[type="submit"]');
+
+        function checkEligibility() {
+            var year = yearSel.value;
+            var sem = semSel.value;
+            var msg = '';
+
+            if (year === '1') {
+                msg = '1st year students are not eligible for the Student Assistant program. Only 2nd year, 3rd year, and 4th year (1st semester only) students may apply.';
+            } else if (year === '4' && sem === '2nd') {
+                msg = '4th year students on their 2nd semester are not eligible because they will be undergoing On-the-Job Training (OJT). Only 4th year — 1st semester students may apply.';
+            }
+
+            if (msg) {
+                alertText.textContent = msg;
+                alertBox.style.display = 'flex';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.pointerEvents = 'none';
+            } else {
+                alertBox.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '';
+                submitBtn.style.pointerEvents = '';
+            }
+        }
+
+        yearSel.addEventListener('change', checkEligibility);
+        semSel.addEventListener('change', checkEligibility);
     })();
 </script>
 <script>
