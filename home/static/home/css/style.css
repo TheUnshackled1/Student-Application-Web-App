@@ -1155,6 +1155,9 @@ body {
   position: relative;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(13, 148, 136, 0.25);
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .applyform-hero-bg {
   position: absolute;
@@ -1258,7 +1261,7 @@ body {
   padding: 40px 44px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.20);
   border: 1px solid rgba(255,255,255,0.10);
-  max-width: 960px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -4479,9 +4482,11 @@ button.review-doc-link:hover {
   color: #86efac;
 }
 .student-id-alert--danger {
-  background: rgba(239,68,68,0.10);
-  border: 1px solid rgba(239,68,68,0.30);
-  color: #fca5a5;
+  background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(168,85,247,0.08));
+  border: 1px solid rgba(239,68,68,0.25);
+  color: rgba(255,255,255,0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .student-id-alert-icon {
   font-size: 20px;
@@ -4490,11 +4495,16 @@ button.review-doc-link:hover {
 }
 .student-id-alert--warning .student-id-alert-icon { color: #f59e0b; }
 .student-id-alert--success .student-id-alert-icon { color: #22c55e; }
-.student-id-alert--danger .student-id-alert-icon  { color: #ef4444; }
+.student-id-alert--danger .student-id-alert-icon  { color: #fca5a5; }
 .student-id-alert-body strong {
   display: block;
   margin-bottom: 2px;
   font-size: 14px;
+  color: #fca5a5;
+}
+.student-id-alert--danger .student-id-alert-body p {
+  margin: 0 0 6px 0;
+  color: rgba(255,255,255,0.70);
 }
 .student-id-alert-body p {
   margin: 0 0 6px 0;

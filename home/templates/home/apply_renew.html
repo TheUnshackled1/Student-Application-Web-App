@@ -131,48 +131,42 @@
                 </div>
 
                 <div class="applyform-field-group">
-                    <span class="applyform-field-group-label"><i class="fa-solid fa-id-card"></i> Basic Info</span>
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-id-card"></i> Basic Info &amp; Contact</span>
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">Student ID <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-id-badge"></i>
                                 <input type="text" class="form-control" name="student_id" id="id_student_id_renew" maxlength="8" inputmode="numeric" placeholder="12345678" required>
                             </div>
-                            <small class="form-text text-muted" id="studentIdStatus">Type your Student ID to auto-detect</small>
+                            <small class="form-text" style="color: rgba(255,255,255,0.55);" id="studentIdStatus">Type your Student ID to auto-detect</small>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-user"></i>
                                 <input type="text" class="form-control" name="full_name" id="id_full_name" placeholder="Juan A. Dela Cruz" required>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-at"></i>
                                 <input type="email" class="form-control" name="email" id="id_email" placeholder="name@example.com" required>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="applyform-field-group">
-                    <span class="applyform-field-group-label"><i class="fa-solid fa-phone"></i> Contact</span>
-                    <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">Contact Number <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-mobile-screen-button"></i>
                                 <input type="text" class="form-control" name="contact_number" id="id_contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" required>
                             </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-2">
                             <label class="form-label">Home Address <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-location-dot"></i>
-                                <input type="text" class="form-control" name="address" id="id_address" placeholder="Street, Barangay, City / Municipality, Province" required>
+                                <input type="text" class="form-control" name="address" id="id_address" placeholder="Street, Brgy, City" required>
                             </div>
                         </div>
                     </div>
@@ -232,9 +226,9 @@
                 </div>
 
                 <div class="applyform-field-group">
-                    <span class="applyform-field-group-label"><i class="fa-solid fa-building"></i> Office Assignment</span>
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-building"></i> Office Assignment &amp; Service Record</span>
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Previous Office Assigned <span class="text-danger">*</span></label>
                             <select class="form-select" name="previous_office" required>
                                 <option value="" selected disabled>Select office</option>
@@ -246,7 +240,7 @@
                                 <option value="osa">Office of Student Affairs</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Preferred Office for Renewal <span class="text-danger">*</span></label>
                             <select class="form-select" name="preferred_office" required>
                                 <option value="" selected disabled>Select office</option>
@@ -258,20 +252,14 @@
                                 <option value="osa">Office of Student Affairs</option>
                             </select>
                         </div>
-                    </div>
-                </div>
-
-                <div class="applyform-field-group">
-                    <span class="applyform-field-group-label"><i class="fa-solid fa-clock"></i> Service Record</span>
-                    <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">Total Hours Rendered <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-hourglass-half"></i>
                                 <input type="number" class="form-control" name="hours_rendered" placeholder="e.g. 120" required>
                             </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-4">
                             <label class="form-label">Supervisor's Name (Previous)</label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-user-tie"></i>
