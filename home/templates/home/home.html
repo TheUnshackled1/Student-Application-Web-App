@@ -240,6 +240,58 @@
                         <span class="dash-stat-lbl">Upcoming Dates</span>
                     </div>
                 </div>
+                <div class="dash-stat-card dash-stat--teal">
+                    <i class="fa-solid fa-users-rectangle"></i>
+                    <div class="dash-stat-info">
+                        <span class="dash-stat-val">{{ applications|length }}</span>
+                        <span class="dash-stat-lbl">Total Applications</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Applicant Status Table ── -->
+            <div class="dash-status-table-wrap">
+                <div class="dash-status-table-header">
+                    <i class="fa-solid fa-table-list"></i>
+                    <span>Student Applicant Status</span>
+                </div>
+                <table class="dash-status-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Student ID</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="dash-st-name">{{ app.student_name }}</td>
+                            <td><code>{{ app.application_id }}</code></td>
+                            <td>
+                                <span class="dash-st-type dash-st-type--{{ app.app_type_class }}">
+                                    <i class="fa-solid {{ app.app_type_icon }}"></i> {{ app.app_type }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="dash-st-status dash-st-status--{{ app.raw_status }}">
+                                    <i class="fa-solid fa-circle" style="font-size:5px;"></i>
+                                    {{ app.application_status }}
+                                </span>
+                            </td>
+                            <td class="dash-st-date">{{ app.submitted_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="dash-st-empty">No applications found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 

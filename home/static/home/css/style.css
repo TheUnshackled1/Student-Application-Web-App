@@ -3487,7 +3487,7 @@ body {
 /* Stats Row */
 .dash-stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 14px;
 }
 .dash-stat-card {
@@ -3515,7 +3515,7 @@ body {
   font-size: 17px;
   flex-shrink: 0;
 }
-.dash-stat--green > i { background: rgba(22,163,74,0.18); color: #86efac; }\n.dash-stat--blue > i  { background: rgba(37,99,235,0.18); color: #93c5fd; }\n.dash-stat--amber > i { background: rgba(217,119,6,0.18); color: #fde68a; }\n.dash-stat--purple > i { background: rgba(124,58,237,0.18); color: #c4b5fd; }
+.dash-stat--green > i { background: rgba(22,163,74,0.18); color: #86efac; }\n.dash-stat--blue > i  { background: rgba(37,99,235,0.18); color: #93c5fd; }\n.dash-stat--amber > i { background: rgba(217,119,6,0.18); color: #fde68a; }\n.dash-stat--purple > i { background: rgba(124,58,237,0.18); color: #c4b5fd; }\n.dash-stat--teal > i   { background: rgba(20,184,166,0.18); color: #5eead4; }
 .dash-stat-info {
   display: flex;
   flex-direction: column;
@@ -3533,6 +3533,118 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* ==============================================
+   APPLICANT STATUS TABLE (inside progress card)
+   ============================================== */
+.dash-status-table-wrap {
+  margin-top: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.dash-status-table-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.dash-status-table-header i {
+  color: #5eead4;
+  font-size: 14px;
+}
+.dash-status-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.dash-status-table thead th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.50);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.dash-status-table tbody tr {
+  transition: background 0.15s;
+}
+.dash-status-table tbody tr:hover {
+  background: rgba(255,255,255,0.05);
+}
+.dash-status-table tbody td {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.80);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: middle;
+}
+.dash-status-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.dash-status-table code {
+  background: rgba(255,255,255,0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #93c5fd;
+}
+.dash-st-name {
+  font-weight: 600;
+  color: #fff;
+}
+.dash-st-date {
+  color: rgba(255,255,255,0.50);
+  font-size: 12px;
+}
+.dash-st-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.dash-st-type--new {
+  background: rgba(59,130,246,0.15);
+  color: #93c5fd;
+}
+.dash-st-type--renewal {
+  background: rgba(168,85,247,0.15);
+  color: #d8b4fe;
+}
+.dash-st-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.dash-st-status--pending          { background: rgba(234,179,8,0.15); color: #fde68a; }
+.dash-st-status--under_review     { background: rgba(59,130,246,0.15); color: #93c5fd; }
+.dash-st-status--interview_scheduled { background: rgba(168,85,247,0.15); color: #d8b4fe; }
+.dash-st-status--office_assigned  { background: rgba(20,184,166,0.15); color: #5eead4; }
+.dash-st-status--approved         { background: rgba(22,163,74,0.15); color: #86efac; }
+.dash-st-status--rejected         { background: rgba(239,68,68,0.15); color: #fca5a5; }
+.dash-st-empty {
+  text-align: center;
+  padding: 24px !important;
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
 }
 
 /* ==============================================
