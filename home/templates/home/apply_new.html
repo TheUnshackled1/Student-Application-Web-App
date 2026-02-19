@@ -213,32 +213,21 @@
 
                 <div class="applyform-field-group">
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">Student ID <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-id-badge"></i>
                                 <input type="text" class="form-control" name="student_id" id="id_student_id_new" maxlength="8" inputmode="numeric" pattern="\d{1,8}" placeholder="12345678" title="Must be up to 8 digits" required>
                             </div>
-                            <!-- Detection banner (hidden by default) -->
-                            <div class="student-id-alert student-id-alert--warning" id="studentIdWarning" style="display:none;">
-                                <div class="student-id-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                <div class="student-id-alert-body">
-                                    <strong>Student ID already registered!</strong>
-                                    <p id="studentIdWarningText">This student ID is already in the system.</p>
-                                    <a href="{% url 'home:apply_renew' %}" class="student-id-alert-link">
-                                        <i class="fa-solid fa-arrows-rotate"></i> Go to Renewal Form instead
-                                    </a>
-                                </div>
-                            </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-4">
                             <label class="form-label">Course / Program <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-book-open"></i>
                                 <input type="text" class="form-control" name="course" placeholder="e.g. BSIT, BSCS, BEED" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Year Level <span class="text-danger">*</span></label>
                             <select class="form-select" name="year_level" required>
                                 <option value="" selected disabled>Select year</option>
@@ -248,13 +237,24 @@
                                 <option value="4">4th Year</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Semester <span class="text-danger">*</span></label>
                             <select class="form-select" name="semester" required>
                                 <option value="" selected disabled>Select semester</option>
                                 <option value="1st">1st Semester</option>
                                 <option value="2nd">2nd Semester</option>
                             </select>
+                        </div>
+                    </div>
+                    <!-- Detection banner (hidden by default) -->
+                    <div class="student-id-alert student-id-alert--warning" id="studentIdWarning" style="display:none;">
+                        <div class="student-id-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="student-id-alert-body">
+                            <strong>Student ID already registered!</strong>
+                            <p id="studentIdWarningText">This student ID is already in the system.</p>
+                            <a href="{% url 'home:apply_renew' %}" class="student-id-alert-link">
+                                <i class="fa-solid fa-arrows-rotate"></i> Go to Renewal Form instead
+                            </a>
                         </div>
                     </div>
                 </div>
