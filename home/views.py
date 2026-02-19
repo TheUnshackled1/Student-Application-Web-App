@@ -129,6 +129,8 @@ def home(request):
     today = _date.today()
 
     # ── Handle "Track Application" form submission ──
+    track_error = ''
+    track_success = ''
     if request.method == 'POST' and 'track_student_id' in request.POST:
         track_sid = request.POST.get('track_student_id', '').strip()
         if track_sid:
@@ -140,6 +142,9 @@ def home(request):
                 if track_sid not in tracked:
                     tracked.append(track_sid)
                 request.session['tracked_student_ids'] = tracked
+                track_success = f'Application found for Student ID {track_sid}!'
+            else:
+                track_error = f'No application found for Student ID "{track_sid}". Please check your ID and try again.'
 
     # ── Collect ALL applications for this visitor ──
     new_apps = []
@@ -335,6 +340,8 @@ def home(request):
         'upcoming_dates': upcoming_dates,
         'reminders': reminders,
         'announcements': announcements,
+        'track_error': track_error,
+        'track_success': track_success,
     }
     return render(request, 'home/home.html', context)
 

@@ -497,6 +497,18 @@
                             <span>Track</span>
                         </button>
                     </form>
+                    {% if track_error %}
+                    <div class="track-app-alert track-app-alert--error">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span>{{ track_error }}</span>
+                    </div>
+                    {% endif %}
+                    {% if track_success %}
+                    <div class="track-app-alert track-app-alert--success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>{{ track_success }}</span>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
