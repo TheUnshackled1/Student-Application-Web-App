@@ -102,6 +102,22 @@
 <!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
 
+    {% if submission_success %}
+    <div class="submission-success-banner" id="submissionBanner">
+        <div class="submission-success-icon">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <div class="submission-success-body">
+            <strong><i class="fa-solid fa-circle-check"></i> Application Submitted Successfully!</strong>
+            <p>{{ submission_success }}</p>
+            <small><i class="fa-solid fa-info-circle"></i> Your status in the table below will update once your documents have been reviewed.</small>
+        </div>
+        <button class="submission-success-close" onclick="this.parentElement.style.display='none';">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    {% endif %}
+
     {% if track_success %}
     <div class="track-app-alert track-app-alert--success" style="margin-bottom: 20px;">
         <i class="fa-solid fa-circle-check"></i>
