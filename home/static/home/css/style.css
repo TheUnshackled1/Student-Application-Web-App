@@ -4892,9 +4892,15 @@ button.review-doc-link:hover {
   animation: trackAlertSlideIn 0.35s ease;
 }
 .track-app-alert--error {
+<<<<<<< HEAD
   background: rgba(248, 113, 113, 0.12);
   color: #fecaca;
   border: 1px solid rgba(248, 113, 113, 0.2);
+=======
+  background: rgba(94, 234, 212, 0.08);
+  color: #99f6e4;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+>>>>>>> origin/main
 }
 .track-app-alert--error i {
   font-size: 1.1rem;
