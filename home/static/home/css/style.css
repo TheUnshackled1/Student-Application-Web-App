@@ -4892,22 +4892,22 @@ button.review-doc-link:hover {
   animation: trackAlertSlideIn 0.35s ease;
 }
 .track-app-alert--error {
-  background: rgba(239, 68, 68, 0.12);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(94, 234, 212, 0.08);
+  color: #99f6e4;
+  border: 1px solid rgba(94, 234, 212, 0.2);
 }
 .track-app-alert--error i {
   font-size: 1.1rem;
-  color: #ef4444;
+  color: #f87171;
 }
 .track-app-alert--success {
-  background: rgba(34, 197, 94, 0.12);
-  color: #16a34a;
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: rgba(94, 234, 212, 0.08);
+  color: #5eead4;
+  border: 1px solid rgba(94, 234, 212, 0.2);
 }
 .track-app-alert--success i {
   font-size: 1.1rem;
-  color: #22c55e;
+  color: #5eead4;
 }
 @keyframes trackAlertSlideIn {
   from { opacity: 0; transform: translateY(-8px); }
