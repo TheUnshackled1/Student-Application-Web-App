@@ -115,7 +115,7 @@ def _build_steps_from_status(status):
 
 
 STATUS_DISPLAY_MAP = {
-    'pending': ('Pending', 'Your application has been submitted and is awaiting review.'),
+    'pending': ('Waiting for Document Check', 'Your application has been submitted. Please wait while your documents are being checked and verified to determine your eligibility as a Student Assistant.'),
     'under_review': ('Under Review', "Your documents are currently being verified by the Registrar's Office."),
     'interview_scheduled': ('Interview Scheduled', 'Your documents have been verified. Please check your scheduled interview date below.'),
     'office_assigned': ('Office Assigned', 'Your interview is complete and you have been assigned to an office. Awaiting final approval with your start date.'),
@@ -131,6 +131,7 @@ def home(request):
     # ── Handle "Track Application" form submission ──
     track_error = ''
     track_success = ''
+    submission_success = request.session.pop('submission_success', None)
     if request.method == 'POST' and 'track_student_id' in request.POST:
         track_sid = request.POST.get('track_student_id', '').strip()
         if track_sid:
@@ -342,6 +343,7 @@ def home(request):
         'announcements': announcements,
         'track_error': track_error,
         'track_success': track_success,
+        'submission_success': submission_success,
     }
     return render(request, 'home/home.html', context)
 
@@ -442,6 +444,7 @@ def apply_new(request):
             if application.student_id not in tracked:
                 tracked.append(application.student_id)
             request.session['tracked_student_ids'] = tracked
+            request.session['submission_success'] = f'Your new application has been submitted successfully! Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
             return redirect('home:home')
     else:
         form = NewApplicationForm()
@@ -460,6 +463,7 @@ def apply_renew(request):
             if application.student_id not in tracked:
                 tracked.append(application.student_id)
             request.session['tracked_student_ids'] = tracked
+            request.session['submission_success'] = f'Your renewal application has been submitted successfully! Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
             return redirect('home:home')
     else:
         form = RenewalApplicationForm()
