@@ -3967,6 +3967,39 @@ body {
 }
 
 /* ==============================================
+   UPCOMING DATES + APPLICANT STATUS (two-column)
+   ============================================== */
+.dates-status-row {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.dates-status-row .dash-dates {
+  margin-bottom: 0;
+}
+.dash-applicant-status {
+  background: linear-gradient(135deg, #0d9488, #0e7490, #1e40af);
+  border-radius: 16px;
+  box-shadow: 0 6px 28px rgba(13,148,136,0.30);
+  border: 1px solid rgba(94,234,212,0.25);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+}
+.dash-applicant-status .dash-section-title { color: #ffffff; }
+.dash-applicant-status .dash-section-hint  { color: rgba(255,255,255,0.60); }
+.dash-section-icon--teal {
+  background: rgba(94,234,212,0.18);
+  color: #5eead4;
+  border: 1px solid rgba(94,234,212,0.22);
+}
+.dash-applicant-status .dash-status-table-wrap {
+  flex: 1;
+  overflow: auto;
+}
+
+/* ==============================================
    UPCOMING DATES (DASHBOARD)
    ============================================== */
 .dash-dates {
@@ -4068,6 +4101,9 @@ body {
 @media (max-width: 900px) {
   .dash-stats-row {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .dates-status-row {
+    grid-template-columns: 1fr;
   }
   .dash-progress-header {
     flex-direction: column;

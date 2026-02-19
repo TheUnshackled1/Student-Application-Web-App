@@ -248,51 +248,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ── Applicant Status Table ── -->
-            <div class="dash-status-table-wrap">
-                <div class="dash-status-table-header">
-                    <i class="fa-solid fa-table-list"></i>
-                    <span>Student Applicant Status</span>
-                </div>
-                <table class="dash-status-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Student ID</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Submitted</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for app in applications %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td class="dash-st-name">{{ app.student_name }}</td>
-                            <td><code>{{ app.application_id }}</code></td>
-                            <td>
-                                <span class="dash-st-type dash-st-type--{{ app.app_type_class }}">
-                                    <i class="fa-solid {{ app.app_type_icon }}"></i> {{ app.app_type }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="dash-st-status dash-st-status--{{ app.raw_status }}">
-                                    <i class="fa-solid fa-circle" style="font-size:5px;"></i>
-                                    {{ app.application_status }}
-                                </span>
-                            </td>
-                            <td class="dash-st-date">{{ app.submitted_at|date:"M d, Y" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="dash-st-empty">No applications found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
 
         <!-- ── Application Workflow ── -->
@@ -436,7 +391,7 @@
                 <thead>
                     <tr>
                         <th><i class="fa-solid fa-hashtag"></i> #</th>
-                        <th><i class="fa-solid fa-file-lines"></i> Type</th>
+                        <th><i class="fa-solid fa-building"></i> Designation Office</th>
                         <th><i class="fa-solid fa-user"></i> Name</th>
                         <th><i class="fa-solid fa-id-badge"></i> Student ID</th>
                         <th><i class="fa-solid fa-signal"></i> Status</th>
@@ -575,42 +530,96 @@
     </div>
     {% endif %}
 
-    <!-- ===== UPCOMING DATES ===== -->
-    <div class="dash-dates">
-        <div class="dash-section-header">
-            <span class="dash-section-icon dash-section-icon--amber"><i class="fa-solid fa-calendar-days"></i></span>
-            <h3 class="dash-section-title">Upcoming Dates</h3>
-            <p class="dash-section-hint">Important deadlines and events</p>
+    <!-- ===== UPCOMING DATES + APPLICANT STATUS (two-column) ===== -->
+    <div class="dates-status-row">
+
+        <!-- LEFT: Upcoming Dates -->
+        <div class="dash-dates">
+            <div class="dash-section-header">
+                <span class="dash-section-icon dash-section-icon--amber"><i class="fa-solid fa-calendar-days"></i></span>
+                <h3 class="dash-section-title">Upcoming Dates</h3>
+                <p class="dash-section-hint">Important deadlines and events</p>
+            </div>
+
+            <div class="dates-track-grid">
+                {% for d in upcoming_dates %}
+                <div class="date-track-card date-track--{{ d.urgency }}">
+                    <div class="date-track-cal">
+                        <span class="date-cal-day">{{ d.day }}</span>
+                        <span class="date-cal-month">{{ d.month }}</span>
+                    </div>
+                    <div class="date-track-info">
+                        <h5 class="date-track-name">{{ d.title }}</h5>
+                        <span class="date-track-full">{{ d.date }}</span>
+                    </div>
+                    <div class="date-track-countdown">
+                        <span class="days-badge badge-{{ d.urgency }}">
+                            {% if d.urgency == 'passed' %}
+                                Passed
+                            {% else %}
+                                {{ d.days_left }} day{{ d.days_left|pluralize }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="panel-empty" style="grid-column: 1/-1;">
+                    <i class="fa-regular fa-calendar"></i>
+                    <p>No upcoming dates at this time</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="dates-track-grid">
-            {% for d in upcoming_dates %}
-            <div class="date-track-card date-track--{{ d.urgency }}">
-                <div class="date-track-cal">
-                    <span class="date-cal-day">{{ d.day }}</span>
-                    <span class="date-cal-month">{{ d.month }}</span>
-                </div>
-                <div class="date-track-info">
-                    <h5 class="date-track-name">{{ d.title }}</h5>
-                    <span class="date-track-full">{{ d.date }}</span>
-                </div>
-                <div class="date-track-countdown">
-                    <span class="days-badge badge-{{ d.urgency }}">
-                        {% if d.urgency == 'passed' %}
-                            Passed
-                        {% else %}
-                            {{ d.days_left }} day{{ d.days_left|pluralize }}
-                        {% endif %}
-                    </span>
-                </div>
+        <!-- RIGHT: Student Applicant Status -->
+        <div class="dash-applicant-status">
+            <div class="dash-section-header">
+                <span class="dash-section-icon dash-section-icon--teal"><i class="fa-solid fa-table-list"></i></span>
+                <h3 class="dash-section-title">Student Applicant Status</h3>
+                <p class="dash-section-hint">Overview of all submitted applications</p>
             </div>
-            {% empty %}
-            <div class="panel-empty" style="grid-column: 1/-1;">
-                <i class="fa-regular fa-calendar"></i>
-                <p>No upcoming dates at this time</p>
+
+            <div class="dash-status-table-wrap">
+                <table class="dash-status-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Student ID</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="dash-st-name">{{ app.student_name }}</td>
+                            <td><code>{{ app.application_id }}</code></td>
+                            <td>
+                                <span class="dash-st-type dash-st-type--{{ app.app_type_class }}">
+                                    <i class="fa-solid {{ app.app_type_icon }}"></i> {{ app.app_type }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="dash-st-status dash-st-status--{{ app.raw_status }}">
+                                    <i class="fa-solid fa-circle" style="font-size:5px;"></i>
+                                    {{ app.application_status }}
+                                </span>
+                            </td>
+                            <td class="dash-st-date">{{ app.submitted_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="dash-st-empty">No applications found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            {% endfor %}
         </div>
+
     </div>
 
     <!-- ===== REMINDERS & ANNOUNCEMENTS TWO-COLUMN ===== -->
