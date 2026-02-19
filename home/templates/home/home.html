@@ -102,6 +102,13 @@
 <!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
 
+    {% if track_success %}
+    <div class="track-app-alert track-app-alert--success" style="margin-bottom: 20px;">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ track_success }}</span>
+    </div>
+    {% endif %}
+
     {% if has_application %}
     <!-- ===== ALL APPLICATIONS ===== -->
     {% for app in applications %}
