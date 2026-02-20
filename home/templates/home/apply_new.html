@@ -222,10 +222,15 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Course / Program <span class="text-danger">*</span></label>
-                            <div class="applyform-input-icon">
-                                <i class="fa-solid fa-book-open"></i>
-                                <input type="text" class="form-control" name="course" placeholder="e.g. BSIT, BSCS, BEED" required>
-                            </div>
+                            <select class="form-select" name="course" required>
+                                <option value="" selected disabled>Select college / program</option>
+                                <option value="CAS">CAS — College of Arts and Sciences</option>
+                                <option value="CBMA">CBMA — College of Business Management and Accountancy</option>
+                                <option value="CCS">CCS — College of Computer Studies</option>
+                                <option value="COEd">COEd — College of Education</option>
+                                <option value="CIT">CIT — College of Industrial Technology</option>
+                                <option value="COE">COE — College of Engineering</option>
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Year Level <span class="text-danger">*</span></label>
