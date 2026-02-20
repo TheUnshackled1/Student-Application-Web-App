@@ -233,20 +233,20 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Year Level <span class="text-danger">*</span></label>
-                            <select class="form-select" name="year_level" id="id_year_level" required>
+                            <select class="form-select year-select" name="year_level" id="id_year_level" required onchange="updateSelectColor(this)">
                                 <option value="" selected disabled>Select year</option>
-                                <option value="1">1st Year</option>
-                                <option value="2">2nd Year</option>
-                                <option value="3">3rd Year</option>
-                                <option value="4">4th Year</option>
+                                <option value="1" data-color="#94a3b8">1st Year</option>
+                                <option value="2" data-color="#22d3ee">2nd Year</option>
+                                <option value="3" data-color="#a78bfa">3rd Year</option>
+                                <option value="4" data-color="#fbbf24">4th Year</option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Semester <span class="text-danger">*</span></label>
-                            <select class="form-select" name="semester" id="id_semester" required>
+                            <select class="form-select semester-select" name="semester" id="id_semester" required onchange="updateSelectColor(this)">
                                 <option value="" selected disabled>Select semester</option>
-                                <option value="1st">1st Semester</option>
-                                <option value="2nd">2nd Semester</option>
+                                <option value="1st" data-color="#34d399">1st Semester</option>
+                                <option value="2nd" data-color="#f472b6">2nd Semester</option>
                             </select>
                         </div>
                     </div>
@@ -511,23 +511,31 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // College color mapping for course dropdown
-    function updateCourseColor(sel) {
+    // Generic select color mapping (works for course, gender, year, semester, etc.)
+    function updateSelectColor(sel) {
         var opt = sel.options[sel.selectedIndex];
-        var color = opt && opt.dataset.color ? opt.dataset.color : '#e2e8f0';
+        var color = opt && opt.dataset.color ? opt.dataset.color : '#5eead4';
         sel.style.color = color;
         sel.style.borderColor = color;
         sel.style.boxShadow = '0 0 0 3px ' + color + '33';
     }
+    // Aliases for specific selects
+    function updateCourseColor(sel) { updateSelectColor(sel); }
+    function updateGenderColor(sel) { updateSelectColor(sel); }
 
-    // Gender color mapping
-    function updateGenderColor(sel) {
-        var opt = sel.options[sel.selectedIndex];
-        var color = opt && opt.dataset.color ? opt.dataset.color : '#e2e8f0';
-        sel.style.color = color;
-        sel.style.borderColor = color;
-        sel.style.boxShadow = '0 0 0 3px ' + color + '33';
-    }
+    // Auto-capitalize first letter of each word in text inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        var textInputs = document.querySelectorAll('input[type="text"]:not([inputmode="numeric"]), textarea');
+        textInputs.forEach(function(input) {
+            input.addEventListener('input', function() {
+                var pos = this.selectionStart;
+                this.value = this.value.replace(/(?:^|\s|[-/])([a-z])/g, function(match) {
+                    return match.toUpperCase();
+                });
+                this.setSelectionRange(pos, pos);
+            });
+        });
+    });
 
     let cameraStream = null;
     let currentField = null;

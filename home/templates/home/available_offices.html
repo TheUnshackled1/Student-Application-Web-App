@@ -140,21 +140,21 @@
         border: 1px solid rgba(255,255,255,0.15);
         padding: 8px 12px;
         background: rgba(255,255,255,0.06);
-        color: #ffffff;
+        color: #5eead4;
     }
     .office-modal .form-control:focus,
     .office-modal .form-select:focus {
         border-color: #0d9488;
         box-shadow: 0 0 0 3px rgba(13,148,136,0.2);
         background: rgba(255,255,255,0.08);
-        color: #ffffff;
+        color: #5eead4;
     }
     .office-modal .form-select option {
         background: #0f2942;
-        color: #ffffff;
+        color: #e2e8f0;
     }
     .office-modal .form-control::placeholder {
-        color: #94a3b8;
+        color: rgba(255,255,255,0.35);
     }
     .office-form-row {
         display: grid;
@@ -791,6 +791,20 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+/* ── Auto-capitalize first letter of each word in text inputs ── */
+document.addEventListener('DOMContentLoaded', function() {
+    var textInputs = document.querySelectorAll('.office-modal input[type="text"], .office-modal textarea');
+    textInputs.forEach(function(input) {
+        input.addEventListener('input', function() {
+            var pos = this.selectionStart;
+            this.value = this.value.replace(/(?:^|\s|[-\/])([a-z])/g, function(match) {
+                return match.toUpperCase();
+            });
+            this.setSelectionRange(pos, pos);
+        });
+    });
+});
+
 // ========== REAL OFFICE DATA FROM DATABASE ==========
 var offices = {{ offices_json|safe }};
 var IS_STAFF = {{ is_staff_user|yesno:"true,false,false" }};

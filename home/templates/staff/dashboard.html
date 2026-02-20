@@ -359,10 +359,10 @@
             <form method="post" action="{% url 'home:staff_edit_reminder' r.pk %}" class="staff-edit-form" id="reminder-edit-{{ r.pk }}" style="display:none;">
                 {% csrf_token %}
                 <textarea name="message" class="form-control mb-1" rows="2">{{ r.message }}</textarea>
-                <select name="priority" class="form-select mb-1">
-                    <option value="info" {% if r.priority == 'info' %}selected{% endif %}>Info</option>
-                    <option value="warning" {% if r.priority == 'warning' %}selected{% endif %}>Warning</option>
-                    <option value="urgent" {% if r.priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                <select name="priority" class="form-select mb-1" onchange="updateSelectColor(this)">
+                    <option value="info" data-color="#38bdf8" {% if r.priority == 'info' %}selected{% endif %}>Info</option>
+                    <option value="warning" data-color="#fbbf24" {% if r.priority == 'warning' %}selected{% endif %}>Warning</option>
+                    <option value="urgent" data-color="#ef4444" {% if r.priority == 'urgent' %}selected{% endif %}>Urgent</option>
                 </select>
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if r.is_active %}checked{% endif %}>
@@ -580,6 +580,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+/* ── Auto-capitalize first letter of each word in text inputs ── */
+document.addEventListener('DOMContentLoaded', function() {
+    var textInputs = document.querySelectorAll('input[type="text"]:not([inputmode="numeric"]), textarea');
+    textInputs.forEach(function(input) {
+        input.addEventListener('input', function() {
+            var pos = this.selectionStart;
+            this.value = this.value.replace(/(?:^|\s|[-\/])([a-z])/g, function(match) {
+                return match.toUpperCase();
+            });
+            this.setSelectionRange(pos, pos);
+        });
+    });
+});
+
+/* ── Generic select color mapping ── */
+function updateSelectColor(sel) {
+    var opt = sel.options[sel.selectedIndex];
+    var color = opt && opt.dataset.color ? opt.dataset.color : '#5eead4';
+    sel.style.color = color;
+    sel.style.borderColor = color;
+    sel.style.boxShadow = '0 0 0 3px ' + color + '33';
+}
+
 /* ── Staff Camera ── */
 var staffCameraStream = null;
 var staffCurrentField = null;

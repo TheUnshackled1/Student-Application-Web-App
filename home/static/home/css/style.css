@@ -1563,9 +1563,9 @@ body {
   border-radius: 8px;
   border: 1.5px solid rgba(255,255,255,0.15);
   padding: 10px 12px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
   background: rgba(255,255,255,0.06);
-  color: #e2e8f0;
+  color: #5eead4;
 }
 .form-control:focus,
 .form-select:focus {
@@ -1574,12 +1574,31 @@ body {
   background: rgba(255,255,255,0.08);
 }
 .form-control::placeholder {
-  color: rgba(255,255,255,0.40);
+  color: rgba(255,255,255,0.35);
+}
+/* Date input text color */
+.form-control[type="date"] {
+  color: #5eead4;
+}
+.form-control[type="date"]::-webkit-datetime-edit {
+  color: #5eead4;
+}
+/* Textarea text color */
+textarea.form-control {
+  color: #5eead4;
 }
 .form-select option {
   background: #1e293b;
   color: #e2e8f0;
 }
+/* Year level colored options */
+.form-select option[value="1"] { color: #94a3b8; }
+.form-select option[value="2"] { color: #22d3ee; }
+.form-select option[value="3"] { color: #a78bfa; }
+.form-select option[value="4"] { color: #fbbf24; }
+/* Semester colored options */
+.form-select option[value="1st"] { color: #34d399; }
+.form-select option[value="2nd"] { color: #f472b6; }
 /* College-colored dropdown options */
 .form-select option[data-color] { font-weight: 600; }
 .form-select option[value="CAS"]  { color: #22c55e; }
@@ -1589,7 +1608,10 @@ body {
 .form-select option[value="CIT"]  { color: #ef4444; }
 .form-select option[value="COE"]  { color: #f97316; }
 .course-select,
-.gender-select {
+.gender-select,
+.year-select,
+.semester-select,
+.office-select {
   transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 /* Gender-colored dropdown options */
