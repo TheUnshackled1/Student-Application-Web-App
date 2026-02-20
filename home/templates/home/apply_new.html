@@ -158,11 +158,10 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
-                            <select class="form-select" name="gender" required>
+                            <select class="form-select gender-select" name="gender" required onchange="updateGenderColor(this)">
                                 <option value="" selected disabled>Select gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
+                                <option value="male" data-color="#3b82f6">Male</option>
+                                <option value="female" data-color="#ec4899">Female</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -514,6 +513,15 @@
 <script>
     // College color mapping for course dropdown
     function updateCourseColor(sel) {
+        var opt = sel.options[sel.selectedIndex];
+        var color = opt && opt.dataset.color ? opt.dataset.color : '#e2e8f0';
+        sel.style.color = color;
+        sel.style.borderColor = color;
+        sel.style.boxShadow = '0 0 0 3px ' + color + '33';
+    }
+
+    // Gender color mapping
+    function updateGenderColor(sel) {
         var opt = sel.options[sel.selectedIndex];
         var color = opt && opt.dataset.color ? opt.dataset.color : '#e2e8f0';
         sel.style.color = color;

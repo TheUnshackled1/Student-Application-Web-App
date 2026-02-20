@@ -1588,9 +1588,13 @@ body {
 .form-select option[value="COEd"] { color: #3b82f6; }
 .form-select option[value="CIT"]  { color: #ef4444; }
 .form-select option[value="COE"]  { color: #f97316; }
-.course-select {
+.course-select,
+.gender-select {
   transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
+/* Gender-colored dropdown options */
+.form-select option[value="male"]   { color: #3b82f6; font-weight: 600; }
+.form-select option[value="female"] { color: #ec4899; font-weight: 600; }
 .form-check-label {
   color: #e2e8f0;
 }
