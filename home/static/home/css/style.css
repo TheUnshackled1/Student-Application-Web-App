@@ -1576,6 +1576,15 @@ body {
 .form-control::placeholder {
   color: rgba(255,255,255,0.35);
 }
+/* Browser autofill override for dark theme */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(10, 20, 35, 0.99) inset;
+  -webkit-text-fill-color: #5eead4;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #5eead4;
+}
 /* Date input text color */
 .form-control[type="date"] {
   color: #5eead4;
@@ -1599,6 +1608,17 @@ textarea.form-control {
 /* Semester colored options */
 .form-select option[value="1st"] { color: #34d399; }
 .form-select option[value="2nd"] { color: #f472b6; }
+/* Priority colored options */
+.form-select option[value="info"]    { color: #38bdf8; font-weight: 600; }
+.form-select option[value="warning"] { color: #fbbf24; font-weight: 600; }
+.form-select option[value="urgent"]  { color: #ef4444; font-weight: 600; }
+/* Office colored options */
+.form-select option[value="registrar"] { color: #22d3ee; }
+.form-select option[value="library"]   { color: #a78bfa; }
+.form-select option[value="guidance"]  { color: #34d399; }
+.form-select option[value="deans"]     { color: #fbbf24; }
+.form-select option[value="cashier"]   { color: #f472b6; }
+.form-select option[value="osa"]       { color: #fb923c; }
 /* College-colored dropdown options */
 .form-select option[data-color] { font-weight: 600; }
 .form-select option[value="CAS"]  { color: #22c55e; }

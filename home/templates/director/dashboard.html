@@ -365,18 +365,23 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/* ── Auto-capitalize first letter of each word in text inputs ── */
+/* ── Auto-capitalize first letter of each word in text inputs (+ browser autofill) ── */
 document.addEventListener('DOMContentLoaded', function() {
+    function capitalizeWords(el) {
+        var pos = el.selectionStart;
+        el.value = el.value.replace(/(?:^|\s|[-\/])([a-z])/g, function(m) { return m.toUpperCase(); });
+        try { el.setSelectionRange(pos, pos); } catch(e) {}
+    }
     var textInputs = document.querySelectorAll('input[type="text"]:not([inputmode="numeric"]), textarea');
     textInputs.forEach(function(input) {
-        input.addEventListener('input', function() {
-            var pos = this.selectionStart;
-            this.value = this.value.replace(/(?:^|\s|[-\/])([a-z])/g, function(match) {
-                return match.toUpperCase();
-            });
-            this.setSelectionRange(pos, pos);
-        });
+        input.addEventListener('input', function() { capitalizeWords(this); });
+        input.addEventListener('change', function() { capitalizeWords(this); });
     });
+    setTimeout(function() {
+        textInputs.forEach(function(input) {
+            if (input.value) capitalizeWords(input);
+        });
+    }, 500);
 });
 
 function openOfficeModal(pk, name) {
