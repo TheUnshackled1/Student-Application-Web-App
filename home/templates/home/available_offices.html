@@ -361,7 +361,7 @@
             <i class="fa-solid fa-map-location-dot"></i>
         </div>
         <h2 class="form-page-title">Available Offices &amp; Campus Map</h2>
-        <p class="form-page-subtitle">Explore the CHMSU Talisay Campus. Click on a building or office marker to view details and availability for student assistants.</p>
+        <p class="form-page-subtitle">Explore the CHMSU Talisay Main Campus. Click on a building or office marker to view details and availability for student assistants.</p>
     </div>
 
     {% if is_staff_user %}
@@ -642,11 +642,11 @@
                         <div class="pin-picker-map" id="addPinMap"></div>
                     </div>
                     <div class="coords-display">
-                        Lat: <code id="addLatDisplay">10.64320</code> &nbsp;
-                        Lng: <code id="addLngDisplay">122.93940</code>
+                        Lat: <code id="addLatDisplay">10.74260</code> &nbsp;
+                        Lng: <code id="addLngDisplay">122.97030</code>
                     </div>
-                    <input type="hidden" name="latitude" id="addLatInput" value="10.6432">
-                    <input type="hidden" name="longitude" id="addLngInput" value="122.9394">
+                    <input type="hidden" name="latitude" id="addLatInput" value="10.7426">
+                    <input type="hidden" name="longitude" id="addLngInput" value="122.9703">
                 </div>
             </div>
             <div class="d-flex justify-content-end gap-2 mt-3">
@@ -795,22 +795,29 @@
 var offices = {{ offices_json|safe }};
 var IS_STAFF = {{ is_staff_user|yesno:"true,false,false" }};
 
-var CAMPUS_CENTER = [10.6432, 122.9394];
+var CAMPUS_CENTER = [10.7426, 122.9703];
 var CAMPUS_ZOOM = 18;
 
 // Bounding box that limits panning to the campus area only
 var CAMPUS_BOUNDS = L.latLngBounds(
-    [10.6415, 122.9375],   // south-west corner
-    [10.6450, 122.9415]    // north-east corner
+    [10.7410, 122.9680],   // south-west corner
+    [10.7442, 122.9725]    // north-east corner
 );
 
 // Campus buildings (static — non-office structures)
 var buildings = [
-    { name: 'College of Engineering', lat: 10.64270, lng: 122.93880, icon: 'fa-solid fa-gears' },
-    { name: 'College of Education', lat: 10.64370, lng: 122.93935, icon: 'fa-solid fa-chalkboard-user' },
-    { name: 'Gymnasium / Covered Court', lat: 10.64260, lng: 122.93950, icon: 'fa-solid fa-volleyball' },
-    { name: 'Canteen', lat: 10.64280, lng: 122.93860, icon: 'fa-solid fa-utensils' },
-    { name: 'Main Gate & Guard House', lat: 10.64380, lng: 122.93945, icon: 'fa-solid fa-dungeon' }
+    { name: 'Administration Building', lat: 10.74260, lng: 122.97030, icon: 'fa-solid fa-building-columns' },
+    { name: 'Academic Building', lat: 10.74240, lng: 122.97100, icon: 'fa-solid fa-graduation-cap' },
+    { name: 'Student Services Building', lat: 10.74280, lng: 122.96950, icon: 'fa-solid fa-users' },
+    { name: 'College of Computer Studies', lat: 10.74300, lng: 122.97000, icon: 'fa-solid fa-laptop-code' },
+    { name: 'Library Building', lat: 10.74320, lng: 122.97060, icon: 'fa-solid fa-book-open' },
+    { name: 'LSAB Building', lat: 10.74310, lng: 122.97130, icon: 'fa-solid fa-flask' },
+    { name: 'Research Building', lat: 10.74220, lng: 122.96920, icon: 'fa-solid fa-microscope' },
+    { name: 'Machine Shop Building', lat: 10.74200, lng: 122.97150, icon: 'fa-solid fa-gears' },
+    { name: 'Lab School', lat: 10.74350, lng: 122.96960, icon: 'fa-solid fa-school' },
+    { name: 'Gymnasium / Covered Court', lat: 10.74180, lng: 122.97020, icon: 'fa-solid fa-volleyball' },
+    { name: 'Canteen', lat: 10.74190, lng: 122.97140, icon: 'fa-solid fa-utensils' },
+    { name: 'Main Gate & Guard House', lat: 10.74370, lng: 122.97050, icon: 'fa-solid fa-dungeon' }
 ];
 
 // ========== HELPER FUNCTIONS ==========
