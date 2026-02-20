@@ -798,6 +798,12 @@ var IS_STAFF = {{ is_staff_user|yesno:"true,false,false" }};
 var CAMPUS_CENTER = [10.6432, 122.9394];
 var CAMPUS_ZOOM = 18;
 
+// Bounding box that limits panning to the campus area only
+var CAMPUS_BOUNDS = L.latLngBounds(
+    [10.6415, 122.9375],   // south-west corner
+    [10.6450, 122.9415]    // north-east corner
+);
+
 // Campus buildings (static — non-office structures)
 var buildings = [
     { name: 'College of Engineering', lat: 10.64270, lng: 122.93880, icon: 'fa-solid fa-gears' },
@@ -849,7 +855,10 @@ var map = L.map('campusMap', {
     center: CAMPUS_CENTER,
     zoom: CAMPUS_ZOOM,
     layers: [standardTile],
-    zoomControl: false
+    zoomControl: false,
+    maxBounds: CAMPUS_BOUNDS,
+    maxBoundsViscosity: 1.0,
+    minZoom: 17
 });
 
 L.control.zoom({ position: 'topright' }).addTo(map);
