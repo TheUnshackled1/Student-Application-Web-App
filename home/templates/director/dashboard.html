@@ -120,8 +120,53 @@
         </div>
     </div>
 
-    <!-- ===== PANELS ROW ===== -->
-    <div class="director-panels-row">
+    <!-- ===== APPROVED STUDENT ASSISTANTS ===== -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-circle-check"></i></span>
+                <h3 class="staff-panel-title">Approved Student Assistants</h3>
+            </div>
+            <span class="staff-panel-count" style="background: rgba(22,163,74,0.15); color: #86efac;">{{ approved_apps|length }}</span>
+        </div>
+        {% if approved_apps %}
+        <div class="staff-table-wrap">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Office</th>
+                        <th>Start Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in approved_apps %}
+                    <tr>
+                        <td><strong>{{ a.student_id }}</strong></td>
+                        <td>{{ a.first_name }} {{ a.last_name }}</td>
+                        <td>{{ a.course }}</td>
+                        <td>{{ a.assigned_office|default:"\u2014" }}</td>
+                        <td>
+                            {% if a.start_date %}
+                                <span style="font-weight:600; color:#16a34a;">{{ a.start_date|date:"M d, Y" }}</span>
+                            {% else %}
+                                <span style="color:#9ca3af;">\u2014</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="panel-empty">
+            <i class="fa-regular fa-circle-check"></i>
+            <p>No approved student assistants yet.</p>
+        </div>
+        {% endif %}
+    </div>
 
     <!-- ===== INTERVIEW QUEUE ===== -->
     <div class="staff-panel">
@@ -290,56 +335,6 @@
         <div class="panel-empty">
             <i class="fa-regular fa-building"></i>
             <p>No students awaiting final approval.</p>
-        </div>
-        {% endif %}
-    </div>
-
-    </div><!-- /director-panels-row -->
-
-    <!-- ===== APPROVED STUDENT ASSISTANTS ===== -->
-    <div class="staff-panel">
-        <div class="staff-panel-header">
-            <div class="staff-panel-header-left">
-                <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-circle-check"></i></span>
-                <h3 class="staff-panel-title">Approved Student Assistants</h3>
-            </div>
-            <span class="staff-panel-count" style="background: rgba(22,163,74,0.15); color: #86efac;">{{ approved_apps|length }}</span>
-        </div>
-        {% if approved_apps %}
-        <div class="staff-table-wrap">
-            <table class="staff-table">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Course</th>
-                        <th>Office</th>
-                        <th>Start Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for a in approved_apps %}
-                    <tr>
-                        <td><strong>{{ a.student_id }}</strong></td>
-                        <td>{{ a.first_name }} {{ a.last_name }}</td>
-                        <td>{{ a.course }}</td>
-                        <td>{{ a.assigned_office|default:"—" }}</td>
-                        <td>
-                            {% if a.start_date %}
-                                <span style="font-weight:600; color:#16a34a;">{{ a.start_date|date:"M d, Y" }}</span>
-                            {% else %}
-                                <span style="color:#9ca3af;">—</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="panel-empty">
-            <i class="fa-regular fa-circle-check"></i>
-            <p>No approved student assistants yet.</p>
         </div>
         {% endif %}
     </div>
