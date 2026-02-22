@@ -603,6 +603,62 @@
   </div>
 </div>
 
+<!-- ========== STUDENT DETAIL MODAL ========== -->
+<div class="modal fade" id="studentDetailModal" tabindex="-1" aria-labelledby="studentDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content camera-modal-card">
+      <div class="modal-header camera-modal-header">
+        <h5 class="modal-title" id="studentDetailModalLabel">
+            <i class="fa-solid fa-user"></i> Student Details
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;color:#e2e8f0;">
+
+        <!-- Status badge -->
+        <div class="text-center mb-3">
+          <span class="staff-status-pill" id="sdStatus" style="font-size:13px;padding:6px 18px;"></span>
+        </div>
+
+        <div class="row g-3">
+          <!-- Left column -->
+          <div class="col-md-6">
+            <div class="sd-field"><span class="sd-label">Full Name</span><span class="sd-value" id="sdName"></span></div>
+            <div class="sd-field"><span class="sd-label">Student ID</span><span class="sd-value" id="sdId"></span></div>
+            <div class="sd-field"><span class="sd-label">Email</span><span class="sd-value" id="sdEmail"></span></div>
+            <div class="sd-field"><span class="sd-label">Contact Number</span><span class="sd-value" id="sdContact"></span></div>
+            <div class="sd-field"><span class="sd-label">Address</span><span class="sd-value" id="sdAddress"></span></div>
+            <div class="sd-field"><span class="sd-label">Gender</span><span class="sd-value" id="sdGender"></span></div>
+            <div class="sd-field"><span class="sd-label">Date of Birth</span><span class="sd-value" id="sdDob"></span></div>
+            <div class="sd-field"><span class="sd-label">Age</span><span class="sd-value" id="sdAge"></span></div>
+          </div>
+          <!-- Right column -->
+          <div class="col-md-6">
+            <div class="sd-field"><span class="sd-label">Application Type</span><span class="sd-value" id="sdType"></span></div>
+            <div class="sd-field"><span class="sd-label">Course</span><span class="sd-value" id="sdCourse"></span></div>
+            <div class="sd-field"><span class="sd-label">Year Level</span><span class="sd-value" id="sdYear"></span></div>
+            <div class="sd-field"><span class="sd-label">Semester</span><span class="sd-value" id="sdSemester"></span></div>
+            <div class="sd-field"><span class="sd-label">Preferred Office</span><span class="sd-value" id="sdOffice"></span></div>
+            <div class="sd-field"><span class="sd-label">Assigned Office</span><span class="sd-value" id="sdAssigned"></span></div>
+            <div class="sd-field"><span class="sd-label">Interview Date</span><span class="sd-value" id="sdInterview"></span></div>
+            <div class="sd-field"><span class="sd-label">Start Date</span><span class="sd-value" id="sdStart"></span></div>
+            <div class="sd-field"><span class="sd-label">Date Filed</span><span class="sd-value" id="sdFiled"></span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.08);padding:12px 24px;">
+        <a id="sdReviewLink" class="btn-form btn-form--submit" style="text-decoration:none;">
+            <i class="fa-solid fa-eye"></i> Review Application
+        </a>
+        <button type="button" class="btn-form btn-form--cancel" data-bs-dismiss="modal">
+            <i class="fa-solid fa-xmark"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 /* ── Auto-capitalize first letter of each word in text inputs (+ browser autofill) ── */
@@ -802,5 +858,48 @@ document.getElementById('navToggle').addEventListener('click',function(){
 <footer class="site-footer">
     <p>&copy; 2026 Tyrone, Ramsey, Gracee &amp; Dhenby. All rights reserved.</p>
 </footer>
+
+<!-- ========== STUDENT DETAIL MODAL SCRIPT ========== -->
+<script>
+var studentDetailModalEl = document.getElementById('studentDetailModal');
+var studentDetailModal = new bootstrap.Modal(studentDetailModalEl);
+
+function openStudentModal(row) {
+    var d = row.dataset;
+    document.getElementById('sdName').textContent     = d.sName     || '—';
+    document.getElementById('sdId').textContent       = d.sId       || '—';
+    document.getElementById('sdEmail').textContent    = d.sEmail    || '—';
+    document.getElementById('sdContact').textContent  = d.sContact  || '—';
+    document.getElementById('sdAddress').textContent  = d.sAddress  || '—';
+    document.getElementById('sdGender').textContent   = d.sGender   || '—';
+    document.getElementById('sdDob').textContent      = d.sDob      || '—';
+    document.getElementById('sdAge').textContent      = d.sAge      || '—';
+    document.getElementById('sdType').textContent     = d.sType     || '—';
+    document.getElementById('sdCourse').textContent   = d.sCourse   || '—';
+    document.getElementById('sdYear').textContent     = d.sYear     || '—';
+    document.getElementById('sdSemester').textContent = d.sSemester || '—';
+    document.getElementById('sdOffice').textContent   = d.sOffice   || '—';
+    document.getElementById('sdAssigned').textContent = d.sAssigned || '—';
+    document.getElementById('sdInterview').textContent= d.sInterview|| '—';
+    document.getElementById('sdStart').textContent    = d.sStart    || '—';
+    document.getElementById('sdFiled').textContent    = d.sFiled    || '—';
+
+    // Status pill
+    var statusEl = document.getElementById('sdStatus');
+    statusEl.textContent = d.sStatus || '—';
+    statusEl.className = 'staff-status-pill staff-status--' + (d.sStatusKey || 'pending');
+
+    // Review link
+    var isRenewal = d.sRenewal === '1';
+    var pk = d.sPk;
+    var url = isRenewal
+        ? '{% url "staff_review_renewal" 0 %}'.replace('0', pk)
+        : '{% url "staff_review_application" 0 %}'.replace('0', pk);
+    document.getElementById('sdReviewLink').href = url;
+
+    studentDetailModal.show();
+}
+</script>
+
 </body>
 </html>
