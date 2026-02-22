@@ -170,7 +170,31 @@
                 </thead>
                 <tbody>
                     {% for s in all_students %}
-                    <tr data-status="{{ s.status }}" data-search="{{ s.student_id }} {{ s.full_name }} {{ s.email }}">
+                    <tr data-status="{{ s.status }}" data-search="{{ s.student_id }} {{ s.full_name }} {{ s.email }}"
+                        style="cursor:pointer;"
+                        onclick="openStudentModal(this)"
+                        data-s-name="{{ s.full_name }}"
+                        data-s-id="{{ s.student_id }}"
+                        data-s-email="{{ s.email }}"
+                        data-s-contact="{{ s.contact_number }}"
+                        data-s-address="{{ s.address }}"
+                        data-s-gender="{{ s.gender_display }}"
+                        data-s-dob="{% if s.date_of_birth %}{{ s.date_of_birth|date:'F d, Y' }}{% endif %}"
+                        data-s-age="{{ s.age }}"
+                        data-s-course="{{ s.course }}"
+                        data-s-year="{{ s.year_level_display }}"
+                        data-s-semester="{{ s.semester_display }}"
+                        data-s-type="{{ s.app_type }}"
+                        data-s-status="{{ s.status_display }}"
+                        data-s-status-key="{{ s.status }}"
+                        data-s-office="{{ s.preferred_office }}"
+                        data-s-assigned="{{ s.assigned_office }}"
+                        data-s-interview="{% if s.interview_date %}{{ s.interview_date|date:'F d, Y — h:i A' }}{% endif %}"
+                        data-s-start="{% if s.start_date %}{{ s.start_date|date:'F d, Y' }}{% endif %}"
+                        data-s-filed="{{ s.submitted_at|date:'F d, Y — h:i A' }}"
+                        data-s-pk="{{ s.pk }}"
+                        data-s-renewal="{% if s.is_renewal %}1{% else %}0{% endif %}"
+                    >
                         <td class="staff-td-id">{{ s.student_id }}</td>
                         <td>
                             <div class="staff-student-cell">

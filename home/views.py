@@ -724,6 +724,8 @@ def staff_dashboard(request):
     all_students = []
 
     for app in new_apps.order_by('-submitted_at'):
+        dob = app.date_of_birth
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
         all_students.append({
             'pk': app.pk,
             'app_type': 'New',
@@ -735,9 +737,18 @@ def staff_dashboard(request):
             'extension_name': app.extension_name,
             'full_name': f"{app.first_name} {app.middle_initial}. {app.last_name}" + (f" {app.extension_name}" if app.extension_name else ""),
             'email': app.email,
+            'contact_number': app.contact_number,
+            'address': app.address,
+            'gender_display': app.get_gender_display(),
+            'date_of_birth': app.date_of_birth,
+            'age': age,
             'course': app.course,
             'year_level_display': app.get_year_level_display(),
             'semester_display': app.get_semester_display(),
+            'preferred_office': app.preferred_office.name if app.preferred_office else '',
+            'interview_date': app.interview_date,
+            'assigned_office': app.assigned_office,
+            'start_date': app.start_date,
             'submitted_at': app.submitted_at,
             'status': app.status,
             'status_display': app.get_status_display(),
@@ -757,9 +768,18 @@ def staff_dashboard(request):
             'extension_name': '',
             'full_name': app.full_name,
             'email': app.email,
+            'contact_number': app.contact_number,
+            'address': app.address,
+            'gender_display': '',
+            'date_of_birth': None,
+            'age': '',
             'course': app.course,
             'year_level_display': app.get_year_level_display(),
             'semester_display': app.get_semester_display(),
+            'preferred_office': app.preferred_office.name if app.preferred_office else '',
+            'interview_date': app.interview_date,
+            'assigned_office': app.assigned_office,
+            'start_date': app.start_date,
             'submitted_at': app.submitted_at,
             'status': app.status,
             'status_display': app.get_status_display(),
