@@ -184,12 +184,12 @@
         {% endif %}
     </div>
 
-    <!-- ===== INTERVIEW DONE — READY FOR OFFICE ASSIGNMENT ===== -->
+    <!-- ===== INTERVIEW DONE — READY FOR APPROVAL ===== -->
     <div class="staff-panel">
         <div class="staff-panel-header">
             <div class="staff-panel-header-left">
                 <span class="staff-panel-icon staff-panel-icon--amber"><i class="fa-solid fa-clipboard-check"></i></span>
-                <h3 class="staff-panel-title">Ready for Office Assignment</h3>
+                <h3 class="staff-panel-title">Ready for Approval</h3>
             </div>
             <span class="staff-panel-count" style="background: rgba(251,191,36,0.15); color: #fbbf24;">{{ interview_done_apps|length }}</span>
         </div>
@@ -201,7 +201,7 @@
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Course</th>
-                        <th>Interview Date</th>
+                        <th>Preferred Office</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -212,17 +212,17 @@
                         <td>{{ a.first_name }} {{ a.last_name }}</td>
                         <td>{{ a.course }}</td>
                         <td>
-                            {% if a.interview_date %}
-                                <span style="font-weight:600; color:#16a34a;">{{ a.interview_date|date:"M d, Y — h:i A" }}</span>
+                            {% if a.preferred_office %}
+                                <span style="font-weight:600; color:#fbbf24;">{{ a.preferred_office.name }}</span>
                             {% else %}
-                                <span style="color:#9ca3af;">—</span>
+                                <span style="color:#9ca3af;">Not specified</span>
                             {% endif %}
                         </td>
                         <td>
                             <div class="staff-action-group">
-                                <button type="button" class="doc-action-btn doc-action-btn--view"
-                                        onclick="openOfficeModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}')">
-                                    <i class="fa-solid fa-building"></i> Assign Office
+                                <button type="button" class="doc-action-btn doc-action-btn--view" style="background: linear-gradient(135deg,#22c55e,#16a34a);"
+                                        onclick="openApproveModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}', '{% if a.preferred_office %}{{ a.preferred_office.name }}{% else %}Not specified{% endif %}')">
+                                    <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start
                                 </button>
                                 <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:rgba(255,255,255,0.08); color:#e2e8f0; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.12);">
                                     <i class="fa-solid fa-eye"></i> Review
@@ -237,7 +237,7 @@
         {% else %}
         <div class="panel-empty">
             <i class="fa-regular fa-clipboard-check"></i>
-            <p>No students ready for office assignment.</p>
+            <p>No students ready for approval.</p>
         </div>
         {% endif %}
     </div>
@@ -346,46 +346,6 @@
 
 </main>
 
-<!-- ========== OFFICE ASSIGNMENT MODAL ========== -->
-<div class="file-preview-overlay" id="officeModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
-    <div class="file-preview-modal" style="max-width: 480px;">
-        <div class="file-preview-header">
-            <div class="file-preview-title-wrap">
-                <i class="fa-solid fa-building" style="color: #d97706;"></i>
-                <span class="file-preview-title">Assign Office</span>
-            </div>
-            <div class="file-preview-actions">
-                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('officeModal').classList.remove('active');document.body.style.overflow='';">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
-        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #0f2942; padding: 24px;">
-            <form id="officeForm" method="post" action="">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{% url 'home:director_dashboard' %}">
-                <input type="hidden" name="status" value="office_assigned">
-                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
-                    Assign <strong id="officeStudentName" style="color:#ffffff;"></strong> to an office after completing the interview.
-                </p>
-                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #e2e8f0;">
-                    Office Name
-                </label>
-                <select name="assigned_office" required
-                        style="width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: rgba(255,255,255,0.06); color: #5eead4;">
-                    <option value="">Select an office…</option>
-                    {% for office in offices %}
-                    <option value="{{ office.name }}">{{ office.name }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #f59e0b, #d97706);">
-                    <i class="fa-solid fa-building"></i> Confirm Office Assignment
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
 <!-- ========== FINAL APPROVAL MODAL ========== -->
 <div class="file-preview-overlay" id="approveModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
     <div class="file-preview-modal" style="max-width: 480px;">
@@ -409,7 +369,7 @@
                     Approve <strong id="approveStudentName" style="color:#ffffff;"></strong> and set their start date.
                 </p>
                 <p style="font-size: 12px; color: #94a3b8; margin-bottom: 16px;">
-                    Office: <strong id="approveOfficeName" style="color:#fbbf24;"></strong>
+                    Preferred Office: <strong id="approveOfficeName" style="color:#fbbf24;"></strong>
                 </p>
                 <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #e2e8f0;">
                     Start Date
@@ -444,13 +404,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 500);
 });
-
-function openOfficeModal(pk, name) {
-    document.getElementById('officeStudentName').textContent = name;
-    document.getElementById('officeForm').action = '/director/applications/' + pk + '/status/';
-    document.getElementById('officeModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
 
 function openApproveModal(pk, name, office) {
     document.getElementById('approveStudentName').textContent = name;

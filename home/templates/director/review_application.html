@@ -128,13 +128,7 @@
                 </button>
             </form>
             {% endif %}
-            {% if app.status == 'interview_done' %}
-            <button type="button" class="review-status-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; border-color:#d97706;"
-                    onclick="document.getElementById('officeModal').classList.add('active'); document.body.style.overflow='hidden';">
-                <i class="fa-solid fa-building"></i> Assign Office
-            </button>
-            {% endif %}
-            {% if app.status == 'office_assigned' %}
+            {% if app.status == 'interview_done' or app.status == 'office_assigned' %}
             <button type="button" class="review-status-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a); color:#fff; border-color:#16a34a;"
                     onclick="document.getElementById('approveModal').classList.add('active'); document.body.style.overflow='hidden';">
                 <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start Date
@@ -308,46 +302,6 @@
 
 </main>
 
-<!-- ========== OFFICE ASSIGNMENT MODAL ========== -->
-<div class="file-preview-overlay" id="officeModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
-    <div class="file-preview-modal" style="max-width: 480px;">
-        <div class="file-preview-header">
-            <div class="file-preview-title-wrap">
-                <i class="fa-solid fa-building" style="color: #d97706;"></i>
-                <span class="file-preview-title">Assign Office</span>
-            </div>
-            <div class="file-preview-actions">
-                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('officeModal').classList.remove('active');document.body.style.overflow='';">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
-        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #fff; padding: 24px;">
-            <form method="post" action="{% url 'home:director_update_application_status' app.pk %}">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{% url 'home:director_review_application' app.pk %}">
-                <input type="hidden" name="status" value="office_assigned">
-                <p style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">
-                    Assign <strong>{{ app.first_name }} {{ app.last_name }}</strong> to an office after completing the interview.
-                </p>
-                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
-                    Office Name
-                </label>
-                <select name="assigned_office" required
-                        style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: #fff;">
-                    <option value="">Select an office&hellip;</option>
-                    {% for office in offices %}
-                    <option value="{{ office.name }}">{{ office.name }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #f59e0b, #d97706);">
-                    <i class="fa-solid fa-building"></i> Confirm Office Assignment
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
 <!-- ========== FINAL APPROVAL MODAL ========== -->
 <div class="file-preview-overlay" id="approveModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
     <div class="file-preview-modal" style="max-width: 480px;">
@@ -371,7 +325,7 @@
                     Approve <strong>{{ app.first_name }} {{ app.last_name }}</strong> and set their start date.
                 </p>
                 <p style="font-size: 12px; color: #9ca3af; margin-bottom: 16px;">
-                    Office: <strong style="color:#d97706;">{{ app.assigned_office|default:"—" }}</strong>
+                    Preferred Office: <strong style="color:#d97706;">{% if app.preferred_office %}{{ app.preferred_office.name }}{% else %}Not specified{% endif %}</strong>
                 </p>
                 <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
                     Start Date
