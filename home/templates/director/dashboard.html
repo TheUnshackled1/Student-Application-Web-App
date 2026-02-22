@@ -105,10 +105,10 @@
             </div>
         </div>
         <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #f59e0b, #d97706);">
-            <div class="staff-stat-icon"><i class="fa-solid fa-building"></i></div>
+            <div class="staff-stat-icon"><i class="fa-solid fa-clipboard-check"></i></div>
             <div class="staff-stat-info">
-                <span class="staff-stat-val">{{ stats.office_assigned }}</span>
-                <span class="staff-stat-lbl">Office Assigned</span>
+                <span class="staff-stat-val">{{ stats.interview_done }}</span>
+                <span class="staff-stat-lbl">Ready for Approval</span>
             </div>
         </div>
         <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #22c55e, #16a34a);">
@@ -294,6 +294,8 @@
         {% endif %}
     </div>
 
+    </div><!-- /director-panels-row -->
+
     <!-- ===== APPROVED STUDENT ASSISTANTS ===== -->
     <div class="staff-panel">
         <div class="staff-panel-header">
@@ -341,8 +343,6 @@
         </div>
         {% endif %}
     </div>
-
-    </div><!-- /director-panels-row -->
 
 </main>
 

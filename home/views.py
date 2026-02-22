@@ -89,17 +89,16 @@ def _build_steps_from_status(status):
         (1, 'Application Submitted'),
         (2, 'Document Verification'),
         (3, 'Interview & Assessment'),
-        (4, 'Office Assignment'),
-        (5, 'Final Approval'),
+        (4, 'Final Approval'),
     ]
     # Map status to the step that is currently active (1-indexed)
     status_to_current = {
         'pending': 2,                # submitted, now waiting for doc verification
         'under_review': 3,           # docs verified, now interview/assessment
         'interview_scheduled': 3,    # interview date set, awaiting interview
-        'interview_done': 4,         # interview completed, awaiting office assignment
-        'office_assigned': 5,        # office given, waiting for final approval / start date
-        'approved': 6,               # all steps done (past the last step)
+        'interview_done': 4,         # interview completed, awaiting approval
+        'office_assigned': 4,        # legacy — treat same as interview_done
+        'approved': 5,               # all steps done (past the last step)
         'rejected': 0,               # none active
     }
     current_step = status_to_current.get(status, 2)
@@ -119,8 +118,8 @@ STATUS_DISPLAY_MAP = {
     'pending': ('Waiting for Document Check', 'Your application has been submitted. Please wait while your documents are being checked and verified to determine your eligibility as a Student Assistant.'),
     'under_review': ('Under Review', "Your documents are currently being verified by the Registrar's Office."),
     'interview_scheduled': ('Interview Scheduled', 'Your documents have been verified. Please check your scheduled interview date below.'),
-    'interview_done': ('Interview Completed', 'Your interview has been completed. Please wait while an office is being assigned to you.'),
-    'office_assigned': ('Office Assigned', 'Your interview is complete and you have been assigned to an office. Awaiting final approval with your start date.'),
+    'interview_done': ('Interview Completed', 'Your interview has been completed. Please wait for the final approval and start date.'),
+    'office_assigned': ('Office Assigned', 'You have been assigned to an office. Awaiting final approval with your start date.'),
     'approved': ('Approved', 'Congratulations! Your application has been approved. Check your start date below.'),
     'rejected': ('Rejected', 'Your application was not approved. Please contact the office for details.'),
 }
@@ -894,13 +893,13 @@ def staff_update_application_status(request, pk):
             elif app.preferred_office:
                 app.assigned_office = app.preferred_office.name
 
-        # Handle final approval with start date — also auto-assign office
+        # Handle final approval with start date — auto-assign office from preference
         if new_status == 'approved':
             start = request.POST.get('start_date')
             if start:
                 app.start_date = start
-            # If no office has been assigned yet, use the student's preference
-            if not app.assigned_office and app.preferred_office:
+            # Always assign from the student's preferred office
+            if app.preferred_office:
                 app.assigned_office = app.preferred_office.name
 
         app.save()
@@ -1138,12 +1137,13 @@ def director_update_application_status(request, pk):
             elif app.preferred_office:
                 app.assigned_office = app.preferred_office.name
 
-        # Handle final approval — also ensure office is assigned
+        # Handle final approval — auto-assign from preferred_office
         if new_status == 'approved':
             start = request.POST.get('start_date')
             if start:
                 app.start_date = start
-            if not app.assigned_office and app.preferred_office:
+            # Always assign from the student's preferred office
+            if app.preferred_office:
                 app.assigned_office = app.preferred_office.name
 
         if new_status == 'interview_scheduled':
