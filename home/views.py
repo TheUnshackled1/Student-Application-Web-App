@@ -722,10 +722,11 @@ def staff_dashboard(request):
 
     # ── Build unified list of ALL students (new + renewal) ──
     all_students = []
+    today = _date.today()
 
     for app in new_apps.order_by('-submitted_at'):
         dob = app.date_of_birth
-        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day)) if dob else None
         all_students.append({
             'pk': app.pk,
             'app_type': 'New',
