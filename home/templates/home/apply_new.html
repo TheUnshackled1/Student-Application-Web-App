@@ -154,7 +154,7 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="date_of_birth" id="id_date_of_birth" max="2008-02-22" value="2007-01-01" required>
+                            <input type="date" class="form-control" name="date_of_birth" id="id_date_of_birth" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -848,34 +848,43 @@
         semSel.addEventListener('change', checkEligibility);
     })();
 
-    // ── Date of Birth: open at 2007, enforce 18+ ──
+    // ── Date of Birth: enforce 18+, open picker at 2007 ──
     (function() {
         var dobInput = document.getElementById('id_date_of_birth');
         if (!dobInput) return;
 
-        // Set max date to exactly 18 years ago from today
+        // Calculate the max allowed date (exactly 18 years ago)
         var today = new Date();
         var maxYear = today.getFullYear() - 18;
         var maxMonth = String(today.getMonth() + 1).padStart(2, '0');
         var maxDay = String(today.getDate()).padStart(2, '0');
-        dobInput.setAttribute('max', maxYear + '-' + maxMonth + '-' + maxDay);
+        var maxDateStr = maxYear + '-' + maxMonth + '-' + maxDay;
+        dobInput.setAttribute('max', maxDateStr);
 
-        // The default value (2007-01-01) makes the picker open at year 2007.
-        // On first focus, clear it so user must consciously pick their DOB.
-        var cleared = false;
-        dobInput.addEventListener('focus', function() {
-            if (!cleared && this.value === '2007-01-01') {
-                // Keep value briefly so the picker opens at 2007, then let user pick
-                cleared = true;
+        // On first click/focus, if empty, temporarily set value to 2007-01-01
+        // so the native date picker opens at year 2007 instead of current year.
+        var seeded = false;
+        dobInput.addEventListener('mousedown', function() {
+            if (!this.value && !seeded) {
+                seeded = true;
+                this.value = maxYear + '-01-01';
+                // Clear after a brief moment if user hasn't picked yet
+                var self = this;
+                setTimeout(function() {
+                    if (self.value === maxYear + '-01-01') {
+                        // Keep it so the picker opens at that year
+                    }
+                }, 50);
             }
         });
 
-        // Validate on change
+        // Validate on change — reject dates that would make the student under 18
         dobInput.addEventListener('change', function() {
-            var maxDate = new Date(maxYear, today.getMonth(), today.getDate());
+            if (!this.value) return;
             var chosen = new Date(this.value);
+            var maxDate = new Date(maxYear, today.getMonth(), today.getDate());
             if (chosen > maxDate) {
-                this.setCustomValidity('You must be at least 18 years old to apply.');
+                this.setCustomValidity('You must be at least 18 years old to apply. This program is for college-level students only.');
                 this.reportValidity();
             } else {
                 this.setCustomValidity('');

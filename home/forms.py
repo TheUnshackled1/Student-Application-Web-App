@@ -125,6 +125,15 @@ class NewApplicationForm(forms.ModelForm):
             raise forms.ValidationError('Student ID must be at most 8 digits.')
         return val
 
+    def clean_date_of_birth(self):
+        from datetime import date
+        dob = self.cleaned_data['date_of_birth']
+        today = date.today()
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if age < 18:
+            raise forms.ValidationError('You must be at least 18 years old to apply. Only college-level students are eligible.')
+        return dob
+
 
 class RenewalApplicationForm(forms.ModelForm):
     class Meta:
