@@ -152,7 +152,7 @@ class NewApplication(models.Model):
     address = models.TextField()
 
     # ── Academic Information ──
-    student_id = models.CharField(max_length=8)
+    student_id = models.CharField(max_length=8, unique=True)
     course = models.CharField(max_length=100)
     year_level = models.IntegerField(choices=YEAR_LEVEL_CHOICES)
     semester = models.CharField(max_length=5, choices=SEMESTER_CHOICES)
@@ -199,7 +199,7 @@ class RenewalApplication(models.Model):
     STATUS_CHOICES = NewApplication.STATUS_CHOICES
 
     # ── Identity ──
-    student_id = models.CharField(max_length=8)
+    student_id = models.CharField(max_length=8, unique=True)
     full_name = models.CharField(max_length=200)
     email = models.EmailField()
     contact_number = models.CharField(max_length=11)

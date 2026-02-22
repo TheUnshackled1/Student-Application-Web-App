@@ -131,6 +131,8 @@ class NewApplicationForm(forms.ModelForm):
             raise forms.ValidationError('Student ID must contain only digits.')
         if len(val) > 8:
             raise forms.ValidationError('Student ID must be at most 8 digits.')
+        if NewApplication.objects.filter(student_id=val).exists():
+            raise forms.ValidationError('An application with this Student ID already exists.')
         return val
 
     def clean_date_of_birth(self):
@@ -214,6 +216,8 @@ class RenewalApplicationForm(forms.ModelForm):
             raise forms.ValidationError('Student ID must contain only digits.')
         if len(val) > 8:
             raise forms.ValidationError('Student ID must be at most 8 digits.')
+        if RenewalApplication.objects.filter(student_id=val).exists():
+            raise forms.ValidationError('A renewal application with this Student ID already exists.')
         return val
 
 
