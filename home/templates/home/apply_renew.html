@@ -245,24 +245,21 @@
                             <label class="form-label">Previous Office Assigned <span class="text-danger">*</span></label>
                             <select class="form-select office-select" name="previous_office" required onchange="updateSelectColor(this)">
                                 <option value="" selected disabled>Select office</option>
-                                <option value="registrar" data-color="#22d3ee">Registrar</option>
-                                <option value="library" data-color="#a78bfa">Library</option>
-                                <option value="guidance" data-color="#34d399">Guidance Office</option>
-                                <option value="deans" data-color="#fbbf24">Dean's Office</option>
-                                <option value="cashier" data-color="#f472b6">Cashier</option>
-                                <option value="osa" data-color="#fb923c">Office of Student Affairs</option>
+                                {% for office in available_offices %}
+                                <option value="{{ office.id }}" data-color="#22d3ee">{{ office.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Preferred Office for Renewal <span class="text-danger">*</span></label>
                             <select class="form-select office-select" name="preferred_office" required onchange="updateSelectColor(this)">
                                 <option value="" selected disabled>Select office</option>
-                                <option value="registrar" data-color="#22d3ee">Registrar</option>
-                                <option value="library" data-color="#a78bfa">Library</option>
-                                <option value="guidance" data-color="#34d399">Guidance Office</option>
-                                <option value="deans" data-color="#fbbf24">Dean's Office</option>
-                                <option value="cashier" data-color="#f472b6">Cashier</option>
-                                <option value="osa" data-color="#fb923c">Office of Student Affairs</option>
+                                {% for office in available_offices %}
+                                <option value="{{ office.id }}" data-color="#22d3ee"
+                                    {% if office.available == 0 %}disabled{% endif %}>
+                                    {{ office.name }}{% if office.available == 0 %} (Full){% else %} — {{ office.available }} slot{{ office.available|pluralize }} available{% endif %}
+                                </option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-2">

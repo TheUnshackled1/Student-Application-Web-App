@@ -251,6 +251,25 @@
                             </select>
                         </div>
                     </div>
+
+                    <!-- Preferred Office Selection -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label">Preferred Office for Duty <span class="text-danger">*</span></label>
+                            <div class="applyform-input-icon">
+                                <i class="fa-solid fa-building"></i>
+                                <select class="form-select office-select" name="preferred_office" id="id_preferred_office" required onchange="updateSelectColor(this)">
+                                    <option value="" selected disabled>Select available office</option>
+                                    {% for office in available_offices %}
+                                    <option value="{{ office.id }}" data-color="#22d3ee"
+                                        {% if office.available == 0 %}disabled{% endif %}>
+                                        {{ office.name }}{% if office.available == 0 %} (Full){% else %} — {{ office.available }} slot{{ office.available|pluralize }} available{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Eligibility alert (hidden by default) -->
                     <div class="student-id-alert student-id-alert--danger" id="eligibilityAlert" style="display:none;">
                         <div class="student-id-alert-icon"><i class="fa-solid fa-ban"></i></div>

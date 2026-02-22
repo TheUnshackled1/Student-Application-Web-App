@@ -59,7 +59,7 @@ class NewApplicationForm(forms.ModelForm):
         fields = [
             'first_name', 'middle_initial', 'last_name', 'extension_name',
             'date_of_birth', 'gender', 'contact_number', 'email', 'address',
-            'student_id', 'course', 'year_level', 'semester',
+            'student_id', 'course', 'year_level', 'semester', 'preferred_office',
             'application_form', 'id_picture', 'barangay_clearance',
             'parents_itr', 'enrolment_form', 'schedule_classes',
             'proof_insurance', 'grades_last_sem', 'official_time',
@@ -107,7 +107,15 @@ class NewApplicationForm(forms.ModelForm):
             }),
             'year_level': forms.Select(attrs={'class': 'form-select'}),
             'semester': forms.Select(attrs={'class': 'form-select'}),
+            'preferred_office': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate preferred_office with active offices that still have open slots
+        active_offices = Office.objects.filter(is_active=True).order_by('name')
+        self.fields['preferred_office'].queryset = active_offices
+        self.fields['preferred_office'].empty_label = 'Select preferred office'
 
     def clean_contact_number(self):
         val = self.cleaned_data['contact_number']
@@ -183,6 +191,14 @@ class RenewalApplicationForm(forms.ModelForm):
                 'placeholder': 'Full name of your previous supervisor',
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        active_offices = Office.objects.filter(is_active=True).order_by('name')
+        self.fields['previous_office'].queryset = active_offices
+        self.fields['previous_office'].empty_label = 'Select office'
+        self.fields['preferred_office'].queryset = active_offices
+        self.fields['preferred_office'].empty_label = 'Select office'
 
     def clean_contact_number(self):
         val = self.cleaned_data['contact_number']

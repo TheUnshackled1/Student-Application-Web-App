@@ -448,7 +448,30 @@ def apply_new(request):
             return redirect('home:home')
     else:
         form = NewApplicationForm()
-    return render(request, 'home/apply_new.html', {'form': form})
+
+    # Build available offices list with slot info for the template
+    available_offices_list = []
+    for office in Office.objects.filter(is_active=True).order_by('name'):
+        filled_new = NewApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).count()
+        filled_renewal = RenewalApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).count()
+        filled = filled_new + filled_renewal
+        available = max(0, office.total_slots - filled)
+        available_offices_list.append({
+            'id': office.pk,
+            'name': office.name,
+            'available': available,
+        })
+
+    return render(request, 'home/apply_new.html', {
+        'form': form,
+        'available_offices': available_offices_list,
+    })
 
 
 def apply_renew(request):
@@ -467,7 +490,30 @@ def apply_renew(request):
             return redirect('home:home')
     else:
         form = RenewalApplicationForm()
-    return render(request, 'home/apply_renew.html', {'form': form})
+
+    # Build available offices list with slot info for the template
+    available_offices_list = []
+    for office in Office.objects.filter(is_active=True).order_by('name'):
+        filled_new = NewApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).count()
+        filled_renewal = RenewalApplication.objects.filter(
+            assigned_office=office.name,
+            status__in=['office_assigned', 'approved'],
+        ).count()
+        filled = filled_new + filled_renewal
+        available = max(0, office.total_slots - filled)
+        available_offices_list.append({
+            'id': office.pk,
+            'name': office.name,
+            'available': available,
+        })
+
+    return render(request, 'home/apply_renew.html', {
+        'form': form,
+        'available_offices': available_offices_list,
+    })
 
 
 def check_student_id(request):
@@ -837,17 +883,23 @@ def staff_update_application_status(request, pk):
                 except (ValueError, TypeError):
                     pass
 
-        # Handle office assignment
+        # Handle office assignment — auto-fill from preferred_office if not
+        # explicitly provided by staff
         if new_status == 'office_assigned':
             office = request.POST.get('assigned_office', '').strip()
             if office:
                 app.assigned_office = office
+            elif app.preferred_office:
+                app.assigned_office = app.preferred_office.name
 
-        # Handle final approval with start date
+        # Handle final approval with start date — also auto-assign office
         if new_status == 'approved':
             start = request.POST.get('start_date')
             if start:
                 app.start_date = start
+            # If no office has been assigned yet, use the student's preference
+            if not app.assigned_office and app.preferred_office:
+                app.assigned_office = app.preferred_office.name
 
         app.save()
     next_url = request.POST.get('next', '')
@@ -1071,15 +1123,21 @@ def director_update_application_status(request, pk):
     if new_status in dict(NewApplication.STATUS_CHOICES):
         app.status = new_status
 
+        # Handle office assignment — auto-fill from preferred_office
         if new_status == 'office_assigned':
             office = request.POST.get('assigned_office', '').strip()
             if office:
                 app.assigned_office = office
+            elif app.preferred_office:
+                app.assigned_office = app.preferred_office.name
 
+        # Handle final approval — also ensure office is assigned
         if new_status == 'approved':
             start = request.POST.get('start_date')
             if start:
                 app.start_date = start
+            if not app.assigned_office and app.preferred_office:
+                app.assigned_office = app.preferred_office.name
 
         if new_status == 'interview_scheduled':
             interview_dt = request.POST.get('interview_date')

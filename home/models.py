@@ -168,6 +168,13 @@ class NewApplication(models.Model):
     grades_last_sem = models.FileField(upload_to='applications/new/', blank=True)
     official_time = models.FileField(upload_to='applications/new/', blank=True)
 
+    # ── Preferred Office ──
+    preferred_office = models.ForeignKey(
+        Office, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='new_applications',
+        help_text='Office the student prefers to be assigned to.',
+    )
+
     # ── Workflow / Scheduling ──
     interview_date = models.DateTimeField(null=True, blank=True)
     assigned_office = models.CharField(max_length=200, blank=True, default='')
@@ -191,15 +198,6 @@ class RenewalApplication(models.Model):
     SEMESTER_CHOICES = NewApplication.SEMESTER_CHOICES
     STATUS_CHOICES = NewApplication.STATUS_CHOICES
 
-    OFFICE_CHOICES = [
-        ('registrar', 'Registrar'),
-        ('library', 'Library'),
-        ('guidance', 'Guidance Office'),
-        ('deans', "Dean's Office"),
-        ('cashier', 'Cashier'),
-        ('osa', 'Office of Student Affairs'),
-    ]
-
     # ── Identity ──
     student_id = models.CharField(max_length=8)
     full_name = models.CharField(max_length=200)
@@ -213,8 +211,16 @@ class RenewalApplication(models.Model):
     semester = models.CharField(max_length=5, choices=SEMESTER_CHOICES)
 
     # ── Previous & Preferred Assignment ──
-    previous_office = models.CharField(max_length=50, choices=OFFICE_CHOICES)
-    preferred_office = models.CharField(max_length=50, choices=OFFICE_CHOICES)
+    previous_office = models.ForeignKey(
+        Office, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='renewal_previous',
+        help_text='Office where the student previously served.',
+    )
+    preferred_office = models.ForeignKey(
+        Office, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='renewal_preferred',
+        help_text='Office the student prefers for renewal.',
+    )
     hours_rendered = models.PositiveIntegerField()
     supervisor_name = models.CharField(max_length=200, blank=True, default='')
 

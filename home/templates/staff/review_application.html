@@ -232,6 +232,10 @@
                     <span class="review-field-label">Semester</span>
                     <span class="review-field-value">{{ app.get_semester_display }}</span>
                 </div>
+                <div class="review-field">
+                    <span class="review-field-label">Preferred Office</span>
+                    <span class="review-field-value">{% if app.preferred_office %}{{ app.preferred_office.name }}{% else %}Not specified{% endif %}</span>
+                </div>
             </div>
         </div>
 
