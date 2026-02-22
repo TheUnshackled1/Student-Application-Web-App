@@ -155,6 +155,7 @@
                         <div class="col-md-3">
                             <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" name="date_of_birth" id="id_date_of_birth" required>
+                            <small class="form-text" id="dobAgeDisplay" style="color: rgba(255,255,255,0.55); margin-top: 4px;"></small>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -880,9 +881,28 @@
 
         // Validate on change — reject dates that would make the student under 18
         dobInput.addEventListener('change', function() {
-            if (!this.value) return;
+            if (!this.value) {
+                document.getElementById('dobAgeDisplay').textContent = '';
+                return;
+            }
             var chosen = new Date(this.value);
             var maxDate = new Date(maxYear, today.getMonth(), today.getDate());
+
+            // Calculate age
+            var age = today.getFullYear() - chosen.getFullYear();
+            var m = today.getMonth() - chosen.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < chosen.getDate())) {
+                age--;
+            }
+
+            // Display age
+            var ageDisplay = document.getElementById('dobAgeDisplay');
+            if (age >= 18) {
+                ageDisplay.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <strong style="color:#22c55e;">' + age + ' years old</strong>';
+            } else {
+                ageDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i> <strong style="color:#ef4444;">' + age + ' years old — Must be 18+</strong>';
+            }
+
             if (chosen > maxDate) {
                 this.setCustomValidity('You must be at least 18 years old to apply. This program is for college-level students only.');
                 this.reportValidity();

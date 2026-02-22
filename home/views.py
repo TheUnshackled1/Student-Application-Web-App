@@ -800,8 +800,14 @@ def staff_review_application(request, pk):
     total_docs = len(documents)
     uploaded_docs = sum(1 for d in documents if d['uploaded'])
 
+    # Calculate age from date of birth
+    today = _date.today()
+    dob = app.date_of_birth
+    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
     context = {
         'app': app,
+        'age': age,
         'documents': documents,
         'total_docs': total_docs,
         'uploaded_docs': uploaded_docs,
@@ -1037,8 +1043,14 @@ def director_review_application(request, pk):
 
     offices = Office.objects.filter(is_active=True).order_by('name')
 
+    # Calculate age from date of birth
+    today = _date.today()
+    dob = app.date_of_birth
+    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
     context = {
         'app': app,
+        'age': age,
         'documents': documents,
         'total_docs': total_docs,
         'uploaded_docs': uploaded_docs,
