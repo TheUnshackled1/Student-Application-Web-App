@@ -2694,6 +2694,7 @@ textarea.form-control {
 .staff-status--pending      { background: rgba(251,191,36,0.18); color: #fde68a; }
 .staff-status--under_review { background: rgba(37,99,235,0.18); color: #93c5fd; }
 .staff-status--interview_scheduled { background: rgba(139,92,246,0.18); color: #c4b5fd; }
+.staff-status--interview_done      { background: rgba(16,185,129,0.18); color: #6ee7b7; }
 .staff-status--office_assigned     { background: rgba(249,115,22,0.18); color: #fdba74; }
 .staff-status--approved     { background: rgba(22,163,74,0.18); color: #86efac; }
 .staff-status--rejected     { background: rgba(220,38,38,0.18); color: #fca5a5; }
@@ -4817,6 +4818,10 @@ button.review-doc-link:hover {
 .app-log-status--interview_scheduled {
   background: rgba(139,92,246,0.12);
   color: #a78bfa;
+}
+.app-log-status--interview_done {
+  background: rgba(16,185,129,0.12);
+  color: #34d399;
 }
 .app-log-status--office_assigned {
   background: rgba(245,158,11,0.12);

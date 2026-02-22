@@ -97,6 +97,7 @@ def _build_steps_from_status(status):
         'pending': 2,                # submitted, now waiting for doc verification
         'under_review': 3,           # docs verified, now interview/assessment
         'interview_scheduled': 3,    # interview date set, awaiting interview
+        'interview_done': 4,         # interview completed, awaiting office assignment
         'office_assigned': 5,        # office given, waiting for final approval / start date
         'approved': 6,               # all steps done (past the last step)
         'rejected': 0,               # none active
@@ -118,6 +119,7 @@ STATUS_DISPLAY_MAP = {
     'pending': ('Waiting for Document Check', 'Your application has been submitted. Please wait while your documents are being checked and verified to determine your eligibility as a Student Assistant.'),
     'under_review': ('Under Review', "Your documents are currently being verified by the Registrar's Office."),
     'interview_scheduled': ('Interview Scheduled', 'Your documents have been verified. Please check your scheduled interview date below.'),
+    'interview_done': ('Interview Completed', 'Your interview has been completed. Please wait while an office is being assigned to you.'),
     'office_assigned': ('Office Assigned', 'Your interview is complete and you have been assigned to an office. Awaiting final approval with your start date.'),
     'approved': ('Approved', 'Congratulations! Your application has been approved. Check your start date below.'),
     'rejected': ('Rejected', 'Your application was not approved. Please contact the office for details.'),
@@ -694,8 +696,8 @@ def staff_dashboard(request):
         + renewal_apps.filter(status='under_review').count()
     )
     interview_count = (
-        new_apps.filter(status='interview_scheduled').count()
-        + renewal_apps.filter(status='interview_scheduled').count()
+        new_apps.filter(status__in=['interview_scheduled', 'interview_done']).count()
+        + renewal_apps.filter(status__in=['interview_scheduled', 'interview_done']).count()
     )
     office_assigned_count = (
         new_apps.filter(status='office_assigned').count()
@@ -1029,8 +1031,11 @@ def director_dashboard(request):
         status='interview_scheduled'
     ).order_by('interview_date')
 
-    # Applications awaiting office assignment (after interview, director assigns)
-    # These are still interview_scheduled until director moves them forward
+    # Applications where interview is done, ready for office assignment
+    interview_done_apps = all_apps.filter(
+        status='interview_done'
+    ).order_by('-submitted_at')
+
     # Applications that have been assigned an office but not yet approved
     office_assigned_apps = all_apps.filter(
         status='office_assigned'
@@ -1043,6 +1048,7 @@ def director_dashboard(request):
     stats = {
         'total_applications': all_apps.count(),
         'awaiting_interview': interview_apps.count(),
+        'interview_done': interview_done_apps.count(),
         'office_assigned': office_assigned_apps.count(),
         'approved': approved_apps.count(),
         'rejected': all_apps.filter(status='rejected').count(),
@@ -1053,6 +1059,7 @@ def director_dashboard(request):
     context = {
         'director_name': request.user.get_full_name() or 'Director',
         'interview_apps': interview_apps,
+        'interview_done_apps': interview_done_apps,
         'office_assigned_apps': office_assigned_apps,
         'approved_apps': approved_apps,
         'all_apps': all_apps.order_by('-submitted_at'),

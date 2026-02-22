@@ -159,6 +159,67 @@
                         </td>
                         <td>
                             <div class="staff-action-group">
+                                <form method="post" action="{% url 'home:director_update_application_status' a.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'home:director_dashboard' %}">
+                                    <button type="submit" name="status" value="interview_done" class="doc-action-btn doc-action-btn--view" style="background: linear-gradient(135deg,#8b5cf6,#7c3aed);">
+                                        <i class="fa-solid fa-clipboard-check"></i> Done Interview
+                                    </button>
+                                </form>
+                                <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:rgba(255,255,255,0.08); color:#e2e8f0; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.12);">
+                                    <i class="fa-solid fa-eye"></i> Review
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="panel-empty">
+            <i class="fa-regular fa-calendar-check"></i>
+            <p>No students awaiting interview.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== INTERVIEW DONE — READY FOR OFFICE ASSIGNMENT ===== -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon staff-panel-icon--amber"><i class="fa-solid fa-clipboard-check"></i></span>
+                <h3 class="staff-panel-title">Ready for Office Assignment</h3>
+            </div>
+            <span class="staff-panel-count" style="background: rgba(251,191,36,0.15); color: #fbbf24;">{{ interview_done_apps|length }}</span>
+        </div>
+        {% if interview_done_apps %}
+        <div class="staff-table-wrap">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Interview Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in interview_done_apps %}
+                    <tr>
+                        <td><strong>{{ a.student_id }}</strong></td>
+                        <td>{{ a.first_name }} {{ a.last_name }}</td>
+                        <td>{{ a.course }}</td>
+                        <td>
+                            {% if a.interview_date %}
+                                <span style="font-weight:600; color:#16a34a;">{{ a.interview_date|date:"M d, Y — h:i A" }}</span>
+                            {% else %}
+                                <span style="color:#9ca3af;">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="staff-action-group">
                                 <button type="button" class="doc-action-btn doc-action-btn--view"
                                         onclick="openOfficeModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}')">
                                     <i class="fa-solid fa-building"></i> Assign Office
@@ -175,8 +236,8 @@
         </div>
         {% else %}
         <div class="panel-empty">
-            <i class="fa-regular fa-calendar-check"></i>
-            <p>No students awaiting interview.</p>
+            <i class="fa-regular fa-clipboard-check"></i>
+            <p>No students ready for office assignment.</p>
         </div>
         {% endif %}
     </div>

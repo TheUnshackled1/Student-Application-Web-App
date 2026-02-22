@@ -87,6 +87,8 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                 {% elif app.status == 'interview_scheduled' %}
                     <i class="fa-solid fa-calendar-check"></i>
+                {% elif app.status == 'interview_done' %}
+                    <i class="fa-solid fa-clipboard-check"></i>
                 {% elif app.status == 'office_assigned' %}
                     <i class="fa-solid fa-building"></i>
                 {% else %}
@@ -118,6 +120,15 @@
         <span class="review-action-label">Director Actions:</span>
         <div class="review-action-form" style="display:flex; gap:8px; flex-wrap:wrap;">
             {% if app.status == 'interview_scheduled' %}
+            <form method="post" action="{% url 'home:director_update_application_status' app.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'home:director_review_application' app.pk %}">
+                <button type="submit" name="status" value="interview_done" class="review-status-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color:#fff; border-color:#7c3aed;">
+                    <i class="fa-solid fa-clipboard-check"></i> Done Interview
+                </button>
+            </form>
+            {% endif %}
+            {% if app.status == 'interview_done' %}
             <button type="button" class="review-status-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; border-color:#d97706;"
                     onclick="document.getElementById('officeModal').classList.add('active'); document.body.style.overflow='hidden';">
                 <i class="fa-solid fa-building"></i> Assign Office

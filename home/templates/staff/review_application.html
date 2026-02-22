@@ -87,6 +87,8 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                 {% elif app.status == 'interview_scheduled' %}
                     <i class="fa-solid fa-calendar-check"></i>
+                {% elif app.status == 'interview_done' %}
+                    <i class="fa-solid fa-clipboard-check"></i>
                 {% elif app.status == 'office_assigned' %}
                     <i class="fa-solid fa-building"></i>
                 {% else %}

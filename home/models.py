@@ -135,6 +135,7 @@ class NewApplication(models.Model):
         ('pending', 'Pending'),
         ('under_review', 'Under Review'),
         ('interview_scheduled', 'Interview Scheduled'),
+        ('interview_done', 'Interview Done'),
         ('office_assigned', 'Office Assigned'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
