@@ -172,7 +172,7 @@
                     {% for s in all_students %}
                     <tr data-status="{{ s.status }}" data-search="{{ s.student_id }} {{ s.full_name }} {{ s.email }}"
                         style="cursor:pointer;"
-                        onclick="openStudentModal(this)"
+                        onclick="openStudentModal(this, event)"
                         data-s-name="{{ s.full_name }}"
                         data-s-id="{{ s.student_id }}"
                         data-s-email="{{ s.email }}"
@@ -864,7 +864,9 @@ document.getElementById('navToggle').addEventListener('click',function(){
 var studentDetailModalEl = document.getElementById('studentDetailModal');
 var studentDetailModal = new bootstrap.Modal(studentDetailModalEl);
 
-function openStudentModal(row) {
+function openStudentModal(row, event) {
+    // Don't open modal when clicking action buttons
+    if (event && (event.target.closest('.staff-action-group') || event.target.closest('a'))) return;
     var d = row.dataset;
     document.getElementById('sdName').textContent     = d.sName     || '—';
     document.getElementById('sdId').textContent       = d.sId       || '—';
@@ -890,11 +892,8 @@ function openStudentModal(row) {
     statusEl.className = 'staff-status-pill staff-status--' + (d.sStatusKey || 'pending');
 
     // Review link
-    var isRenewal = d.sRenewal === '1';
     var pk = d.sPk;
-    var url = isRenewal
-        ? '{% url "staff_review_renewal" 0 %}'.replace('0', pk)
-        : '{% url "staff_review_application" 0 %}'.replace('0', pk);
+    var url = '{% url "home:staff_review_application" 0 %}'.replace('0', pk);
     document.getElementById('sdReviewLink').href = url;
 
     studentDetailModal.show();
