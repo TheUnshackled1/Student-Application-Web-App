@@ -677,16 +677,13 @@
                 <div class="detail-student-list" id="detailStudentList"></div>
             </div>
         </div>
+        {% if not is_staff_user %}
         <div class="office-detail-actions">
             <a href="{% url 'home:apply_new' %}" class="btn-form btn-form--submit">
                 <i class="fa-solid fa-paper-plane"></i> Apply Here
             </a>
-            {% if is_staff_user %}
-            <button class="btn-form btn-form--submit" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);" id="detailEditBtn" onclick="openEditFromDetail()">
-                <i class="fa-solid fa-pen-to-square"></i> Edit Office
-            </button>
-            {% endif %}
         </div>
+        {% endif %}
     </div>
 
 </main>
@@ -1251,10 +1248,6 @@ function showOfficeDetail(officeId) {
 function closeDetailPanel() {
     document.getElementById('officeDetailPanel').style.display = 'none';
     currentDetailOfficeId = null;
-}
-
-function openEditFromDetail() {
-    if (currentDetailOfficeId) openEditOffice(currentDetailOfficeId);
 }
 
 // ========== STAFF: EDIT / DELETE FUNCTIONS ==========
