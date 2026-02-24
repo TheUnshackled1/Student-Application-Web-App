@@ -298,3 +298,8 @@ class OfficeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['icon'].choices = ICON_CHOICES
+        # Pre-fill model defaults so add-form shows real values (not just placeholders)
+        if not self.instance.pk:
+            self.initial.setdefault('hours', 'Mon\u2013Fri, 8:00 AM \u2013 5:00 PM')
+            self.initial.setdefault('total_slots', 3)
+            self.initial.setdefault('is_active', True)

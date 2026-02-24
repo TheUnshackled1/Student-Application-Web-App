@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.contrib import messages
 from django.http import HttpResponseForbidden, JsonResponse
 from django.views.decorators.http import require_POST
 from django.conf import settings
@@ -1195,7 +1196,13 @@ def staff_add_office(request):
         return redirect('home:home')
     form = OfficeForm(request.POST)
     if form.is_valid():
-        form.save()
+        office = form.save()
+        messages.success(request, f'Office "{office.name}" has been created successfully!')
+    else:
+        error_list = '; '.join(
+            f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()
+        )
+        messages.error(request, f'Failed to create office: {error_list}')
     return redirect('home:available_offices')
 
 
@@ -1209,6 +1216,12 @@ def staff_edit_office(request, pk):
     form = OfficeForm(request.POST, instance=office)
     if form.is_valid():
         form.save()
+        messages.success(request, f'Office "{office.name}" has been updated successfully!')
+    else:
+        error_list = '; '.join(
+            f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()
+        )
+        messages.error(request, f'Failed to update office: {error_list}')
     return redirect('home:available_offices')
 
 
@@ -1219,8 +1232,10 @@ def staff_delete_office(request, pk):
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('home:home')
     office = get_object_or_404(Office, pk=pk)
+    office_name = office.name
     office.is_active = False
     office.save()
+    messages.success(request, f'Office "{office_name}" has been deactivated.')
     return redirect('home:available_offices')
 
 
