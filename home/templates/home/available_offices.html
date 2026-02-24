@@ -1300,7 +1300,13 @@ if (IS_STAFF) {
                 document.getElementById('editHours').value = data.hours || '';
                 document.getElementById('editHead').value = data.head || '';
                 document.getElementById('editTotalSlots').value = data.total_slots;
-                document.getElementById('editIcon').value = data.icon;
+                // Set icon picker
+                document.getElementById('editIconInput').value = data.icon;
+                var iconLabel = 'Building';
+                ICON_CHOICES.forEach(function(pair) { if (pair[0] === data.icon) iconLabel = pair[1]; });
+                var editToggle = document.getElementById('editIconToggle');
+                editToggle.querySelector('.preview-icon').className = 'preview-icon ' + data.icon;
+                editToggle.querySelector('.preview-label').textContent = iconLabel;
                 document.getElementById('editIsActive').checked = data.is_active;
                 document.getElementById('editDescription').value = data.description || '';
                 document.getElementById('editLatInput').value = data.latitude;
