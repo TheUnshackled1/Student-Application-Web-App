@@ -2573,6 +2573,67 @@ textarea.form-control {
   padding: 0 10px;
 }
 
+/* ── Staff Toolbar (Filters + Search) ── */
+.staff-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 24px;
+  background: rgba(255,255,255,0.025);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.staff-toolbar-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.staff-toolbar-search {
+  position: relative;
+  max-width: 380px;
+}
+.staff-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,0.40);
+  font-size: 13px;
+  pointer-events: none;
+}
+.staff-search-input {
+  width: 100%;
+  padding: 9px 14px 9px 38px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  background: rgba(255,255,255,0.06);
+  color: #e2e8f0;
+  transition: all 0.2s;
+}
+.staff-search-input:focus {
+  outline: none;
+  border-color: #0d9488;
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
+}
+.staff-search-input::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+@media (max-width: 600px) {
+  .staff-toolbar {
+    padding: 12px 16px;
+  }
+  .staff-toolbar-search {
+    max-width: 100%;
+  }
+  .staff-filter-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
 /* ── Filter Buttons ── */
 .staff-panel-filters {
   display: flex;
@@ -2580,24 +2641,33 @@ textarea.form-control {
   flex-wrap: wrap;
 }
 .staff-filter-btn {
-  padding: 5px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.60);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
+.staff-filter-btn i {
+  font-size: 10px;
+  opacity: 0.7;
+}
 .staff-filter-btn:hover {
   border-color: #0d9488;
   color: #5eead4;
+  background: rgba(13,148,136,0.08);
 }
 .staff-filter--active {
-  background: #0d9488;
+  background: linear-gradient(135deg, #0d9488, #0e7490);
   color: #ffffff;
   border-color: #0d9488;
+  box-shadow: 0 2px 8px rgba(13,148,136,0.25);
 }
 .staff-filter--active:hover {
   background: #0e7490;

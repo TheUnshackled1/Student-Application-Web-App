@@ -120,37 +120,32 @@
         </div>
     </div>
 
-    <!-- ===== ALL STUDENTS + RECENT ACTIVITY (inline row) ===== -->
-    <div class="staff-panels-row">
-
-    <!-- LEFT: All Students Table -->
+    <!-- ===== ALL STUDENTS TABLE (full width) ===== -->
     <div class="staff-panel">
+        <!-- Panel Header -->
         <div class="staff-panel-header">
             <div class="staff-panel-header-left">
                 <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-users"></i></span>
                 <h3 class="staff-panel-title">All Students</h3>
                 <span class="staff-panel-count">{{ stats.total_applications }}</span>
             </div>
-            <div class="staff-panel-filters">
-                <button class="staff-filter-btn staff-filter--active" data-filter="all">All</button>
-                <button class="staff-filter-btn" data-filter="pending">Pending</button>
-                <button class="staff-filter-btn" data-filter="under_review">Under Review</button>
-                <button class="staff-filter-btn" data-filter="interview_scheduled">Interview</button>
-                <button class="staff-filter-btn" data-filter="interview_done">Interview Done</button>
-                <button class="staff-filter-btn" data-filter="office_assigned">Office Assigned</button>
-                <button class="staff-filter-btn" data-filter="approved">Approved</button>
-                <button class="staff-filter-btn" data-filter="rejected">Rejected</button>
-            </div>
         </div>
 
-        <!-- Search bar -->
-        <div style="padding: 0 20px 12px;">
-            <div style="position: relative;">
-                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.45); font-size: 13px;"></i>
-                <input type="text" id="studentSearchInput" placeholder="Search by name, student ID, or email…"
-                       style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; font-size: 13px; font-family: 'Inter', sans-serif; background: rgba(255,255,255,0.06); color: #e2e8f0; transition: all .2s;"
-                       onfocus="this.style.borderColor='#0d9488'; this.style.background='rgba(255,255,255,0.10)';"
-                       onblur="this.style.borderColor='rgba(255,255,255,0.15)'; this.style.background='rgba(255,255,255,0.06)';">
+        <!-- Toolbar: Filters + Search -->
+        <div class="staff-toolbar">
+            <div class="staff-toolbar-filters">
+                <button class="staff-filter-btn staff-filter--active" data-filter="all"><i class="fa-solid fa-layer-group"></i> All</button>
+                <button class="staff-filter-btn" data-filter="pending"><i class="fa-solid fa-clock"></i> Pending</button>
+                <button class="staff-filter-btn" data-filter="under_review"><i class="fa-solid fa-magnifying-glass"></i> Under Review</button>
+                <button class="staff-filter-btn" data-filter="interview_scheduled"><i class="fa-solid fa-calendar-check"></i> Interview</button>
+                <button class="staff-filter-btn" data-filter="interview_done"><i class="fa-solid fa-clipboard-check"></i> Interview Done</button>
+                <button class="staff-filter-btn" data-filter="office_assigned"><i class="fa-solid fa-building-circle-check"></i> Office Assigned</button>
+                <button class="staff-filter-btn" data-filter="approved"><i class="fa-solid fa-circle-check"></i> Approved</button>
+                <button class="staff-filter-btn" data-filter="rejected"><i class="fa-solid fa-circle-xmark"></i> Rejected</button>
+            </div>
+            <div class="staff-toolbar-search">
+                <i class="fa-solid fa-magnifying-glass staff-search-icon"></i>
+                <input type="text" id="studentSearchInput" class="staff-search-input" placeholder="Search by name, student ID, or email…">
             </div>
         </div>
 
@@ -273,8 +268,8 @@
         </div>
     </div>
 
-    <!-- RIGHT: Recent Activity -->
-    <div class="staff-panel staff-panel--recent">
+    <!-- ===== RECENTLY PROCESSED (full width) ===== -->
+    <div class="staff-panel">
         <div class="staff-panel-header">
             <div class="staff-panel-header-left">
                 <span class="staff-panel-icon staff-panel-icon--blue"><i class="fa-solid fa-clock-rotate-left"></i></span>
@@ -313,8 +308,6 @@
             {% endfor %}
         </div>
     </div>
-
-    </div><!-- /.staff-panels-row -->
 
     <!-- ====================================================
          CONTENT MANAGEMENT SECTION
