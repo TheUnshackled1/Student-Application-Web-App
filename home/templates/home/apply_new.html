@@ -907,19 +907,33 @@
             var chosen = new Date(this.value);
             var maxDate = new Date(maxYear, today.getMonth(), today.getDate());
 
-            // Calculate age
+            // Calculate age in years and days
             var age = today.getFullYear() - chosen.getFullYear();
             var m = today.getMonth() - chosen.getMonth();
             if (m < 0 || (m === 0 && today.getDate() < chosen.getDate())) {
                 age--;
             }
 
+            // Calculate remaining days since last birthday
+            var lastBirthday = new Date(today.getFullYear(), chosen.getMonth(), chosen.getDate());
+            if (lastBirthday > today) {
+                lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
+            }
+            var days = Math.floor((today - lastBirthday) / (1000 * 60 * 60 * 24));
+
+            // Build age string with days
+            var ageStr = age + ' years';
+            if (days > 0) {
+                ageStr += ' and ' + days + ' day' + (days !== 1 ? 's' : '');
+            }
+            ageStr += ' old';
+
             // Display age
             var ageDisplay = document.getElementById('dobAgeDisplay');
             if (age >= 18) {
-                ageDisplay.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <strong style="color:#e2e8f0;">' + age + ' years old</strong>';
+                ageDisplay.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <strong style="color:#e2e8f0;">' + ageStr + '</strong>';
             } else {
-                ageDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#fca5a5;"></i> <strong style="color:#fca5a5;">' + age + ' years old — Must be 18+</strong>';
+                ageDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#fca5a5;"></i> <strong style="color:#fca5a5;">' + ageStr + ' — Must be 18+</strong>';
             }
 
             if (chosen > maxDate) {
