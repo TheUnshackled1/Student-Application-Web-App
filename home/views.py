@@ -431,6 +431,11 @@ def available_offices(request):
         context['is_staff_user'] = True
         context['office_form'] = OfficeForm()
 
+    # Director flag (superuser) — enables draggable markers
+    is_director = request.user.is_authenticated and request.user.is_superuser
+    if is_director:
+        context['is_director'] = True
+
     return render(request, 'home/available_offices.html', context)
 
 
@@ -1237,6 +1242,26 @@ def staff_delete_office(request, pk):
     office.save()
     messages.success(request, f'Office "{office_name}" has been deactivated.')
     return redirect('home:available_offices')
+
+
+@login_required
+@require_POST
+def director_move_office(request, pk):
+    """Update office coordinates via AJAX. Director (superuser) only."""
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'forbidden'}, status=403)
+    office = get_object_or_404(Office, pk=pk)
+    try:
+        import json as _json
+        data = _json.loads(request.body)
+        lat = float(data['lat'])
+        lng = float(data['lng'])
+    except (KeyError, ValueError, _json.JSONDecodeError):
+        return JsonResponse({'error': 'Invalid coordinates'}, status=400)
+    office.latitude = lat
+    office.longitude = lng
+    office.save(update_fields=['latitude', 'longitude'])
+    return JsonResponse({'success': True, 'name': office.name, 'lat': lat, 'lng': lng})
 
 
 @login_required

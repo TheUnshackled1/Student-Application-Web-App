@@ -39,4 +39,7 @@ urlpatterns = [
     path('staff/offices/<int:pk>/edit/', views.staff_edit_office, name='staff_edit_office'),
     path('staff/offices/<int:pk>/delete/', views.staff_delete_office, name='staff_delete_office'),
     path('staff/offices/<int:pk>/json/', views.staff_get_office_json, name='staff_get_office_json'),
+
+    # ---- Director: Move Office Marker ----
+    path('director/offices/<int:pk>/move/', views.director_move_office, name='director_move_office'),
 ]

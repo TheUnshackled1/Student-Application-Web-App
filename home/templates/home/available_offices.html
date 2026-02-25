@@ -511,6 +511,14 @@
     </div>
     {% endif %}
 
+    {% if is_director %}
+    <!-- Director: Draggable markers hint -->
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 18px;margin-bottom:12px;border-radius:12px;background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);font-size:12px;color:#c4b5fd;">
+        <i class="fa-solid fa-hand-pointer" style="font-size:15px;color:#a78bfa;"></i>
+        <span><strong>Director Mode:</strong> You can drag any marker (green, yellow, red, or purple) to reposition it. Office locations save automatically.</span>
+    </div>
+    {% endif %}
+
     <!-- Office Stats Summary -->
     <div class="staff-stats-row" style="margin-bottom: 16px;">
         <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #6366f1, #4f46e5);">
@@ -939,6 +947,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========== REAL OFFICE DATA FROM DATABASE ==========
 var offices = {{ offices_json|safe }};
 var IS_STAFF = {{ is_staff_user|yesno:"true,false,false" }};
+var IS_DIRECTOR = {{ is_director|yesno:"true,false,false" }};
 
 var CAMPUS_CENTER = [10.7426, 122.9703];
 var CAMPUS_ZOOM = 18;
@@ -1044,6 +1053,61 @@ function toggleFullscreen() {
     setTimeout(function() { map.invalidateSize(); }, 300);
 }
 
+// ========== MAP TOAST NOTIFICATION ==========
+function showMapToast(message, type) {
+    type = type || 'success';
+    var existing = document.getElementById('mapToast');
+    if (existing) existing.remove();
+    var colors = {
+        success: { bg: 'linear-gradient(135deg,#0d9488,#0e7490)', icon: 'fa-circle-check' },
+        error:   { bg: 'linear-gradient(135deg,#ef4444,#dc2626)', icon: 'fa-circle-xmark' },
+        info:    { bg: 'linear-gradient(135deg,#6366f1,#4f46e5)', icon: 'fa-circle-info' }
+    };
+    var c = colors[type] || colors.success;
+    var toast = document.createElement('div');
+    toast.id = 'mapToast';
+    toast.style.cssText = 'position:fixed;bottom:28px;right:28px;z-index:99999;padding:14px 22px;border-radius:14px;color:#fff;font-size:13px;font-weight:600;font-family:Inter,sans-serif;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,0.35);background:' + c.bg + ';animation:toastIn .35s cubic-bezier(.34,1.56,.64,1);max-width:460px;';
+    toast.innerHTML = '<i class="fa-solid ' + c.icon + '" style="font-size:16px;"></i><span>' + message + '</span>';
+    document.body.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all .3s';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 3500);
+}
+
+// ========== DIRECTOR: SAVE MARKER POSITION ==========
+function saveMarkerPosition(officeId, officeName, lat, lng) {
+    var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (!csrfToken) {
+        // Try from cookie
+        var match = document.cookie.match(/csrftoken=([^;]+)/);
+        csrfToken = match ? match[1] : '';
+    } else {
+        csrfToken = csrfToken.value;
+    }
+    fetch('/director/offices/' + officeId + '/move/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ lat: lat, lng: lng })
+    })
+    .then(function(resp) { return resp.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showMapToast('Moved "' + officeName + '" to [' + lat.toFixed(6) + ', ' + lng.toFixed(6) + ']', 'success');
+        } else {
+            showMapToast('Failed to save: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(function(err) {
+        showMapToast('Network error saving position', 'error');
+    });
+}
+
 // ========== ADD OFFICE MARKERS (from real DB data) ==========
 offices.forEach(function(office) {
     var color = statusColor(office.status);
@@ -1083,9 +1147,17 @@ offices.forEach(function(office) {
             '<button class="popup-detail-btn" onclick="showOfficeDetail(' + office.id + ')">View Full Details</button>' +
         '</div>';
 
-    var marker = L.marker([office.lat, office.lng], { icon: icon }).addTo(map);
+    var marker = L.marker([office.lat, office.lng], { icon: icon, draggable: IS_DIRECTOR }).addTo(map);
     marker.bindPopup(popupHtml, { maxWidth: 320 });
     office._marker = marker;
+
+    // Director: save new position on drag end
+    if (IS_DIRECTOR) {
+        marker.on('dragend', function(e) {
+            var pos = e.target.getLatLng();
+            saveMarkerPosition(office.id, office.name, pos.lat, pos.lng);
+        });
+    }
 });
 
 // ========== ADD BUILDING MARKERS (static) ==========
@@ -1096,7 +1168,14 @@ buildings.forEach(function(bldg) {
             '<h4>' + bldg.name + '</h4>' +
             '<span class="popup-status" style="background:#6366f1;">Campus Building</span>' +
         '</div>';
-    L.marker([bldg.lat, bldg.lng], { icon: icon }).addTo(map).bindPopup(popupHtml, { maxWidth: 280 });
+    var bMarker = L.marker([bldg.lat, bldg.lng], { icon: icon, draggable: IS_DIRECTOR }).addTo(map);
+    bMarker.bindPopup(popupHtml, { maxWidth: 280 });
+    if (IS_DIRECTOR) {
+        bMarker.on('dragend', function(e) {
+            var pos = e.target.getLatLng();
+            showMapToast('Moved "' + bldg.name + '" to [' + pos.lat.toFixed(6) + ', ' + pos.lng.toFixed(6) + ']. Update the code to persist.', 'info');
+        });
+    }
 });
 
 // Campus boundary circle
