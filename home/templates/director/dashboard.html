@@ -265,10 +265,6 @@
                         </td>
                         <td>
                             <div class="staff-action-group">
-                                <button type="button" class="doc-action-btn doc-action-btn--view" style="background: linear-gradient(135deg,#22c55e,#16a34a);"
-                                        onclick="openApproveModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}', '{% if a.preferred_office %}{{ a.preferred_office.name }}{% else %}Not specified{% endif %}')">
-                                    <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start
-                                </button>
                                 <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:rgba(255,255,255,0.08); color:#e2e8f0; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.12);">
                                     <i class="fa-solid fa-eye"></i> Review
                                 </a>
@@ -317,10 +313,6 @@
                         <td><span style="font-weight:600; color:#fbbf24;">{{ a.assigned_office|default:"—" }}</span></td>
                         <td>
                             <div class="staff-action-group">
-                                <button type="button" class="doc-action-btn doc-action-btn--view" style="background: linear-gradient(135deg,#22c55e,#16a34a);"
-                                        onclick="openApproveModal({{ a.pk }}, '{{ a.first_name }} {{ a.last_name }}', '{{ a.assigned_office }}')">
-                                    <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start
-                                </button>
                                 <a href="{% url 'home:director_review_application' a.pk %}" class="doc-action-btn" style="background:rgba(255,255,255,0.08); color:#e2e8f0; font-size:12px; padding:6px 12px; border-radius:8px; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.12);">
                                     <i class="fa-solid fa-eye"></i> Review
                                 </a>
@@ -340,44 +332,6 @@
     </div>
 
 </main>
-
-<!-- ========== FINAL APPROVAL MODAL ========== -->
-<div class="file-preview-overlay" id="approveModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
-    <div class="file-preview-modal" style="max-width: 480px;">
-        <div class="file-preview-header">
-            <div class="file-preview-title-wrap">
-                <i class="fa-solid fa-flag-checkered" style="color: #16a34a;"></i>
-                <span class="file-preview-title">Final Approval</span>
-            </div>
-            <div class="file-preview-actions">
-                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('approveModal').classList.remove('active');document.body.style.overflow='';">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
-        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #0f2942; padding: 24px;">
-            <form id="approveForm" method="post" action="">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{% url 'home:director_dashboard' %}">
-                <input type="hidden" name="status" value="approved">
-                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">
-                    Approve <strong id="approveStudentName" style="color:#ffffff;"></strong> and set their start date.
-                </p>
-                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 16px;">
-                    Preferred Office: <strong id="approveOfficeName" style="color:#fbbf24;"></strong>
-                </p>
-                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #e2e8f0;">
-                    Start Date
-                </label>
-                <input type="date" name="start_date" required
-                       style="width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px; background: rgba(255,255,255,0.06); color: #5eead4;">
-                <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #22c55e, #16a34a);">
-                    <i class="fa-solid fa-circle-check"></i> Approve Application
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -399,14 +353,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 500);
 });
-
-function openApproveModal(pk, name, office) {
-    document.getElementById('approveStudentName').textContent = name;
-    document.getElementById('approveOfficeName').textContent = office || '—';
-    document.getElementById('approveForm').action = '/director/applications/' + pk + '/status/';
-    document.getElementById('approveModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
