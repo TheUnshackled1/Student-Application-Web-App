@@ -226,6 +226,7 @@ class RenewalApplication(models.Model):
     supervisor_name = models.CharField(max_length=200, blank=True, default='')
 
     # ── Renewal Documents ──
+    id_picture = models.ImageField(upload_to='applications/renewal/', blank=True)
     enrolment_form = models.FileField(upload_to='applications/renewal/', blank=True)
     schedule_classes = models.FileField(upload_to='applications/renewal/', blank=True)
     grades_last_sem = models.FileField(upload_to='applications/renewal/', blank=True)

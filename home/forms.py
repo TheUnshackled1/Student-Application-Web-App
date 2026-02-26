@@ -152,7 +152,7 @@ class RenewalApplicationForm(forms.ModelForm):
             'student_id', 'full_name', 'email', 'contact_number', 'address',
             'course', 'year_level', 'semester',
             'previous_office', 'preferred_office', 'hours_rendered', 'supervisor_name',
-            'enrolment_form', 'schedule_classes', 'grades_last_sem',
+            'id_picture', 'enrolment_form', 'schedule_classes', 'grades_last_sem',
             'official_time', 'recommendation_letter', 'evaluation_form',
         ]
         widgets = {

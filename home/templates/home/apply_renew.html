@@ -292,6 +292,24 @@
 
                 <div class="applyform-docs-grid">
 
+                    <!-- Doc 0: 2x2 ID Picture -->
+                    <div class="applyform-doc-card">
+                        <div class="applyform-doc-num"><i class="fa-solid fa-id-badge"></i></div>
+                        <label class="applyform-doc-label">2x2 ID Picture <span class="text-danger">*</span></label>
+                        <div class="input-with-camera">
+                            <div class="custom-file-upload">
+                                <input type="file" name="id_picture" accept="image/*" required>
+                                <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                                <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                            </div>
+                            <button type="button" class="btn-camera-sm" onclick="openCameraModal('id_picture')">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="file-preview" id="preview_id_picture"></div>
+                        <input type="hidden" name="id_picture_photo" id="photo_id_picture">
+                    </div>
+
                     <!-- Doc 1 -->
                     <div class="applyform-doc-card">
                         <div class="applyform-doc-num">1</div>

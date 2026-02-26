@@ -63,6 +63,7 @@ def _build_documents_from_app(app):
 def _build_documents_from_renewal(app):
     """Build document status list from a RenewalApplication's file fields."""
     doc_fields = [
+        ('id_picture', '2x2 ID Picture'),
         ('enrolment_form', 'Photocopy of Enrolment Form'),
         ('schedule_classes', 'Schedule of Classes'),
         ('grades_last_sem', 'Grades Last Semester'),
@@ -398,7 +399,7 @@ def available_offices(request):
                 'student_id': app.student_id,
                 'status': app.get_status_display(),
                 'status_key': app.status,
-                'photo': '',
+                'photo': app.id_picture.url if app.id_picture else '',
             })
 
         offices_data.append({
