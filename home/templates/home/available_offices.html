@@ -1120,8 +1120,11 @@ offices.forEach(function(office) {
             '<strong style="font-size:11px;color:#e2e8f0;">Assigned SAs:</strong>';
         office.students.forEach(function(s) {
             var sColor = s.status_key === 'approved' ? '#16a34a' : '#d97706';
+            var avatarPop = s.photo
+                ? '<img src="' + s.photo + '" style="width:22px;height:22px;border-radius:50%;object-fit:cover;border:1.5px solid ' + sColor + ';">'
+                : '<i class="fa-solid fa-user" style="color:' + sColor + ';font-size:9px;"></i>';
             studentsHtml += '<div style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:11px;">' +
-                '<i class="fa-solid fa-user" style="color:' + sColor + ';font-size:9px;"></i>' +
+                avatarPop +
                 '<span>' + s.name + ' (' + s.student_id + ')</span>' +
                 '</div>';
         });
@@ -1299,11 +1302,14 @@ function showOfficeDetail(officeId) {
         office.students.forEach(function(s) {
             var sColor = s.status_key === 'approved' ? '#86efac' : '#fbbf24';
             var sBg = s.status_key === 'approved' ? 'rgba(22,163,74,0.15)' : 'rgba(251,191,36,0.15)';
+            var avatarHtml = s.photo
+                ? '<img src="' + s.photo + '" alt="' + s.name + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid ' + sColor + ';">'
+                : '<div style="width:36px;height:36px;border-radius:50%;background:' + sBg + ';display:flex;align-items:center;justify-content:center;">' +
+                      '<i class="fa-solid fa-user" style="color:' + sColor + ';font-size:13px;"></i>' +
+                  '</div>';
             studentList.innerHTML +=
                 '<div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:rgba(255,255,255,0.04); border-radius:10px; margin-bottom:6px; border:1px solid rgba(255,255,255,0.06);">' +
-                    '<div style="width:32px;height:32px;border-radius:50%;background:' + sBg + ';display:flex;align-items:center;justify-content:center;">' +
-                        '<i class="fa-solid fa-user" style="color:' + sColor + ';font-size:12px;"></i>' +
-                    '</div>' +
+                    avatarHtml +
                     '<div style="flex:1;">' +
                         '<div style="font-size:13px;font-weight:600;color:#ffffff;">' + s.name + '</div>' +
                         '<div style="font-size:11px;color:#94a3b8;">ID: ' + s.student_id + '</div>' +

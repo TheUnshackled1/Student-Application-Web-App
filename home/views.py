@@ -387,6 +387,7 @@ def available_offices(request):
                 'student_id': app.student_id,
                 'status': app.get_status_display(),
                 'status_key': app.status,
+                'photo': app.id_picture.url if app.id_picture else '',
             })
         for app in RenewalApplication.objects.filter(
             assigned_office=office.name,
@@ -397,6 +398,7 @@ def available_offices(request):
                 'student_id': app.student_id,
                 'status': app.get_status_display(),
                 'status_key': app.status,
+                'photo': '',
             })
 
         offices_data.append({
