@@ -516,6 +516,10 @@
                     {{ announcement_form.is_active }}
                     <label class="form-check-label" style="font-size:13px;">Active</label>
                 </div>
+                <div class="mb-2">
+                    <label class="form-label">Expires On <span style="color:#9ca3af; font-weight:400;">(optional)</span></label>
+                    {{ announcement_form.expires_at }}
+                </div>
                 <button type="submit" class="btn-primary" style="margin-top:8px;">
                     <i class="fa-solid fa-plus"></i> Add Announcement
                 </button>
@@ -562,6 +566,10 @@
                 {% if a.image %}
                 <p style="font-size:11px; color:rgba(255,255,255,0.45); margin:0 0 4px;">Current: {{ a.image.name }}</p>
                 {% endif %}
+                <div class="mb-1">
+                    <label class="form-label" style="font-size:11px;">Expires On</label>
+                    <input type="date" name="expires_at" class="form-control" value="{% if a.expires_at %}{{ a.expires_at|date:'Y-m-d' }}{% endif %}">
+                </div>
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if a.is_active %}checked{% endif %}>
                     <label class="form-check-label" style="font-size:13px;">Active</label>
@@ -577,6 +585,73 @@
         </div>
 
     </div>
+
+    <!-- ========== EXPIRED CONTENT TABLE ========== -->
+    {% if expired_reminders or expired_dates or expired_announcements %}
+    <div class="staff-panel expired-content-section">
+        <div class="panel-header" style="margin-bottom: 16px;">
+            <div class="panel-header-left">
+                <span class="panel-icon" style="background:rgba(239,68,68,0.15); color:#f87171;"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                <h3 class="panel-title">Expired Content</h3>
+            </div>
+            <span class="expired-total-badge">{{ expired_reminders|length|add:expired_dates|length|add:expired_announcements|length }}</span>
+        </div>
+
+        <div class="expired-table-wrap">
+            <table class="expired-content-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Content</th>
+                        <th>Expired On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in expired_reminders %}
+                    <tr>
+                        <td><span class="expired-type-badge expired-type--reminder"><i class="fa-solid fa-bell"></i> Reminder</span></td>
+                        <td class="expired-content-text">{{ r.message|truncatewords:15 }}</td>
+                        <td class="expired-date-cell">{{ r.expires_at|date:"M d, Y" }}</td>
+                        <td class="expired-actions-cell">
+                            <form method="post" action="{% url 'home:staff_delete_reminder' r.pk %}" style="display:inline;" onsubmit="return confirm('Permanently delete this expired reminder?');">
+                                {% csrf_token %}
+                                <button type="submit" class="staff-btn-delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for d in expired_dates %}
+                    <tr>
+                        <td><span class="expired-type-badge expired-type--date"><i class="fa-solid fa-calendar-days"></i> Date</span></td>
+                        <td class="expired-content-text">{{ d.title }}</td>
+                        <td class="expired-date-cell">{{ d.expires_at|date:"M d, Y" }}</td>
+                        <td class="expired-actions-cell">
+                            <form method="post" action="{% url 'home:staff_delete_date' d.pk %}" style="display:inline;" onsubmit="return confirm('Permanently delete this expired date?');">
+                                {% csrf_token %}
+                                <button type="submit" class="staff-btn-delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for a in expired_announcements %}
+                    <tr>
+                        <td><span class="expired-type-badge expired-type--announcement"><i class="fa-solid fa-bullhorn"></i> Announcement</span></td>
+                        <td class="expired-content-text">{{ a.title|truncatewords:10 }}</td>
+                        <td class="expired-date-cell">{{ a.expires_at|date:"M d, Y" }}</td>
+                        <td class="expired-actions-cell">
+                            <form method="post" action="{% url 'home:staff_delete_announcement' a.pk %}" style="display:inline;" onsubmit="return confirm('Permanently delete this expired announcement?');">
+                                {% csrf_token %}
+                                <button type="submit" class="staff-btn-delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
 
 </main>
 

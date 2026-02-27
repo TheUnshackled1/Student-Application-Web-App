@@ -3471,6 +3471,107 @@ textarea.form-control {
   caret-color: #e2e8f0;
 }
 
+/* ==========================================
+   EXPIRED CONTENT TABLE
+   ========================================== */
+.expired-content-section {
+  margin-top: 24px;
+}
+.expired-total-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 8px;
+}
+.expired-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.expired-content-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.expired-content-table thead tr {
+  background: rgba(255,255,255,0.04);
+}
+.expired-content-table th {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  text-align: left;
+  white-space: nowrap;
+}
+.expired-content-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: #cbd5e1;
+  vertical-align: middle;
+}
+.expired-content-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.expired-content-table tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+.expired-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.expired-type--reminder {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+.expired-type--date {
+  background: rgba(94, 234, 212, 0.12);
+  color: #5eead4;
+}
+.expired-type--announcement {
+  background: rgba(134, 239, 172, 0.12);
+  color: #86efac;
+}
+.expired-content-text {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  color: rgba(226,232,240,0.7);
+}
+.expired-date-cell {
+  font-size: 12px;
+  color: #f87171;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.expired-actions-cell {
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .expired-content-text { max-width: 140px; }
+  .expired-content-table th,
+  .expired-content-table td { padding: 8px 10px; }
+}
+
 .staff-item-row {
   display: flex;
   align-items: center;
