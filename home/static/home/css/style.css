@@ -2667,12 +2667,8 @@ textarea.form-control {
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.10);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.staff-stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.20);
-  background: rgba(255,255,255,0.08);
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 .staff-stat-icon {
   width: 48px;
@@ -2713,6 +2709,8 @@ textarea.form-control {
   border: 1px solid rgba(255,255,255,0.10);
   margin-bottom: 24px;
   overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 
 /* ── Director Panels Inline Row ── */
