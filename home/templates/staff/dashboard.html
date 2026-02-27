@@ -807,6 +807,29 @@ function toggleEditForm(id) {
     var btns = document.querySelectorAll('.staff-filter-btn');
     var rows = document.querySelectorAll('#applicationsTable tbody tr[data-status]');
     var currentFilter = 'all';
+    var tbody = document.querySelector('#applicationsTable tbody');
+
+    // Filter label map for friendly empty messages
+    var filterLabels = {
+        'all': 'applications',
+        'pending': 'pending applications',
+        'under_review': 'applications under review',
+        'interview_scheduled': 'students with scheduled interviews',
+        'interview_done': 'students with completed interviews',
+        'office_assigned': 'students with office assignments',
+        'approved': 'approved applications',
+        'rejected': 'rejected applications'
+    };
+    var filterIcons = {
+        'all': 'fa-regular fa-folder-open',
+        'pending': 'fa-solid fa-clock',
+        'under_review': 'fa-solid fa-magnifying-glass',
+        'interview_scheduled': 'fa-solid fa-calendar-check',
+        'interview_done': 'fa-solid fa-clipboard-check',
+        'office_assigned': 'fa-solid fa-building-circle-check',
+        'approved': 'fa-solid fa-circle-check',
+        'rejected': 'fa-solid fa-circle-xmark'
+    };
 
     btns.forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -827,6 +850,12 @@ function toggleEditForm(id) {
 
     function applyFilters() {
         var search = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        var visibleCount = 0;
+
+        // Remove any previous empty-state row
+        var oldEmpty = document.getElementById('filterEmptyRow');
+        if (oldEmpty) oldEmpty.remove();
+
         rows.forEach(function(row) {
             var matchFilter = (currentFilter === 'all' || row.getAttribute('data-status') === currentFilter);
             var matchSearch = true;
@@ -834,8 +863,26 @@ function toggleEditForm(id) {
                 var searchText = (row.getAttribute('data-search') || '').toLowerCase();
                 matchSearch = searchText.indexOf(search) !== -1;
             }
-            row.style.display = (matchFilter && matchSearch) ? '' : 'none';
+            var visible = matchFilter && matchSearch;
+            row.style.display = visible ? '' : 'none';
+            if (visible) visibleCount++;
         });
+
+        // Show empty state message when no rows match
+        if (visibleCount === 0 && rows.length > 0) {
+            var label = filterLabels[currentFilter] || 'applications';
+            var icon = filterIcons[currentFilter] || 'fa-regular fa-folder-open';
+            var msg = search
+                ? 'No ' + label + ' match your search.'
+                : 'No ' + label + ' found.';
+            var emptyRow = document.createElement('tr');
+            emptyRow.id = 'filterEmptyRow';
+            emptyRow.innerHTML = '<td colspan="8" class="staff-table-empty">' +
+                '<i class="' + icon + '"></i>' +
+                '<p>' + msg + '</p>' +
+                '</td>';
+            tbody.appendChild(emptyRow);
+        }
     }
 })();
 
