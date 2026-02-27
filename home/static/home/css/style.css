@@ -3405,6 +3405,72 @@ textarea.form-control {
   margin-bottom: 3px;
 }
 
+/* Staff form input text color fixes */
+.staff-mgmt-form .form-control,
+.staff-mgmt-form .form-select,
+.staff-edit-form .form-control,
+.staff-edit-form .form-select {
+  background: rgba(255,255,255,0.06) !important;
+  color: #e2e8f0 !important;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  font-size: 13px;
+}
+.staff-mgmt-form .form-control:focus,
+.staff-mgmt-form .form-select:focus,
+.staff-edit-form .form-control:focus,
+.staff-edit-form .form-select:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.20);
+  background: rgba(255,255,255,0.08) !important;
+  color: #f1f5f9 !important;
+}
+.staff-mgmt-form .form-control::placeholder,
+.staff-edit-form .form-control::placeholder {
+  color: rgba(255,255,255,0.35) !important;
+}
+.staff-mgmt-form textarea.form-control,
+.staff-edit-form textarea.form-control {
+  color: #e2e8f0 !important;
+}
+.staff-mgmt-form .form-control[type="date"],
+.staff-edit-form .form-control[type="date"] {
+  color: #e2e8f0 !important;
+  color-scheme: dark;
+}
+.staff-mgmt-form .form-control[type="date"]::-webkit-datetime-edit,
+.staff-edit-form .form-control[type="date"]::-webkit-datetime-edit {
+  color: #e2e8f0 !important;
+}
+.staff-mgmt-form .form-control[type="date"]::-webkit-calendar-picker-indicator,
+.staff-edit-form .form-control[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+.staff-mgmt-form .form-select,
+.staff-edit-form .form-select {
+  color: #e2e8f0 !important;
+  color-scheme: dark;
+}
+.staff-mgmt-form .form-select option,
+.staff-edit-form .form-select option {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+.staff-mgmt-form .form-check-label,
+.staff-edit-form .form-check-label {
+  color: #cbd5e1;
+}
+.staff-mgmt-form .form-control:-webkit-autofill,
+.staff-mgmt-form .form-control:-webkit-autofill:hover,
+.staff-mgmt-form .form-control:-webkit-autofill:focus,
+.staff-edit-form .form-control:-webkit-autofill,
+.staff-edit-form .form-control:-webkit-autofill:hover,
+.staff-edit-form .form-control:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(10, 20, 35, 0.99) inset !important;
+  -webkit-text-fill-color: #e2e8f0 !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #e2e8f0;
+}
+
 .staff-item-row {
   display: flex;
   align-items: center;
