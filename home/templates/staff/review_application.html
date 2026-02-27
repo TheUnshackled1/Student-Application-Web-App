@@ -462,7 +462,7 @@ document.getElementById('navToggle').addEventListener('click',function(){
     var tiltCards = document.querySelectorAll(
         '.status-banner, .staff-panel, .review-wf-card'
     );
-    var maxTilt = 4, perspective = 1000, scale = 1.02, glowStrength = 0.45;
+    var maxTilt = 4, perspective = 1000, scale = 2.02, glowStrength = 0.45;
     tiltCards.forEach(function(card){
         card.style.perspective = perspective + 'px';
         card.addEventListener('mouseenter', function(){
@@ -479,7 +479,7 @@ document.getElementById('navToggle').addEventListener('click',function(){
             card.style.boxShadow = shadowX + 'px ' + (8 + shadowY) + 'px 30px rgba(13,148,136,' + glowStrength + '), 0 0 60px rgba(94,234,212,0.08), inset 0 0 0 1px rgba(94,234,212,0.15)';
         });
         card.addEventListener('mouseleave', function(){
-            card.style.transition = 'transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.45s ease';
+            card.style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 1s ease';
             card.style.transform = 'perspective(' + perspective + 'px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
             card.style.boxShadow = '';
         });

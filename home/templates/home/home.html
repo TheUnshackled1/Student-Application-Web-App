@@ -597,10 +597,7 @@ document.getElementById('navToggle').addEventListener('click',function(){
     var tiltCards = document.querySelectorAll(
         '.status-banner, .track-app-card, .dash-dates, .dash-applicant-status, .home-panel, .app-log-section'
     );
-    var maxTilt = 4;       // max degrees of rotation
-    var perspective = 1000; // perspective distance in px
-    var scale = 1.02;       // slight scale-up on hover
-    var glowStrength = 0.45;
+    var maxTilt = 4, perspective = 1000, scale = 2.02, glowStrength = 0.45;
 
     tiltCards.forEach(function(card){
         card.style.perspective = perspective + 'px';
@@ -638,7 +635,7 @@ document.getElementById('navToggle').addEventListener('click',function(){
 
         card.addEventListener('mouseleave', function(){
             // Smooth return to flat
-            card.style.transition = 'transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.45s ease';
+            card.style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 1s ease';
             card.style.transform = 'perspective(' + perspective + 'px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
             card.style.boxShadow = '';
         });
