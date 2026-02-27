@@ -292,7 +292,8 @@
 
             <div class="dates-track-grid">
                 {% for d in upcoming_dates %}
-                <div class="date-track-card date-track--{{ d.urgency }}">
+                <div class="date-track-card date-track--{{ d.urgency }} content-card-clickable" style="cursor:pointer;"
+                     onclick="openContentPopup(event, 'date', '{{ d.title|escapejs }}', '{{ d.date }}', '{% if d.urgency == 'passed' %}Passed{% else %}{{ d.days_left }} day{{ d.days_left|pluralize }} left{% endif %}', '', false, '{{ d.urgency }}')">
                     <div class="date-track-cal">
                         <span class="date-cal-day">{{ d.day }}</span>
                         <span class="date-cal-month">{{ d.month }}</span>
@@ -387,7 +388,9 @@
             </div>
             <div class="panel-body">
                 {% for reminder in reminders %}
-                <div class="rem-card rem-card--{{ reminder.priority }}" id="reminder-{{ reminder.id }}">
+                <div class="rem-card rem-card--{{ reminder.priority }} content-card-clickable" id="reminder-{{ reminder.id }}"
+                     onclick="openContentPopup(event, 'reminder', '{{ reminder.priority }}', '{{ reminder.message|escapejs }}', '{{ reminder.created_at|default:'' }}')"
+                     style="cursor:pointer;">
                     <div class="rem-accent rem-accent--{{ reminder.priority }}"></div>
                     <div class="rem-main">
                         <div class="rem-top">
@@ -400,7 +403,7 @@
                                     <i class="fa-solid fa-circle-info"></i> Info
                                 {% endif %}
                             </span>
-                            <button class="rem-dismiss" onclick="this.closest('.rem-card').style.display='none'" title="Dismiss">
+                            <button class="rem-dismiss" onclick="event.stopPropagation(); this.closest('.rem-card').style.display='none'" title="Dismiss">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
@@ -408,6 +411,7 @@
                         {% if reminder.created_at %}
                         <span class="rem-date"><i class="fa-regular fa-clock"></i> {{ reminder.created_at }}</span>
                         {% endif %}
+                        <span class="content-card-hint"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> Click to expand</span>
                     </div>
                 </div>
                 {% empty %}
@@ -433,7 +437,8 @@
             <div class="panel-body">
                 <div class="ann-list">
                     {% for announcement in announcements %}
-                    <div class="ann-card">
+                    <div class="ann-card content-card-clickable" style="cursor:pointer;"
+                         onclick="openContentPopup(event, 'announcement', '{{ announcement.title|escapejs }}', '{{ announcement.summary|escapejs }}', '{{ announcement.published_at|default:'' }}', '{% if announcement.image %}{{ announcement.image.url }}{% endif %}', {% if announcement.is_new %}true{% else %}false{% endif %})">
                         <div class="ann-thumb">
                             {% if announcement.image %}
                                 <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}">
@@ -457,6 +462,7 @@
                                 <span class="ann-new-text"><i class="fa-solid fa-sparkles"></i> Just posted</span>
                                 {% endif %}
                             </div>
+                            <span class="content-card-hint"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> Click to view</span>
                         </div>
                     </div>
                     {% empty %}
@@ -525,6 +531,30 @@
     </div>
 </div>
 
+<!-- ========== CONTENT DETAIL POPUP ========== -->
+<div class="content-popup-overlay" id="contentPopupOverlay" onclick="closeContentPopup(event)">
+    <div class="content-popup-modal">
+        <div class="content-popup-header" id="contentPopupHeader">
+            <div class="content-popup-icon" id="contentPopupIcon">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div class="content-popup-header-text">
+                <span class="content-popup-tag" id="contentPopupTag">Reminder</span>
+                <h3 class="content-popup-title" id="contentPopupTitle">Title</h3>
+            </div>
+            <button type="button" class="content-popup-close" onclick="closeContentPopup()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="content-popup-body" id="contentPopupBody">
+            <!-- Injected by JS -->
+        </div>
+        <div class="content-popup-footer" id="contentPopupFooter">
+            <span class="content-popup-date" id="contentPopupDate"></span>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function openFilePreview(url, name) {
@@ -567,8 +597,102 @@ function closeFilePreview(e) {
 }
 
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeFilePreview();
+    if (e.key === 'Escape') { closeFilePreview(); closeContentPopup(); }
 });
+
+/* ========== Content Popup Logic ========== */
+function openContentPopup(e, type, param1, param2, param3, imageUrl, isNew, urgency) {
+    // Prevent if clicking dismiss button
+    if (e && e.target.closest('.rem-dismiss')) return;
+
+    var overlay = document.getElementById('contentPopupOverlay');
+    var icon = document.getElementById('contentPopupIcon');
+    var tag = document.getElementById('contentPopupTag');
+    var title = document.getElementById('contentPopupTitle');
+    var body = document.getElementById('contentPopupBody');
+    var footer = document.getElementById('contentPopupFooter');
+    var dateEl = document.getElementById('contentPopupDate');
+    var header = document.getElementById('contentPopupHeader');
+
+    // Reset
+    header.className = 'content-popup-header';
+    body.innerHTML = '';
+    footer.style.display = '';
+
+    if (type === 'reminder') {
+        var priority = param1;
+        var message = param2;
+        var createdAt = param3;
+
+        var icons = { urgent: 'fa-triangle-exclamation', warning: 'fa-circle-exclamation', info: 'fa-circle-info' };
+        var labels = { urgent: 'Urgent Reminder', warning: 'Warning Reminder', info: 'Info Reminder' };
+        var colors = { urgent: '#ef4444', warning: '#fbbf24', info: '#38bdf8' };
+
+        header.classList.add('content-popup-header--' + priority);
+        icon.innerHTML = '<i class="fa-solid ' + (icons[priority] || 'fa-bell') + '"></i>';
+        icon.style.background = 'rgba(255,255,255,0.15)';
+        icon.style.color = '#fff';
+        tag.textContent = labels[priority] || 'Reminder';
+        title.textContent = 'Reminder';
+        body.innerHTML = '<p class="content-popup-message">' + message + '</p>';
+        dateEl.innerHTML = createdAt ? '<i class="fa-regular fa-clock"></i> Posted: ' + createdAt : '';
+        footer.style.display = createdAt ? '' : 'none';
+
+    } else if (type === 'announcement') {
+        var annTitle = param1;
+        var summary = param2;
+        var publishedAt = param3;
+
+        header.classList.add('content-popup-header--announcement');
+        icon.innerHTML = '<i class="fa-solid fa-bullhorn"></i>';
+        icon.style.background = 'rgba(255,255,255,0.15)';
+        icon.style.color = '#fff';
+        tag.textContent = isNew ? 'New Announcement' : 'Announcement';
+        title.textContent = annTitle;
+
+        var imgHtml = '';
+        if (imageUrl) {
+            imgHtml = '<div class="content-popup-image"><img src="' + imageUrl + '" alt="' + annTitle + '"></div>';
+        }
+        body.innerHTML = imgHtml + '<p class="content-popup-message">' + summary + '</p>';
+        dateEl.innerHTML = publishedAt ? '<i class="fa-regular fa-calendar"></i> Published: ' + publishedAt : '';
+        footer.style.display = publishedAt ? '' : 'none';
+
+    } else if (type === 'date') {
+        var dateTitle = param1;
+        var dateValue = param2;
+        var countdown = param3;
+        var urg = urgency || 'normal';
+
+        var urgColors = { urgent: '#ef4444', warning: '#fbbf24', normal: '#5eead4', passed: '#9ca3af' };
+        header.classList.add('content-popup-header--date');
+        icon.innerHTML = '<i class="fa-solid fa-calendar-days"></i>';
+        icon.style.background = 'rgba(255,255,255,0.15)';
+        icon.style.color = '#fff';
+        tag.textContent = 'Important Date';
+        title.textContent = dateTitle;
+
+        body.innerHTML =
+            '<div class="content-popup-date-detail">' +
+            '  <div class="content-popup-date-main">' +
+            '    <i class="fa-regular fa-calendar" style="font-size:20px; color:' + (urgColors[urg] || '#5eead4') + ';"></i>' +
+            '    <span>' + dateValue + '</span>' +
+            '  </div>' +
+            '  <span class="content-popup-countdown days-badge badge-' + urg + '">' + countdown + '</span>' +
+            '</div>';
+        footer.style.display = 'none';
+    }
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeContentPopup(e) {
+    if (e && e.target !== document.getElementById('contentPopupOverlay')) return;
+    var overlay = document.getElementById('contentPopupOverlay');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
 
 /* Toggle expandable document detail row */
 function toggleDocRow(id) {
