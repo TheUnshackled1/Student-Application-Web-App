@@ -348,6 +348,10 @@
                     <label class="form-label">Priority</label>
                     {{ reminder_form.priority }}
                 </div>
+                <div class="mb-2">
+                    <label class="form-label">Expires On <span style="color:#9ca3af; font-weight:400;">(optional)</span></label>
+                    {{ reminder_form.expires_at }}
+                </div>
                 <div class="mb-2 form-check">
                     {{ reminder_form.is_active }}
                     <label class="form-check-label" style="font-size:13px;">Active</label>
@@ -388,6 +392,10 @@
                     <option value="warning" data-color="#fbbf24" {% if r.priority == 'warning' %}selected{% endif %}>Warning</option>
                     <option value="urgent" data-color="#ef4444" {% if r.priority == 'urgent' %}selected{% endif %}>Urgent</option>
                 </select>
+                <div class="mb-1">
+                    <label class="form-label" style="font-size:11px;">Expires On</label>
+                    <input type="date" name="expires_at" class="form-control" value="{% if r.expires_at %}{{ r.expires_at|date:'Y-m-d' }}{% endif %}">
+                </div>
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if r.is_active %}checked{% endif %}>
                     <label class="form-check-label" style="font-size:13px;">Active</label>
@@ -416,6 +424,10 @@
                 <div class="mb-2">
                     <label class="form-label">Date</label>
                     {{ date_form.date }}
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Expires On <span style="color:#9ca3af; font-weight:400;">(optional)</span></label>
+                    {{ date_form.expires_at }}
                 </div>
                 <div class="mb-2 form-check">
                     {{ date_form.is_active }}
@@ -453,6 +465,10 @@
                 {% csrf_token %}
                 <input type="text" name="title" class="form-control mb-1" value="{{ d.title }}">
                 <input type="date" name="date" class="form-control mb-1" value="{{ d.date|date:'Y-m-d' }}">
+                <div class="mb-1">
+                    <label class="form-label" style="font-size:11px;">Expires On</label>
+                    <input type="date" name="expires_at" class="form-control" value="{% if d.expires_at %}{{ d.expires_at|date:'Y-m-d' }}{% endif %}">
+                </div>
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if d.is_active %}checked{% endif %}>
                     <label class="form-check-label" style="font-size:13px;">Active</label>
