@@ -982,10 +982,8 @@ function toggleEditForm(id) {
 
 // ── Close dropdowns when clicking outside ──
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.staff-action-dropdown')) {
-        document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(m) {
-            m.classList.remove('show');
-        });
+    if (!e.target.closest('.staff-action-dropdown') && !e.target.closest('.staff-dropdown-menu')) {
+        closeAllStatusDropdowns();
     }
 });
 // Prevent dropdown item clicks from bubbling to the row
@@ -995,23 +993,46 @@ document.querySelectorAll('.staff-dropdown-menu').forEach(function(menu) {
     });
 });
 
-// ── Toggle & position dropdown (position:fixed) ──
-function toggleStatusDropdown(btn) {
-    var menu = btn.nextElementSibling;
-    // Close all other dropdowns first
+// ── Close helper: hide & return menus to original parent ──
+function closeAllStatusDropdowns() {
     document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(d) {
-        if (d !== menu) d.classList.remove('show');
+        d.classList.remove('show');
+        if (d._originalParent) {
+            d._originalParent.appendChild(d);
+            d._originalParent = null;
+        }
     });
-    // Toggle this one
-    var willShow = !menu.classList.contains('show');
-    menu.classList.toggle('show');
-    if (willShow) {
-        // Position the menu using fixed coordinates
+}
+
+// ── Toggle & position dropdown (appended to body to escape transforms) ──
+function toggleStatusDropdown(btn) {
+    var menu = btn.nextElementSibling || (btn._menuRef);
+    if (!menu) return;
+    var isOpen = menu.classList.contains('show');
+
+    // Close all open dropdowns first
+    closeAllStatusDropdowns();
+
+    if (!isOpen) {
+        // Save references so we can return the menu later
+        menu._originalParent = menu.parentElement;
+        btn._menuRef = menu;
+
+        // Get button position before moving
         var rect = btn.getBoundingClientRect();
+
+        // Move to body to escape transforms / overflow clipping
+        document.body.appendChild(menu);
+
+        // Position with fixed coordinates
+        menu.style.position = 'fixed';
         menu.style.top = (rect.bottom + 4) + 'px';
         menu.style.left = 'auto';
         menu.style.right = (window.innerWidth - rect.right) + 'px';
-        // If menu would go off bottom of viewport, show above instead
+
+        menu.classList.add('show');
+
+        // Flip above if it would overflow the viewport bottom
         requestAnimationFrame(function() {
             var menuRect = menu.getBoundingClientRect();
             if (menuRect.bottom > window.innerHeight - 10) {
@@ -1021,17 +1042,12 @@ function toggleStatusDropdown(btn) {
     }
 }
 
-// ── Reposition on scroll/resize ──
+// ── Close on scroll/resize ──
 (function() {
-    function closeAllDropdowns() {
-        document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(m) {
-            m.classList.remove('show');
-        });
-    }
     var tableWrap = document.querySelector('.staff-table-wrap');
-    if (tableWrap) tableWrap.addEventListener('scroll', closeAllDropdowns);
-    window.addEventListener('scroll', closeAllDropdowns);
-    window.addEventListener('resize', closeAllDropdowns);
+    if (tableWrap) tableWrap.addEventListener('scroll', closeAllStatusDropdowns);
+    window.addEventListener('scroll', closeAllStatusDropdowns);
+    window.addEventListener('resize', closeAllStatusDropdowns);
 })();
 </script>
 <script>
