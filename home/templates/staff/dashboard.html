@@ -229,7 +229,7 @@
                                 <!-- Quick status dropdown -->
                                 {% if not s.is_renewal %}
                                 <div class="staff-action-dropdown">
-                                    <button class="staff-action-btn staff-action--status" title="Update Status" onclick="event.stopPropagation(); var m=this.nextElementSibling; document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(d){if(d!==m)d.classList.remove('show')}); m.classList.toggle('show');">
+                                    <button class="staff-action-btn staff-action--status" title="Update Status" onclick="event.stopPropagation(); toggleStatusDropdown(this);">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <div class="staff-dropdown-menu">
@@ -994,6 +994,45 @@ document.querySelectorAll('.staff-dropdown-menu').forEach(function(menu) {
         e.stopPropagation();
     });
 });
+
+// ── Toggle & position dropdown (position:fixed) ──
+function toggleStatusDropdown(btn) {
+    var menu = btn.nextElementSibling;
+    // Close all other dropdowns first
+    document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(d) {
+        if (d !== menu) d.classList.remove('show');
+    });
+    // Toggle this one
+    var willShow = !menu.classList.contains('show');
+    menu.classList.toggle('show');
+    if (willShow) {
+        // Position the menu using fixed coordinates
+        var rect = btn.getBoundingClientRect();
+        menu.style.top = (rect.bottom + 4) + 'px';
+        menu.style.left = 'auto';
+        menu.style.right = (window.innerWidth - rect.right) + 'px';
+        // If menu would go off bottom of viewport, show above instead
+        requestAnimationFrame(function() {
+            var menuRect = menu.getBoundingClientRect();
+            if (menuRect.bottom > window.innerHeight - 10) {
+                menu.style.top = (rect.top - menuRect.height - 4) + 'px';
+            }
+        });
+    }
+}
+
+// ── Reposition on scroll/resize ──
+(function() {
+    function closeAllDropdowns() {
+        document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(m) {
+            m.classList.remove('show');
+        });
+    }
+    var tableWrap = document.querySelector('.staff-table-wrap');
+    if (tableWrap) tableWrap.addEventListener('scroll', closeAllDropdowns);
+    window.addEventListener('scroll', closeAllDropdowns);
+    window.addEventListener('resize', closeAllDropdowns);
+})();
 </script>
 <script>
 document.getElementById('navToggle').addEventListener('click',function(){
