@@ -3617,6 +3617,18 @@ textarea.form-control {
   font-style: italic;
 }
 
+.staff-item-expires {
+  font-size: 10px;
+  color: #fb923c;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(251, 146, 60, 0.10);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
 .staff-item-badge {
   font-size: 10px;
   font-weight: 700;
