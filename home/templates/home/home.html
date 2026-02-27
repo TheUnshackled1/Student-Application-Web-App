@@ -253,7 +253,10 @@
                         {% csrf_token %}
                         <div class="track-app-input-wrap">
                             <i class="fa-solid fa-id-badge"></i>
-                            <input type="text" name="track_student_id" placeholder="Enter your Student ID (e.g. 20230321)" class="track-app-input" maxlength="8" pattern="\d{8}" required>
+                            <input type="text" name="track_student_id" placeholder="Enter your Student ID (e.g. 20230321)" class="track-app-input" maxlength="8" pattern="\d{8}" inputmode="numeric" required
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                                   onkeypress="return (event.charCode>=48 && event.charCode<=57)"
+                                   onpaste="var d=event.clipboardData.getData('text');if(!/^\d+$/.test(d))event.preventDefault()">
                         </div>
                         <button type="submit" class="track-app-btn">
                             <i class="fa-solid fa-arrow-right"></i>
