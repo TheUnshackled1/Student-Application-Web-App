@@ -73,9 +73,15 @@ class UpcomingDate(models.Model):
     title = models.CharField(max_length=200)
     date = models.DateField()
     is_active = models.BooleanField(default=True)
+    expires_at = models.DateField(null=True, blank=True, help_text='Content will hide from homepage after this date.')
 
     class Meta:
         ordering = ['date']
+
+    @property
+    def is_expired(self):
+        from datetime import date as _date
+        return self.expires_at is not None and self.expires_at < _date.today()
 
     def __str__(self):
         return f"{self.title} - {self.date}"
@@ -92,7 +98,13 @@ class Reminder(models.Model):
     message = models.TextField()
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='info')
     is_active = models.BooleanField(default=True)
+    expires_at = models.DateField(null=True, blank=True, help_text='Content will hide from homepage after this date.')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def is_expired(self):
+        from datetime import date as _date
+        return self.expires_at is not None and self.expires_at < _date.today()
 
     def __str__(self):
         return f"[{self.get_priority_display()}] {self.message[:50]}"
@@ -104,9 +116,15 @@ class Announcement(models.Model):
     image = models.ImageField(upload_to='announcements/', null=True, blank=True)
     published_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    expires_at = models.DateField(null=True, blank=True, help_text='Content will hide from homepage after this date.')
 
     class Meta:
         ordering = ['-published_at']
+
+    @property
+    def is_expired(self):
+        from datetime import date as _date
+        return self.expires_at is not None and self.expires_at < _date.today()
 
     def __str__(self):
         return self.title
