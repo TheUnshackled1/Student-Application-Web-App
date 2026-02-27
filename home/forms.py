@@ -5,7 +5,7 @@ from .models import Reminder, UpcomingDate, Announcement, NewApplication, Renewa
 class ReminderForm(forms.ModelForm):
     class Meta:
         model = Reminder
-        fields = ['message', 'priority', 'is_active']
+        fields = ['message', 'priority', 'expires_at', 'is_active']
         widgets = {
             'message': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -13,6 +13,10 @@ class ReminderForm(forms.ModelForm):
                 'placeholder': 'Enter reminder message...',
             }),
             'priority': forms.Select(attrs={'class': 'form-select'}),
+            'expires_at': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
@@ -20,13 +24,17 @@ class ReminderForm(forms.ModelForm):
 class UpcomingDateForm(forms.ModelForm):
     class Meta:
         model = UpcomingDate
-        fields = ['title', 'date', 'is_active']
+        fields = ['title', 'date', 'expires_at', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'e.g. Entrance Exam',
             }),
             'date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+            'expires_at': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date',
             }),
@@ -37,7 +45,7 @@ class UpcomingDateForm(forms.ModelForm):
 class AnnouncementForm(forms.ModelForm):
     class Meta:
         model = Announcement
-        fields = ['title', 'summary', 'image', 'is_active']
+        fields = ['title', 'summary', 'image', 'expires_at', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -49,6 +57,10 @@ class AnnouncementForm(forms.ModelForm):
                 'placeholder': 'Write the announcement details...',
             }),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'expires_at': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 

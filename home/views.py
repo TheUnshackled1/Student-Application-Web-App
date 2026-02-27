@@ -297,7 +297,9 @@ def home(request):
 
     # ── Upcoming dates ──
     upcoming_dates = []
-    db_dates = UpcomingDate.objects.filter(is_active=True)
+    db_dates = UpcomingDate.objects.filter(is_active=True).exclude(
+        expires_at__isnull=False, expires_at__lt=today
+    )
     if db_dates.exists():
         for d in db_dates:
             delta = (d.date - today).days
@@ -312,7 +314,9 @@ def home(request):
 
     # ── Reminders ──
     from django.db.models import Q
-    reminder_filter = Q(student__isnull=True, is_active=True)
+    reminder_filter = Q(student__isnull=True, is_active=True) & (
+        Q(expires_at__isnull=True) | Q(expires_at__gte=today)
+    )
     db_reminders = Reminder.objects.filter(reminder_filter).order_by('-created_at')
     reminders = [
         {
@@ -325,7 +329,9 @@ def home(request):
     ]
 
     # ── Announcements ──
-    db_announcements = Announcement.objects.filter(is_active=True)[:6]
+    db_announcements = Announcement.objects.filter(is_active=True).exclude(
+        expires_at__isnull=False, expires_at__lt=today
+    )[:6]
     seven_days_ago = timezone.now() - timedelta(days=7)
     announcements = [
         {
@@ -826,6 +832,7 @@ def staff_dashboard(request):
     recent_combined.sort(key=lambda x: x.submitted_at, reverse=True)
     recent_activity = recent_combined[:10]
 
+    from django.db.models import Q as _Q
     context = {
         'staff_name': request.user.get_full_name() or request.user.username,
         'pending_applications': pending_applications,
@@ -833,10 +840,26 @@ def staff_dashboard(request):
         'all_students': all_students,
         'recent_activity': recent_activity,
         'stats': stats,
-        # Management data
-        'reminders': Reminder.objects.all().order_by('-created_at'),
-        'upcoming_dates': UpcomingDate.objects.all().order_by('date'),
-        'announcements': Announcement.objects.all().order_by('-published_at'),
+        # Management data (active / non-expired)
+        'reminders': Reminder.objects.filter(
+            _Q(expires_at__isnull=True) | _Q(expires_at__gte=_date.today())
+        ).order_by('-created_at'),
+        'upcoming_dates': UpcomingDate.objects.filter(
+            _Q(expires_at__isnull=True) | _Q(expires_at__gte=_date.today())
+        ).order_by('date'),
+        'announcements': Announcement.objects.filter(
+            _Q(expires_at__isnull=True) | _Q(expires_at__gte=_date.today())
+        ).order_by('-published_at'),
+        # Expired content
+        'expired_reminders': Reminder.objects.filter(
+            expires_at__isnull=False, expires_at__lt=_date.today()
+        ).order_by('-expires_at'),
+        'expired_dates': UpcomingDate.objects.filter(
+            expires_at__isnull=False, expires_at__lt=_date.today()
+        ).order_by('-expires_at'),
+        'expired_announcements': Announcement.objects.filter(
+            expires_at__isnull=False, expires_at__lt=_date.today()
+        ).order_by('-expires_at'),
         # Forms
         'reminder_form': ReminderForm(),
         'date_form': UpcomingDateForm(),
