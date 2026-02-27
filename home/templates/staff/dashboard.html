@@ -229,7 +229,7 @@
                                 <!-- Quick status dropdown -->
                                 {% if not s.is_renewal %}
                                 <div class="staff-action-dropdown">
-                                    <button class="staff-action-btn staff-action--status" title="Update Status" onclick="this.nextElementSibling.classList.toggle('show')">
+                                    <button class="staff-action-btn staff-action--status" title="Update Status" onclick="event.stopPropagation(); var m=this.nextElementSibling; document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(d){if(d!==m)d.classList.remove('show')}); m.classList.toggle('show');">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <div class="staff-dropdown-menu">
@@ -987,6 +987,12 @@ document.addEventListener('click', function(e) {
             m.classList.remove('show');
         });
     }
+});
+// Prevent dropdown item clicks from bubbling to the row
+document.querySelectorAll('.staff-dropdown-menu').forEach(function(menu) {
+    menu.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
 });
 </script>
 <script>
