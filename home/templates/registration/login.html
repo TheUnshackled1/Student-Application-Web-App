@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- ========== PAGE LOADER ========== -->
 <div class="page-loader" id="pageLoader">
     <span class="loader-text">LOADING...</span>
     <div class="loader-bar-wrapper">
@@ -38,7 +37,6 @@
 })();
 </script>
 
-<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
     <div class="navbar-left d-flex align-items-center gap-2">
         <div class="logo">
@@ -76,11 +74,9 @@
     </div>
 </nav>
 
-<!-- ========== LOGIN CONTENT ========== -->
 <main class="main-content" style="display:flex; justify-content:center; align-items:center; min-height:calc(100vh - 64px);">
     <div class="card" style="max-width:420px; width:100%; padding:40px;">
 
-        <!-- Header -->
         <div style="text-align:center; margin-bottom:28px;">
             <div class="logo-circle" style="width:64px; height:64px; margin:0 auto 16px;">
                 <span class="logo-text" style="font-size:14px;">CHMSU</span>
@@ -88,8 +84,6 @@
             <h2 style="font-size:22px; font-weight:700; color:#5eead4; margin:0 0 4px;">Welcome Back</h2>
             <p style="font-size:13px; color:rgba(255,255,255,0.55); margin:0;">Sign in to access your dashboard</p>
         </div>
-
-        <!-- Error Messages -->
         {% if form.errors %}
         <div style="background:rgba(220,38,38,0.15); border:1px solid rgba(248,113,113,0.3); border-radius:8px; padding:12px 16px; margin-bottom:20px;">
             <p style="font-size:13px; color:#f87171; margin:0; font-weight:600;">
@@ -98,13 +92,9 @@
             </p>
         </div>
         {% endif %}
-
-        <!-- Login Form -->
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}">
-
-            <!-- Username -->
             <div style="margin-bottom:16px;">
                 <label for="id_username" style="display:block; font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:6px;">Username</label>
                 <div style="position:relative;">
@@ -115,8 +105,6 @@
                         placeholder="Enter your username">
                 </div>
             </div>
-
-            <!-- Password -->
             <div style="margin-bottom:24px;">
                 <label for="id_password" style="display:block; font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:6px;">Password</label>
                 <div style="position:relative;">
@@ -127,15 +115,11 @@
                         placeholder="Enter your password">
                 </div>
             </div>
-
-            <!-- Submit -->
             <button type="submit" class="btn-nav btn-nav--apply" style="width:100%; padding:12px; font-size:14px; font-weight:600; border:none; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px; border-radius:8px;">
                 <i class="fa-solid fa-right-to-bracket"></i>
                 Sign In
             </button>
         </form>
-
-        <!-- Back Link -->
         <div style="text-align:center; margin-top:20px;">
             <a href="{% url 'home:home' %}" style="font-size:13px; color:rgba(255,255,255,0.55); text-decoration:none;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Home
