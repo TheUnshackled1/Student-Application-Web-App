@@ -407,6 +407,221 @@ input[type="checkbox"]:checked {
     animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Text Color Fixes — Readability Overrides
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Body / Global Text ── */
+body, #content, #content-main {
+    color: #1a1a2e !important;
+}
+
+/* ── Breadcrumbs / Top Nav ── */
+.breadcrumbs {
+    color: #2c3e50 !important;
+}
+.breadcrumbs a {
+    color: #1565c0 !important;
+    font-weight: 500;
+}
+.breadcrumbs a:hover {
+    color: #0d47a1 !important;
+}
+
+/* ── Section Titles (e.g. "AUTHENTICATION AND AUTHORIZATION", "HOME") ── */
+.app-home caption,
+.app-auth caption,
+#content-main .module caption,
+#content-main .module table caption,
+.section h2,
+h2 {
+    color: #1a1a2e !important;
+    font-weight: 700 !important;
+}
+
+/* ── Column Headers (MODEL NAME, ADD LINK, etc.) ── */
+#content-main th,
+.module thead th,
+.module thead th a {
+    color: #37474f !important;
+    font-weight: 600 !important;
+}
+
+/* ── Model Name Links (Announcements, Offices, etc.) ── */
+#content-main .model-name a,
+#content-main td a,
+.module tbody td a,
+.module a,
+#content-main a {
+    color: #1565c0 !important;
+    font-weight: 500;
+}
+#content-main .model-name a:hover,
+#content-main td a:hover,
+.module tbody td a:hover,
+#content-main a:hover {
+    color: #0d47a1 !important;
+    text-decoration: underline;
+}
+
+/* ── "Add" and "Change" Links ── */
+.addlink,
+.changelink,
+.viewlink {
+    color: #2e7d32 !important;
+    font-weight: 500;
+}
+.addlink:hover,
+.changelink:hover,
+.viewlink:hover {
+    color: #1b5e20 !important;
+}
+
+/* ── Table Cell Text ── */
+#content-main td,
+.module tbody td {
+    color: #263238 !important;
+}
+
+/* ── Recent Actions Module ── */
+.jet-index-dashboard__recent-actions li,
+#recent-actions-module li,
+.dashboard-module li {
+    color: #37474f !important;
+}
+.jet-index-dashboard__recent-actions li a,
+#recent-actions-module li a,
+.dashboard-module li a {
+    color: #1565c0 !important;
+    font-weight: 500;
+}
+.jet-index-dashboard__recent-actions li a:hover,
+#recent-actions-module li a:hover,
+.dashboard-module li a:hover {
+    color: #0d47a1 !important;
+}
+
+/* ── Recent Actions – action type labels ── */
+.mini.deletelink,
+.mini.addlink,
+.mini.changelink {
+    color: #546e7a !important;
+}
+
+/* ── Module / Dashboard Headers ── */
+.dashboard-module h2,
+.dashboard-module h3,
+.dashboard-module caption,
+.module > h2,
+.module > h3,
+.module > caption,
+.jet-index-dashboard__module h3 {
+    color: #1a1a2e !important;
+    font-weight: 700 !important;
+}
+
+/* ── Sidebar / Side Menu ── */
+.jet-sidebar a,
+.jet-sidebar-popup__item a,
+.jet-sidemenu__item a,
+.sidebar a,
+.jet-popup__side-navigation a {
+    color: #37474f !important;
+}
+.jet-sidebar a:hover,
+.jet-sidebar-popup__item a:hover,
+.jet-sidemenu__item a:hover,
+.sidebar a:hover,
+.jet-popup__side-navigation a:hover {
+    color: #1565c0 !important;
+}
+
+/* ── Header / Branding ── */
+#branding h1,
+#branding h1 a,
+#branding h2 {
+    color: #ffffff !important;
+}
+#header {
+    color: #ffffff !important;
+}
+#header a,
+#header a:visited {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+#header a:hover {
+    color: #ffffff !important;
+}
+
+/* ── Login Page ── */
+#login-form label {
+    color: #1a1a2e !important;
+    font-weight: 600;
+}
+
+/* ── Help Text / Descriptions ── */
+.help,
+.helptext,
+p.help {
+    color: #546e7a !important;
+}
+
+/* ── Fieldset Legends ── */
+fieldset h2,
+fieldset legend {
+    color: #1a1a2e !important;
+    font-weight: 700 !important;
+}
+
+/* ── Change-List Table ── */
+#result_list th a,
+#changelist table thead th a {
+    color: #1a1a2e !important;
+    font-weight: 600 !important;
+}
+#result_list td,
+#result_list td a,
+#changelist table tbody td,
+#changelist table tbody td a {
+    color: #263238 !important;
+}
+#result_list td a:hover,
+#changelist table tbody td a:hover {
+    color: #1565c0 !important;
+}
+
+/* ── Submit Row / Action Buttons Text ── */
+.submit-row input,
+.submit-row button,
+input[type="submit"] {
+    color: #ffffff !important;
+}
+
+/* ── Object Tools (e.g. "Add" button top-right) ── */
+.object-tools a {
+    color: #ffffff !important;
+}
+
+/* ── Messages ── */
+.messagelist .success {
+    color: #1b5e20 !important;
+}
+.messagelist .warning {
+    color: #e65100 !important;
+}
+.messagelist .error {
+    color: #b71c1c !important;
+}
+.messagelist .info {
+    color: #0d47a1 !important;
+}
+
+/* ── Empty / No-results text ── */
+.paginator,
+p.paginator {
+    color: #37474f !important;
+}
+
 /* ── Responsive: Reduce Animations on reduced-motion preference ── */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
