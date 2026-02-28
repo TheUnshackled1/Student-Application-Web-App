@@ -1,0 +1,417 @@
+/* ═══════════════════════════════════════════════════════════
+   Custom Admin Animations for Django JET Reboot
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Keyframes ── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.04); }
+}
+@keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+@keyframes spinIn {
+    from { opacity: 0; transform: rotate(-8deg) scale(0.9); }
+    to   { opacity: 1; transform: rotate(0) scale(1); }
+}
+@keyframes borderGlow {
+    0%, 100% { box-shadow: 0 0 4px rgba(66, 133, 244, 0.2); }
+    50%      { box-shadow: 0 0 12px rgba(66, 133, 244, 0.45); }
+}
+
+/* ── Global Transitions ── */
+* {
+    transition-property: background-color, color, border-color, box-shadow, opacity;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+}
+
+/* ── Page Load Fade-In ── */
+body {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ── Header / Branding ── */
+#branding,
+#header {
+    animation: slideDown 0.5s ease-out;
+}
+#branding h1,
+#branding h2 {
+    animation: fadeInLeft 0.6s ease-out;
+}
+
+/* ── Sidebar ── */
+.sidebar,
+.cms-sidebar,
+#changelist-filter,
+.jet-sidebar {
+    animation: fadeInLeft 0.5s ease-out;
+}
+.sidebar a,
+.jet-sidebar a,
+.jet-popup__side-navigation a {
+    position: relative;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.sidebar a:hover,
+.jet-sidebar a:hover,
+.jet-popup__side-navigation a:hover {
+    padding-left: 6px;
+    color: #4285f4 !important;
+}
+
+/* ── Side Menu Items ── */
+.jet-sidebar-popup__item,
+.jet-sidemenu__item {
+    animation: fadeInLeft 0.4s ease-out both;
+}
+.jet-sidebar-popup__item:nth-child(1) { animation-delay: 0.04s; }
+.jet-sidebar-popup__item:nth-child(2) { animation-delay: 0.08s; }
+.jet-sidebar-popup__item:nth-child(3) { animation-delay: 0.12s; }
+.jet-sidebar-popup__item:nth-child(4) { animation-delay: 0.16s; }
+.jet-sidebar-popup__item:nth-child(5) { animation-delay: 0.20s; }
+.jet-sidebar-popup__item:nth-child(6) { animation-delay: 0.24s; }
+.jet-sidebar-popup__item:nth-child(7) { animation-delay: 0.28s; }
+.jet-sidebar-popup__item:nth-child(8) { animation-delay: 0.32s; }
+
+/* ── Content Area ── */
+#content,
+#content-main {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* ── Dashboard Modules (JET) ── */
+.dashboard-module,
+.jet-index-dashboard__module,
+[class*="dashboard"] .module {
+    animation: scaleIn 0.45s ease-out both;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+.dashboard-module:nth-child(1) { animation-delay: 0.05s; }
+.dashboard-module:nth-child(2) { animation-delay: 0.12s; }
+.dashboard-module:nth-child(3) { animation-delay: 0.19s; }
+.dashboard-module:nth-child(4) { animation-delay: 0.26s; }
+.dashboard-module:nth-child(5) { animation-delay: 0.33s; }
+.dashboard-module:nth-child(6) { animation-delay: 0.40s; }
+
+.dashboard-module:hover,
+.jet-index-dashboard__module:hover,
+[class*="dashboard"] .module:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ── Module Headers ── */
+.module h2,
+.module caption,
+.dashboard-module h3 {
+    position: relative;
+    overflow: hidden;
+}
+.module h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, #4285f4, #34a853);
+    transition: width 0.4s ease;
+}
+.module:hover h2::after {
+    width: 100%;
+}
+
+/* ── Table Rows (Change-List) ── */
+#result_list tbody tr,
+#changelist table tbody tr {
+    animation: fadeInUp 0.35s ease-out both;
+    transition: background-color 0.2s ease, transform 0.2s ease !important;
+}
+#result_list tbody tr:nth-child(1)  { animation-delay: 0.02s; }
+#result_list tbody tr:nth-child(2)  { animation-delay: 0.04s; }
+#result_list tbody tr:nth-child(3)  { animation-delay: 0.06s; }
+#result_list tbody tr:nth-child(4)  { animation-delay: 0.08s; }
+#result_list tbody tr:nth-child(5)  { animation-delay: 0.10s; }
+#result_list tbody tr:nth-child(6)  { animation-delay: 0.12s; }
+#result_list tbody tr:nth-child(7)  { animation-delay: 0.14s; }
+#result_list tbody tr:nth-child(8)  { animation-delay: 0.16s; }
+#result_list tbody tr:nth-child(9)  { animation-delay: 0.18s; }
+#result_list tbody tr:nth-child(10) { animation-delay: 0.20s; }
+
+#result_list tbody tr:hover,
+#changelist table tbody tr:hover {
+    transform: scale(1.005);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Buttons ── */
+.submit-row input,
+.submit-row button,
+input[type="submit"],
+.button,
+.addlink,
+.deletelink,
+a.button,
+.jet-popup__action,
+.object-tools a {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+.submit-row input:hover,
+.submit-row button:hover,
+input[type="submit"]:hover,
+.button:hover,
+a.button:hover,
+.object-tools a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+.submit-row input:active,
+input[type="submit"]:active,
+.button:active,
+a.button:active,
+.object-tools a:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Add / Delete Links ── */
+.addlink,
+.related-widget-wrapper-link {
+    transition: all 0.2s ease !important;
+}
+.addlink:hover,
+.related-widget-wrapper-link:hover {
+    transform: scale(1.12);
+}
+
+/* ── Breadcrumbs ── */
+.breadcrumbs {
+    animation: slideDown 0.4s ease-out;
+}
+.breadcrumbs a {
+    transition: color 0.2s ease, padding-left 0.2s ease !important;
+}
+.breadcrumbs a:hover {
+    color: #4285f4 !important;
+    padding-left: 2px;
+}
+
+/* ── Messages / Alerts ── */
+.messagelist li,
+ul.messagelist li {
+    animation: fadeInRight 0.5s ease-out both;
+}
+.messagelist li:nth-child(1) { animation-delay: 0.05s; }
+.messagelist li:nth-child(2) { animation-delay: 0.15s; }
+.messagelist li:nth-child(3) { animation-delay: 0.25s; }
+
+/* ── Form Fieldsets ── */
+fieldset {
+    animation: fadeInUp 0.5s ease-out both;
+}
+fieldset:nth-of-type(1) { animation-delay: 0.05s; }
+fieldset:nth-of-type(2) { animation-delay: 0.15s; }
+fieldset:nth-of-type(3) { animation-delay: 0.25s; }
+
+/* ── Inline Groups ── */
+.inline-group,
+.inline-related {
+    animation: fadeInUp 0.4s ease-out both;
+    transition: box-shadow 0.3s ease !important;
+}
+.inline-related:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Change Form Tabs ── */
+.changeform-tabs-item,
+.jet-changeform-tabs__item {
+    transition: all 0.25s ease !important;
+}
+.changeform-tabs-item:hover,
+.jet-changeform-tabs__item:hover {
+    transform: translateY(-1px);
+}
+
+/* ── Input Focus Glow ── */
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
+    animation: borderGlow 1.5s ease-in-out infinite;
+    outline: none;
+}
+
+/* ── Login Page ── */
+#login-form {
+    animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#login-form input[type="text"],
+#login-form input[type="password"] {
+    transition: all 0.3s ease !important;
+}
+#login-form input[type="text"]:focus,
+#login-form input[type="password"]:focus {
+    transform: scale(1.02);
+}
+#login-form input[type="submit"] {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+#login-form input[type="submit"]:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Pagination ── */
+.paginator,
+.pagination {
+    animation: fadeIn 0.5s ease-out 0.3s both;
+}
+.paginator a,
+.pagination a {
+    transition: all 0.2s ease !important;
+}
+.paginator a:hover,
+.pagination a:hover {
+    transform: scale(1.1);
+}
+
+/* ── Filter List ── */
+#changelist-filter li {
+    animation: fadeInLeft 0.3s ease-out both;
+    transition: padding-left 0.2s ease !important;
+}
+#changelist-filter li:nth-child(1) { animation-delay: 0.03s; }
+#changelist-filter li:nth-child(2) { animation-delay: 0.06s; }
+#changelist-filter li:nth-child(3) { animation-delay: 0.09s; }
+#changelist-filter li:nth-child(4) { animation-delay: 0.12s; }
+#changelist-filter li:nth-child(5) { animation-delay: 0.15s; }
+#changelist-filter li:hover {
+    padding-left: 4px;
+}
+
+/* ── Tooltip / Popover Animations ── */
+.jet-popup,
+.jet-tooltip {
+    animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Loading Shimmer (decorative class) ── */
+.admin-shimmer {
+    background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.15) 50%, transparent 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite;
+}
+
+/* ── Smooth Scrollbar ── */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+/* ── Object Tool Buttons ── */
+.object-tools {
+    animation: fadeInRight 0.4s ease-out;
+}
+.object-tools li {
+    animation: fadeInRight 0.35s ease-out both;
+}
+.object-tools li:nth-child(1) { animation-delay: 0.05s; }
+.object-tools li:nth-child(2) { animation-delay: 0.12s; }
+.object-tools li:nth-child(3) { animation-delay: 0.19s; }
+
+/* ── Help Text ── */
+.help,
+.helptext {
+    animation: fadeIn 0.6s ease-out 0.3s both;
+}
+
+/* ── Recent Actions ── */
+#recent-actions-module li,
+.jet-index-dashboard__recent-actions li {
+    animation: fadeInLeft 0.35s ease-out both;
+    transition: padding-left 0.2s ease !important;
+}
+#recent-actions-module li:nth-child(1) { animation-delay: 0.04s; }
+#recent-actions-module li:nth-child(2) { animation-delay: 0.08s; }
+#recent-actions-module li:nth-child(3) { animation-delay: 0.12s; }
+#recent-actions-module li:nth-child(4) { animation-delay: 0.16s; }
+#recent-actions-module li:nth-child(5) { animation-delay: 0.20s; }
+#recent-actions-module li:hover {
+    padding-left: 4px;
+}
+
+/* ── App Module Icons (stagger) ── */
+.app-icon,
+.jet-sidebar-popup__icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.app-icon:hover,
+.jet-sidebar-popup__icon:hover {
+    transform: rotate(8deg) scale(1.15);
+}
+
+/* ── Checkbox / Toggle ── */
+input[type="checkbox"] {
+    transition: all 0.15s ease !important;
+}
+input[type="checkbox"]:checked {
+    animation: pulse 0.3s ease;
+}
+
+/* ── Calendar & Date Widgets ── */
+.calendarbox,
+.clockbox,
+.calendar {
+    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Responsive: Reduce Animations on reduced-motion preference ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
