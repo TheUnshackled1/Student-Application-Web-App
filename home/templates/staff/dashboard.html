@@ -1057,13 +1057,11 @@ document.getElementById('navToggle').addEventListener('click',function(){
     <p>&copy; 2026 Tyrone, Ramsey, Gracee &amp; Dhenby. All rights reserved.</p>
 </footer>
 
-<!-- ========== STUDENT DETAIL MODAL SCRIPT ========== -->
 <script>
 var studentDetailModalEl = document.getElementById('studentDetailModal');
 var studentDetailModal = new bootstrap.Modal(studentDetailModalEl);
 
 function openStudentModal(row, event) {
-    // Don't open modal when clicking action buttons
     if (event && (event.target.closest('.staff-action-group') || event.target.closest('a'))) return;
     var d = row.dataset;
     document.getElementById('sdName').textContent     = d.sName     || '—';
@@ -1084,12 +1082,10 @@ function openStudentModal(row, event) {
     document.getElementById('sdStart').textContent    = d.sStart    || '—';
     document.getElementById('sdFiled').textContent    = d.sFiled    || '—';
 
-    // Status pill
     var statusEl = document.getElementById('sdStatus');
     statusEl.textContent = d.sStatus || '—';
     statusEl.className = 'staff-status-pill staff-status--' + (d.sStatusKey || 'pending');
 
-    // Review link
     var pk = d.sPk;
     var url = '{% url "home:staff_review_application" 0 %}'.replace('0', pk);
     document.getElementById('sdReviewLink').href = url;
