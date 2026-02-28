@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- ========== PAGE LOADER ========== -->
 <div class="page-loader" id="pageLoader">
     <span class="loader-text">LOADING...</span>
     <div class="loader-bar-wrapper">
@@ -38,7 +37,6 @@
 })();
 </script>
 
-<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
     <div class="navbar-left d-flex align-items-center gap-2">
         <div class="logo">
@@ -71,10 +69,8 @@
     </div>
 </nav>
 
-<!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
 
-    <!-- ── Application Header Banner ── -->
     <div class="status-banner">
         <div class="status-banner-bg"></div>
         <div class="status-banner-content">
@@ -115,7 +111,6 @@
         </div>
     </div>
 
-    <!-- ── Status Action Bar ── -->
     <div class="review-action-bar">
         <span class="review-action-label">Update Status:</span>
         <form method="post" action="{% url 'home:staff_update_application_status' app.pk %}" class="review-action-form">
