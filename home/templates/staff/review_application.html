@@ -142,7 +142,6 @@
         {% endif %}
     </div>
 
-    <!-- ── Interview / Office / Start Date Info Cards ── -->
     {% if app.interview_date or app.assigned_office or app.start_date %}
     <div class="review-workflow-cards">
         {% if app.interview_date %}
@@ -175,10 +174,8 @@
     </div>
     {% endif %}
 
-    <!-- ── Two-Column Info ── -->
     <div class="review-grid">
 
-        <!-- LEFT: Personal & Academic Info -->
         <div class="staff-panel">
             <div class="staff-panel-header">
                 <div class="staff-panel-header-left">
@@ -246,8 +243,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- RIGHT: Documents -->
         <div class="staff-panel">
             <div class="staff-panel-header">
                 <div class="staff-panel-header-left">
@@ -258,8 +253,6 @@
                     {{ uploaded_docs }}/{{ total_docs }}
                 </span>
             </div>
-
-            <!-- Progress bar -->
             <div class="review-doc-progress">
                 <div class="review-doc-progress-bar" style="width: {% widthratio uploaded_docs total_docs 100 %}%;"></div>
             </div>
@@ -299,8 +292,6 @@
     </div>
 
 </main>
-
-<!-- ========== INTERVIEW SCHEDULING MODAL ========== -->
 <div class="file-preview-overlay" id="interviewModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
     <div class="file-preview-modal" style="max-width: 480px;">
         <div class="file-preview-header">
@@ -327,8 +318,8 @@
                     Interview Date &amp; Time
                 </label>
                 <input type="datetime-local" name="interview_date" required
-                       style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px;"
-                       {% if app.interview_date %}value="{{ app.interview_date|date:'Y-m-d' }}T{{ app.interview_date|time:'H:i' }}"{% endif %}>
+                    style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px;"
+                    {% if app.interview_date %}value="{{ app.interview_date|date:'Y-m-d' }}T{{ app.interview_date|time:'H:i' }}"{% endif %}>
                 <button type="submit" class="review-status-btn review-btn--interview" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;">
                     <i class="fa-solid fa-calendar-check"></i> Confirm Schedule
                 </button>
@@ -337,7 +328,6 @@
     </div>
 </div>
 
-<!-- ========== FINAL APPROVAL MODAL ========== -->
 <div class="file-preview-overlay" id="approveModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
     <div class="file-preview-modal" style="max-width: 480px;">
         <div class="file-preview-header">
