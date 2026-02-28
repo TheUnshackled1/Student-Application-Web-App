@@ -1,5 +1,42 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from .models import Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication, Office
+
+
+# ── Shared file validators ──
+
+ALLOWED_DOC_EXTENSIONS = ('.pdf', '.jpg', '.jpeg', '.png')
+ALLOWED_IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
+MAX_FILE_SIZE_MB = 10  # 10 MB per document
+
+
+def validate_file_size(value):
+    """Reject files larger than MAX_FILE_SIZE_MB."""
+    if value and hasattr(value, 'size') and value.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+        raise ValidationError(
+            f'File size must not exceed {MAX_FILE_SIZE_MB} MB. '
+            f'Your file is {value.size / (1024 * 1024):.1f} MB.'
+        )
+
+
+def validate_document_type(value):
+    """Only allow PDF and common image types for documents."""
+    if value and hasattr(value, 'name'):
+        ext = ('.' + value.name.rsplit('.', 1)[-1]).lower() if '.' in value.name else ''
+        if ext not in ALLOWED_DOC_EXTENSIONS:
+            raise ValidationError(
+                f'Unsupported file type "{ext}". Allowed: {", ".join(ALLOWED_DOC_EXTENSIONS)}.'
+            )
+
+
+def validate_image_type(value):
+    """Only allow common image types for ID pictures."""
+    if value and hasattr(value, 'name'):
+        ext = ('.' + value.name.rsplit('.', 1)[-1]).lower() if '.' in value.name else ''
+        if ext not in ALLOWED_IMAGE_EXTENSIONS:
+            raise ValidationError(
+                f'Unsupported image type "{ext}". Allowed: {", ".join(ALLOWED_IMAGE_EXTENSIONS)}.'
+            )
 
 
 class ReminderForm(forms.ModelForm):
@@ -156,6 +193,49 @@ class NewApplicationForm(forms.ModelForm):
             raise forms.ValidationError('You must be at least 18 years old to apply. Only college-level students are eligible.')
         return dob
 
+    # ── Document file validators (size & type) ──
+
+    def _validate_doc(self, field_name):
+        f = self.cleaned_data.get(field_name)
+        if f:
+            validate_file_size(f)
+            validate_document_type(f)
+        return f
+
+    def _validate_img(self, field_name):
+        f = self.cleaned_data.get(field_name)
+        if f:
+            validate_file_size(f)
+            validate_image_type(f)
+        return f
+
+    def clean_application_form(self):
+        return self._validate_doc('application_form')
+
+    def clean_id_picture(self):
+        return self._validate_img('id_picture')
+
+    def clean_barangay_clearance(self):
+        return self._validate_doc('barangay_clearance')
+
+    def clean_parents_itr(self):
+        return self._validate_doc('parents_itr')
+
+    def clean_enrolment_form(self):
+        return self._validate_doc('enrolment_form')
+
+    def clean_schedule_classes(self):
+        return self._validate_doc('schedule_classes')
+
+    def clean_proof_insurance(self):
+        return self._validate_doc('proof_insurance')
+
+    def clean_grades_last_sem(self):
+        return self._validate_doc('grades_last_sem')
+
+    def clean_official_time(self):
+        return self._validate_doc('official_time')
+
 
 class RenewalApplicationForm(forms.ModelForm):
     class Meta:
@@ -231,6 +311,43 @@ class RenewalApplicationForm(forms.ModelForm):
         if RenewalApplication.objects.filter(student_id=val).exists():
             raise forms.ValidationError('A renewal application with this Student ID already exists.')
         return val
+
+    # ── Document file validators (size & type) ──
+
+    def _validate_doc(self, field_name):
+        f = self.cleaned_data.get(field_name)
+        if f:
+            validate_file_size(f)
+            validate_document_type(f)
+        return f
+
+    def _validate_img(self, field_name):
+        f = self.cleaned_data.get(field_name)
+        if f:
+            validate_file_size(f)
+            validate_image_type(f)
+        return f
+
+    def clean_id_picture(self):
+        return self._validate_img('id_picture')
+
+    def clean_enrolment_form(self):
+        return self._validate_doc('enrolment_form')
+
+    def clean_schedule_classes(self):
+        return self._validate_doc('schedule_classes')
+
+    def clean_grades_last_sem(self):
+        return self._validate_doc('grades_last_sem')
+
+    def clean_official_time(self):
+        return self._validate_doc('official_time')
+
+    def clean_recommendation_letter(self):
+        return self._validate_doc('recommendation_letter')
+
+    def clean_evaluation_form(self):
+        return self._validate_doc('evaluation_form')
 
 
 # ================================================================

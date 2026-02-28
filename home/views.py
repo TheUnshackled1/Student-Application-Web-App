@@ -33,6 +33,77 @@ def _urgency_for_days(days_left):
     return 'normal'
 
 
+def _validate_uploaded_file(file_field, field_name):
+    """Run OpenCV quality checks on stored uploaded file. Returns dict with results."""
+    result = {'warnings': [], 'checks': {}}
+    try:
+        if not file_field or not file_field.name:
+            return result
+        ext = ''
+        if '.' in file_field.name:
+            ext = ('.' + file_field.name.rsplit('.', 1)[-1]).lower()
+        is_image = ext in ('.jpg', '.jpeg', '.png')
+        if not is_image:
+            return result
+
+        file_field.open('rb')
+        file_bytes = file_field.read()
+        file_field.close()
+
+        np_arr = np.frombuffer(file_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        if img is None:
+            result['warnings'].append('Could not decode image — file may be corrupted.')
+            result['checks']['decodable'] = False
+            return result
+
+        result['checks']['decodable'] = True
+        h, w = img.shape[:2]
+        result['checks']['resolution'] = f'{w}x{h}'
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Blur detection
+        lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+        result['checks']['blur_score'] = round(lap_var, 2)
+        if lap_var < 50.0:
+            result['warnings'].append(f'Blurry (sharpness: {lap_var:.0f})')
+            result['checks']['blur_ok'] = False
+        else:
+            result['checks']['blur_ok'] = True
+
+        # Blank detection
+        std_dev = gray.std()
+        result['checks']['contrast_score'] = round(std_dev, 2)
+        if std_dev < 15.0:
+            result['warnings'].append('Appears blank or nearly blank')
+            result['checks']['blank_ok'] = False
+        else:
+            result['checks']['blank_ok'] = True
+
+        # Face detection for ID pictures
+        if field_name == 'id_picture':
+            try:
+                cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+                face_cascade = cv2.CascadeClassifier(cascade_path)
+                faces = face_cascade.detectMultiScale(gray, 1.1, 5, minSize=(30, 30))
+                num = len(faces) if faces is not None else 0
+                result['checks']['faces_detected'] = num
+                if num == 0:
+                    result['warnings'].append('No face detected')
+                    result['checks']['face_ok'] = False
+                elif num > 1:
+                    result['warnings'].append(f'{num} faces detected (expected 1)')
+                    result['checks']['face_ok'] = False
+                else:
+                    result['checks']['face_ok'] = True
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return result
+
+
 def _build_documents_from_app(app):
     """Build document status list from a NewApplication's file fields."""
     doc_fields = [
@@ -645,6 +716,131 @@ def process_camera_photo(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
+@require_POST
+def validate_document(request):
+    """AJAX endpoint — validate an uploaded file with OpenCV checks.
+
+    Checks performed:
+      • File size (max 10 MB)
+      • File type (PDF / JPG / PNG only)
+      • For images marked as 'id_picture': face detection via Haar cascade
+      • For all images: blur detection (Laplacian variance) & blank page detection
+    Returns JSON with ``valid``, ``warnings`` list, and ``checks`` dict.
+    """
+    from .forms import MAX_FILE_SIZE_MB, ALLOWED_DOC_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS
+
+    uploaded = request.FILES.get('file')
+    field_name = request.POST.get('field', '')
+
+    if not uploaded:
+        return JsonResponse({'valid': False, 'warnings': ['No file uploaded.'], 'checks': {}}, status=400)
+
+    warnings = []
+    checks = {}
+
+    # ── Size check ──
+    size_mb = uploaded.size / (1024 * 1024)
+    checks['size_mb'] = round(size_mb, 2)
+    if size_mb > MAX_FILE_SIZE_MB:
+        warnings.append(f'File is too large ({size_mb:.1f} MB). Maximum is {MAX_FILE_SIZE_MB} MB.')
+        checks['size_ok'] = False
+    else:
+        checks['size_ok'] = True
+
+    # ── Type check ──
+    ext = ''
+    if '.' in uploaded.name:
+        ext = ('.' + uploaded.name.rsplit('.', 1)[-1]).lower()
+    is_image = ext in ('.jpg', '.jpeg', '.png')
+    is_pdf = ext == '.pdf'
+    allowed = ALLOWED_IMAGE_EXTENSIONS if field_name == 'id_picture' else ALLOWED_DOC_EXTENSIONS
+    checks['extension'] = ext
+    if ext not in allowed:
+        warnings.append(f'File type "{ext}" is not allowed. Accepted: {", ".join(allowed)}.')
+        checks['type_ok'] = False
+    else:
+        checks['type_ok'] = True
+
+    # ── OpenCV image analysis (only for images) ──
+    if is_image and checks.get('type_ok', True) and checks.get('size_ok', True):
+        try:
+            file_bytes = uploaded.read()
+            uploaded.seek(0)
+            np_arr = np.frombuffer(file_bytes, np.uint8)
+            img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+            if img is None:
+                warnings.append('Could not decode image. The file may be corrupted.')
+                checks['decodable'] = False
+            else:
+                checks['decodable'] = True
+                h, w = img.shape[:2]
+                checks['resolution'] = f'{w}x{h}'
+
+                # ── Blur detection (Laplacian variance) ──
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+                checks['blur_score'] = round(laplacian_var, 2)
+                BLUR_THRESHOLD = 50.0
+                if laplacian_var < BLUR_THRESHOLD:
+                    warnings.append(
+                        f'Image appears blurry (sharpness score: {laplacian_var:.0f}, '
+                        f'minimum recommended: {BLUR_THRESHOLD:.0f}). '
+                        'Please upload a clearer photo.'
+                    )
+                    checks['blur_ok'] = False
+                else:
+                    checks['blur_ok'] = True
+
+                # ── Blank page detection (low std-dev = mostly uniform) ──
+                std_dev = gray.std()
+                checks['contrast_score'] = round(std_dev, 2)
+                BLANK_THRESHOLD = 15.0
+                if std_dev < BLANK_THRESHOLD:
+                    warnings.append(
+                        'Image appears to be blank or nearly blank. '
+                        'Please upload the correct document.'
+                    )
+                    checks['blank_ok'] = False
+                else:
+                    checks['blank_ok'] = True
+
+                # ── Face detection for id_picture ──
+                if field_name == 'id_picture':
+                    try:
+                        cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+                        face_cascade = cv2.CascadeClassifier(cascade_path)
+                        faces = face_cascade.detectMultiScale(
+                            gray,
+                            scaleFactor=1.1,
+                            minNeighbors=5,
+                            minSize=(30, 30),
+                        )
+                        num_faces = len(faces) if faces is not None else 0
+                        checks['faces_detected'] = num_faces
+                        if num_faces == 0:
+                            warnings.append(
+                                'No face detected in the ID photo. '
+                                'Please upload a clear, front-facing photo.'
+                            )
+                            checks['face_ok'] = False
+                        elif num_faces > 1:
+                            warnings.append(
+                                f'{num_faces} faces detected. The ID photo should contain exactly one face.'
+                            )
+                            checks['face_ok'] = False
+                        else:
+                            checks['face_ok'] = True
+                    except Exception:
+                        checks['face_ok'] = None  # cascade not available
+
+        except Exception as e:
+            warnings.append(f'Image analysis error: {str(e)}')
+
+    is_valid = len(warnings) == 0
+    return JsonResponse({'valid': is_valid, 'warnings': warnings, 'checks': checks})
+
+
 def staff_login(request):
     """Login page for staff users."""
     if request.user.is_authenticated:
@@ -890,12 +1086,17 @@ def staff_review_application(request, pk):
     documents = []
     for field_name, label in doc_fields:
         file_field = getattr(app, field_name)
-        documents.append({
+        doc_entry = {
             'name': label,
             'field': field_name,
             'file': file_field if file_field else None,
             'uploaded': bool(file_field),
-        })
+            'validation': None,
+        }
+        # Run inline OpenCV validation on uploaded image files
+        if file_field:
+            doc_entry['validation'] = _validate_uploaded_file(file_field, field_name)
+        documents.append(doc_entry)
 
     total_docs = len(documents)
     uploaded_docs = sum(1 for d in documents if d['uploaded'])
@@ -1142,12 +1343,16 @@ def director_review_application(request, pk):
     documents = []
     for field_name, label in doc_fields:
         file_field = getattr(app, field_name)
-        documents.append({
+        doc_entry = {
             'name': label,
             'field': field_name,
             'file': file_field if file_field else None,
             'uploaded': bool(file_field),
-        })
+            'validation': None,
+        }
+        if file_field:
+            doc_entry['validation'] = _validate_uploaded_file(file_field, field_name)
+        documents.append(doc_entry)
 
     total_docs = len(documents)
     uploaded_docs = sum(1 for d in documents if d['uploaded'])

@@ -10,6 +10,7 @@ urlpatterns = [
     path('apply/renew/', views.apply_renew, name='apply_renew'),
     path('apply/check-student/', views.check_student_id, name='check_student_id'),
     path('apply/camera-photo/', views.process_camera_photo, name='process_camera_photo'),
+    path('apply/validate-document/', views.validate_document, name='validate_document'),
     path('staff/login/', views.staff_login, name='staff_login'),
     path('director/login/', views.director_login, name='director_login'),
     path('staff/', views.staff_dashboard, name='staff_dashboard'),
