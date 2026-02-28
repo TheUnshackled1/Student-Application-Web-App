@@ -686,6 +686,33 @@
         document.getElementById('cameraStatus').textContent = '';
     }
 
+    // ── Client-side File Validation ──
+    var MAX_FILE_MB = 10;
+    var ALLOWED_DOC_EXT = ['pdf', 'jpg', 'jpeg', 'png'];
+    var ALLOWED_IMG_EXT = ['jpg', 'jpeg', 'png'];
+    var VALIDATE_URL = "{% url 'home:validate_document' %}";
+    var CSRF = '{{ csrf_token }}';
+
+    function getFileExt(name) {
+        return name.split('.').pop().toLowerCase();
+    }
+
+    function showFileWarning(card, message, type) {
+        /* type: 'error' | 'warning' | 'success' */
+        var existing = card.querySelector('.file-validation-msg');
+        if (existing) existing.remove();
+        var div = document.createElement('div');
+        div.className = 'file-validation-msg file-validation-msg--' + type;
+        var icon = type === 'error' ? 'fa-circle-xmark' : type === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-check';
+        div.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + message;
+        card.appendChild(div);
+    }
+
+    function clearFileWarning(card) {
+        var existing = card.querySelector('.file-validation-msg');
+        if (existing) existing.remove();
+    }
+
     // Show file name on regular file upload
     document.querySelectorAll('input[type="file"]').forEach(function(input) {
         input.addEventListener('change', function() {
@@ -707,6 +734,53 @@
             if (preview && this.files.length > 0) {
                 preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
                 preview.style.display = 'block';
+            }
+
+            // Client-side validation
+            if (!this.files.length) { clearFileWarning(col); return; }
+            var file = this.files[0];
+            var fieldName = this.name;
+            var ext = getFileExt(file.name);
+            var allowed = fieldName === 'id_picture' ? ALLOWED_IMG_EXT : ALLOWED_DOC_EXT;
+
+            // Type check
+            if (allowed.indexOf(ext) === -1) {
+                showFileWarning(col, 'Invalid file type ".' + ext + '". Allowed: ' + allowed.map(function(e){return '.'+e;}).join(', '), 'error');
+                return;
+            }
+
+            // Size check
+            var sizeMB = file.size / (1024 * 1024);
+            if (sizeMB > MAX_FILE_MB) {
+                showFileWarning(col, 'File too large (' + sizeMB.toFixed(1) + ' MB). Max: ' + MAX_FILE_MB + ' MB.', 'error');
+                return;
+            }
+
+            clearFileWarning(col);
+
+            // AJAX server-side validation (OpenCV checks)
+            var isImage = ['jpg','jpeg','png'].indexOf(ext) !== -1;
+            if (isImage) {
+                var formData = new FormData();
+                formData.append('file', file);
+                formData.append('field', fieldName);
+                fetch(VALIDATE_URL, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': CSRF },
+                    body: formData
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.warnings && data.warnings.length > 0) {
+                        showFileWarning(col, data.warnings.join(' '), 'warning');
+                    } else {
+                        var info = '';
+                        if (data.checks && data.checks.resolution) info += data.checks.resolution;
+                        if (data.checks && data.checks.blur_score) info += ' · Sharpness: ' + data.checks.blur_score;
+                        showFileWarning(col, 'Quality check passed' + (info ? ' (' + info.trim() + ')' : ''), 'success');
+                    }
+                })
+                .catch(function() { /* silent */ });
             }
         });
     });

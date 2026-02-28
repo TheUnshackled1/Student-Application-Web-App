@@ -280,6 +280,23 @@
                         {% else %}
                             <span class="review-doc-missing">Not submitted</span>
                         {% endif %}
+                        {% if doc.validation and doc.validation.warnings %}
+                        <div class="doc-validation-warnings">
+                            {% for w in doc.validation.warnings %}
+                            <span class="doc-validation-badge doc-validation-badge--warn">
+                                <i class="fa-solid fa-triangle-exclamation"></i> {{ w }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% elif doc.uploaded and doc.validation and not doc.validation.warnings %}
+                        <div class="doc-validation-warnings">
+                            <span class="doc-validation-badge doc-validation-badge--pass">
+                                <i class="fa-solid fa-shield-check"></i> Quality OK
+                                {% if doc.validation.checks.resolution %} &middot; {{ doc.validation.checks.resolution }}{% endif %}
+                                {% if doc.validation.checks.blur_score %} &middot; Sharpness: {{ doc.validation.checks.blur_score }}{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="review-doc-badge">
                         {% if doc.uploaded %}
@@ -306,6 +323,15 @@
                 <span class="file-preview-title" id="filePreviewTitle">Document</span>
             </div>
             <div class="file-preview-actions">
+                <button type="button" class="file-preview-btn" id="btnZoomIn" onclick="previewZoom(1)" title="Zoom In">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                </button>
+                <button type="button" class="file-preview-btn" id="btnZoomOut" onclick="previewZoom(-1)" title="Zoom Out">
+                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                </button>
+                <button type="button" class="file-preview-btn" id="btnRotate" onclick="previewRotate()" title="Rotate 90°">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
                 <a href="#" id="filePreviewDownload" class="file-preview-btn" download title="Download">
                     <i class="fa-solid fa-download"></i>
                 </a>
@@ -322,7 +348,17 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+/* Set PDF.js worker */
+if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+var _previewZoomLevel = 1;
+var _previewRotation = 0;
+var _previewIsImage = false;
+
 function openFilePreview(url, name) {
     var overlay = document.getElementById('filePreviewOverlay');
     var body = document.getElementById('filePreviewBody');
@@ -334,24 +370,98 @@ function openFilePreview(url, name) {
     downloadBtn.href = url;
     newTabBtn.href = url;
 
+    _previewZoomLevel = 1;
+    _previewRotation = 0;
+    _previewIsImage = false;
+
     var ext = url.split('.').pop().toLowerCase().split('?')[0];
     var imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
     var pdfExts = ['pdf'];
 
+    document.getElementById('btnZoomIn').style.display = '';
+    document.getElementById('btnZoomOut').style.display = '';
+    document.getElementById('btnRotate').style.display = '';
+
     if (imageExts.indexOf(ext) !== -1) {
-        body.innerHTML = '<img src="' + url + '" alt="' + name + '" class="file-preview-image">';
+        _previewIsImage = true;
+        body.innerHTML = '<img src="' + url + '" alt="' + name + '" class="file-preview-image" id="previewImg" style="transition:transform .2s ease;">';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     } else if (pdfExts.indexOf(ext) !== -1) {
-        body.innerHTML = '<iframe src="' + url + '" class="file-preview-iframe"></iframe>';
+        body.innerHTML = '<canvas id="pdfCanvas" style="max-width:100%;border-radius:8px;transition:transform .2s ease;"></canvas>' +
+            '<div class="pdf-page-nav" id="pdfPageNav" style="display:none;">' +
+            '<button class="file-preview-btn" onclick="pdfPrev()"><i class="fa-solid fa-chevron-left"></i></button>' +
+            '<span id="pdfPageInfo" style="color:#fff;font-size:13px;padding:0 10px;">1 / 1</span>' +
+            '<button class="file-preview-btn" onclick="pdfNext()"><i class="fa-solid fa-chevron-right"></i></button>' +
+            '</div>';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        _loadPdf(url);
     } else {
+        document.getElementById('btnZoomIn').style.display = 'none';
+        document.getElementById('btnZoomOut').style.display = 'none';
+        document.getElementById('btnRotate').style.display = 'none';
         body.innerHTML = '<div class="file-preview-fallback">' +
             '<i class="fa-solid fa-file-circle-question"></i>' +
             '<p>Preview not available for this file type.</p>' +
             '<a href="' + url + '" class="doc-action-btn" download>Download File</a>' +
             '</div>';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
+}
 
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+var _pdfDoc = null, _pdfPage = 1, _pdfTotal = 1;
+
+function _loadPdf(url) {
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+        _pdfDoc = pdf;
+        _pdfTotal = pdf.numPages;
+        _pdfPage = 1;
+        if (_pdfTotal > 1) document.getElementById('pdfPageNav').style.display = 'flex';
+        _renderPdfPage(_pdfPage);
+    }).catch(function() {
+        document.getElementById('filePreviewBody').innerHTML =
+            '<iframe src="' + url + '" class="file-preview-iframe"></iframe>';
+    });
+}
+
+function _renderPdfPage(num) {
+    _pdfDoc.getPage(num).then(function(page) {
+        var canvas = document.getElementById('pdfCanvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var scale = 1.8 * _previewZoomLevel;
+        var viewport = page.getViewport({ scale: scale, rotation: _previewRotation });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        page.render({ canvasContext: ctx, viewport: viewport });
+        var info = document.getElementById('pdfPageInfo');
+        if (info) info.textContent = num + ' / ' + _pdfTotal;
+    });
+}
+
+function pdfPrev() { if (_pdfPage > 1) { _pdfPage--; _renderPdfPage(_pdfPage); } }
+function pdfNext() { if (_pdfPage < _pdfTotal) { _pdfPage++; _renderPdfPage(_pdfPage); } }
+
+function previewZoom(dir) {
+    _previewZoomLevel = Math.max(0.25, Math.min(5, _previewZoomLevel + dir * 0.25));
+    _applyTransform();
+}
+
+function previewRotate() {
+    _previewRotation = (_previewRotation + 90) % 360;
+    _applyTransform();
+}
+
+function _applyTransform() {
+    var img = document.getElementById('previewImg');
+    if (img) {
+        img.style.transform = 'scale(' + _previewZoomLevel + ') rotate(' + _previewRotation + 'deg)';
+        return;
+    }
+    var canvas = document.getElementById('pdfCanvas');
+    if (canvas && _pdfDoc) _renderPdfPage(_pdfPage);
 }
 
 function closeFilePreview(e) {
@@ -360,6 +470,7 @@ function closeFilePreview(e) {
     overlay.classList.remove('active');
     document.body.style.overflow = '';
     document.getElementById('filePreviewBody').innerHTML = '';
+    _pdfDoc = null;
 }
 
 document.addEventListener('keydown', function(e) {
@@ -369,6 +480,8 @@ document.addEventListener('keydown', function(e) {
         });
         document.body.style.overflow = '';
     }
+    if (e.key === 'ArrowLeft') pdfPrev();
+    if (e.key === 'ArrowRight') pdfNext();
 });
 </script>
 <script>
