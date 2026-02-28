@@ -628,7 +628,7 @@
     var MAX_FILE_MB   = 10;
     var ALLOWED_DOC_EXT = ['.pdf','.jpg','.jpeg','.png'];
     var ALLOWED_IMG_EXT = ['.jpg','.jpeg','.png'];
-    var VALIDATE_URL  = "{% url 'validate_document' %}";
+    var VALIDATE_URL  = "{% url 'home:validate_document' %}";
     var CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     function getFileExt(name){ return name.substring(name.lastIndexOf('.')).toLowerCase(); }
