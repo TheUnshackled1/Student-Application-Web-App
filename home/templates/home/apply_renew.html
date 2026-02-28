@@ -624,7 +624,27 @@
         document.getElementById('cameraStatus').textContent = '';
     }
 
-    // Show file name on regular file upload
+    // ── File upload validation ──
+    var MAX_FILE_MB   = 10;
+    var ALLOWED_DOC_EXT = ['.pdf','.jpg','.jpeg','.png'];
+    var ALLOWED_IMG_EXT = ['.jpg','.jpeg','.png'];
+    var VALIDATE_URL  = "{% url 'validate_document' %}";
+    var CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    function getFileExt(name){ return name.substring(name.lastIndexOf('.')).toLowerCase(); }
+
+    function showFileWarning(card, message, type){
+        clearFileWarning(card);
+        var div = document.createElement('div');
+        div.className = 'file-validation-msg file-validation-msg--' + type;
+        div.innerHTML = message;
+        card.appendChild(div);
+    }
+    function clearFileWarning(card){
+        var old = card.querySelector('.file-validation-msg');
+        if(old) old.remove();
+    }
+
     document.querySelectorAll('input[type="file"]').forEach(function(input) {
         input.addEventListener('change', function() {
             // Update custom file text
@@ -639,12 +659,62 @@
                     textSpan.classList.remove('has-file');
                 }
             }
-            var col = this.closest('.applyform-doc-card') || this.closest('.col-md-6');
-            if (!col) return;
-            var preview = col.querySelector('.file-preview');
-            if (preview && this.files.length > 0) {
-                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
+
+            var card = this.closest('.applyform-doc-card') || this.closest('.col-md-6');
+            if (!card) return;
+            clearFileWarning(card);
+
+            var preview = card.querySelector('.file-preview');
+
+            if (!this.files.length) {
+                if (preview) preview.style.display = 'none';
+                return;
+            }
+
+            var file = this.files[0];
+            var ext  = getFileExt(file.name);
+            var fieldName = this.name || '';
+
+            // Determine allowed extensions per field
+            var allowed = (fieldName === 'id_picture') ? ALLOWED_IMG_EXT : ALLOWED_DOC_EXT;
+
+            // Client-side type check
+            if (allowed.indexOf(ext) === -1) {
+                showFileWarning(card, '<i class="fa-solid fa-triangle-exclamation"></i> Invalid file type. Allowed: ' + allowed.join(', '), 'error');
+                this.value = '';
+                if (preview) preview.style.display = 'none';
+                return;
+            }
+
+            // Client-side size check
+            if (file.size > MAX_FILE_MB * 1024 * 1024) {
+                showFileWarning(card, '<i class="fa-solid fa-triangle-exclamation"></i> File too large (max ' + MAX_FILE_MB + ' MB).', 'error');
+                this.value = '';
+                if (preview) preview.style.display = 'none';
+                return;
+            }
+
+            // Show file name
+            if (preview) {
+                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + file.name;
                 preview.style.display = 'block';
+            }
+
+            // Server-side OpenCV validation for images
+            if (ALLOWED_IMG_EXT.indexOf(ext) !== -1) {
+                var fd = new FormData();
+                fd.append('file', file);
+                fd.append('field_name', fieldName);
+                fetch(VALIDATE_URL, { method:'POST', headers:{'X-CSRFToken': CSRF}, body: fd })
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if (data.warnings && data.warnings.length) {
+                        showFileWarning(card, '<i class="fa-solid fa-circle-exclamation"></i> ' + data.warnings.join('<br>'), 'warning');
+                    } else {
+                        showFileWarning(card, '<i class="fa-solid fa-circle-check"></i> Image quality OK', 'success');
+                    }
+                })
+                .catch(function(){ /* silent */ });
             }
         });
     });
