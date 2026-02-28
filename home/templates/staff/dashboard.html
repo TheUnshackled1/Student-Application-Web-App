@@ -242,9 +242,11 @@
                                             <button type="submit" name="status" value="interview_done" class="staff-dropdown-item">
                                                 <i class="fa-solid fa-clipboard-check"></i> Done Interview
                                             </button>
+                                            {% if s.status == 'interview_done' or s.status == 'office_assigned' %}
                                             <button type="submit" name="status" value="approved" class="staff-dropdown-item" style="color: #16a34a;">
                                                 <i class="fa-solid fa-circle-check"></i> Approve
                                             </button>
+                                            {% endif %}
                                             <button type="submit" name="status" value="rejected" class="staff-dropdown-item staff-dropdown--reject">
                                                 <i class="fa-solid fa-circle-xmark"></i> Reject
                                             </button>
