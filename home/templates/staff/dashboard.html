@@ -888,7 +888,6 @@ function toggleEditForm(id) {
     var currentFilter = 'all';
     var tbody = document.querySelector('#applicationsTable tbody');
 
-    // Filter label map for friendly empty messages
     var filterLabels = {
         'all': 'applications',
         'pending': 'pending applications',
@@ -919,7 +918,6 @@ function toggleEditForm(id) {
         });
     });
 
-    // ── Search bar ──
     var searchInput = document.getElementById('studentSearchInput');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
@@ -931,7 +929,6 @@ function toggleEditForm(id) {
         var search = (searchInput ? searchInput.value : '').toLowerCase().trim();
         var visibleCount = 0;
 
-        // Remove any previous empty-state row
         var oldEmpty = document.getElementById('filterEmptyRow');
         if (oldEmpty) oldEmpty.remove();
 
