@@ -983,35 +983,23 @@ function closeAllStatusDropdowns() {
     });
 }
 
-// ── Toggle & position dropdown (appended to body to escape transforms) ──
 function toggleStatusDropdown(btn) {
     var menu = btn.nextElementSibling || (btn._menuRef);
     if (!menu) return;
     var isOpen = menu.classList.contains('show');
 
-    // Close all open dropdowns first
     closeAllStatusDropdowns();
 
     if (!isOpen) {
-        // Save references so we can return the menu later
         menu._originalParent = menu.parentElement;
         btn._menuRef = menu;
-
-        // Get button position before moving
         var rect = btn.getBoundingClientRect();
-
-        // Move to body to escape transforms / overflow clipping
         document.body.appendChild(menu);
-
-        // Position with fixed coordinates
         menu.style.position = 'fixed';
         menu.style.top = (rect.bottom + 4) + 'px';
         menu.style.left = 'auto';
         menu.style.right = (window.innerWidth - rect.right) + 'px';
-
         menu.classList.add('show');
-
-        // Flip above if it would overflow the viewport bottom
         requestAnimationFrame(function() {
             var menuRect = menu.getBoundingClientRect();
             if (menuRect.bottom > window.innerHeight - 10) {
@@ -1021,7 +1009,6 @@ function toggleStatusDropdown(btn) {
     }
 }
 
-// ── Close on scroll/resize ──
 (function() {
     var tableWrap = document.querySelector('.staff-table-wrap');
     if (tableWrap) tableWrap.addEventListener('scroll', closeAllStatusDropdowns);
@@ -1036,7 +1023,6 @@ document.getElementById('navToggle').addEventListener('click',function(){
 });
 </script>
 
-<!-- ========== 3D TILT / PARALLAX EFFECT ========== -->
 <script>
 (function(){
     var tiltCards = document.querySelectorAll(
