@@ -136,7 +136,7 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
 # ── Django JET Configuration ──
-JET_DEFAULT_THEME = "dark-gray"
+JET_DEFAULT_THEME = "light-gray"
 JET_SIDE_MENU_COMPACT = True
 JET_CHANGE_FORM_SIBLING_LINKS = True
 JET_INDEX_DASHBOARD = "student_application.dashboard.CustomIndexDashboard"
