@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- ========== PAGE LOADER ========== -->
 <div class="page-loader" id="pageLoader">
     <span class="loader-text">LOADING...</span>
     <div class="loader-bar-wrapper">
@@ -38,7 +37,6 @@
 })();
 </script>
 
-<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
     <div class="navbar-left d-flex align-items-center gap-2">
         <div class="logo">
@@ -71,7 +69,6 @@
     </div>
 </nav>
 
-<!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
 
     <!-- Welcome Banner -->
@@ -88,7 +85,6 @@
         </div>
     </div>
 
-    <!-- ===== STATS CARDS ===== -->
     <div class="staff-stats-row">
         <div class="staff-stat-card staff-stat--total">
             <div class="staff-stat-icon"><i class="fa-solid fa-layer-group"></i></div>
@@ -120,9 +116,7 @@
         </div>
     </div>
 
-    <!-- ===== ALL STUDENTS TABLE (full width) ===== -->
     <div class="staff-panel">
-        <!-- Panel Header -->
         <div class="staff-panel-header">
             <div class="staff-panel-header-left">
                 <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-users"></i></span>
@@ -274,7 +268,6 @@
         </div>
     </div>
 
-    <!-- ===== RECENTLY PROCESSED (full width) ===== -->
     <div class="staff-panel">
         <div class="staff-panel-header">
             <div class="staff-panel-header-left">
@@ -658,7 +651,6 @@
 
 </main>
 
-<!-- ========== CAMERA MODAL ========== -->
 <div class="modal fade" id="staffCameraModal" tabindex="-1" aria-labelledby="staffCameraModalLabel" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content camera-modal-card">
@@ -698,24 +690,23 @@
 
 <!-- ========== STUDENT DETAIL MODAL ========== -->
 <div class="modal fade" id="studentDetailModal" tabindex="-1" aria-labelledby="studentDetailModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content camera-modal-card">
-      <div class="modal-header camera-modal-header">
+    <div class="modal-header camera-modal-header">
         <h5 class="modal-title" id="studentDetailModalLabel">
             <i class="fa-solid fa-user"></i> Student Details
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" style="padding:24px;color:#e2e8f0;">
+    </div>
+    <div class="modal-body" style="padding:24px;color:#e2e8f0;">
 
         <!-- Status badge -->
         <div class="text-center mb-3">
-          <span class="staff-status-pill" id="sdStatus" style="font-size:13px;padding:6px 18px;"></span>
+        <span class="staff-status-pill" id="sdStatus" style="font-size:13px;padding:6px 18px;"></span>
         </div>
 
         <div class="row g-3">
-          <!-- Left column -->
-          <div class="col-md-6">
+        <div class="col-md-6">
             <div class="sd-field"><span class="sd-label">Full Name</span><span class="sd-value" id="sdName"></span></div>
             <div class="sd-field"><span class="sd-label">Student ID</span><span class="sd-value" id="sdId"></span></div>
             <div class="sd-field"><span class="sd-label">Email</span><span class="sd-value" id="sdEmail"></span></div>
@@ -724,9 +715,8 @@
             <div class="sd-field"><span class="sd-label">Gender</span><span class="sd-value" id="sdGender"></span></div>
             <div class="sd-field"><span class="sd-label">Date of Birth</span><span class="sd-value" id="sdDob"></span></div>
             <div class="sd-field"><span class="sd-label">Age</span><span class="sd-value" id="sdAge"></span></div>
-          </div>
-          <!-- Right column -->
-          <div class="col-md-6">
+        </div>
+        <div class="col-md-6">
             <div class="sd-field"><span class="sd-label">Application Type</span><span class="sd-value" id="sdType"></span></div>
             <div class="sd-field"><span class="sd-label">Course</span><span class="sd-value" id="sdCourse"></span></div>
             <div class="sd-field"><span class="sd-label">Year Level</span><span class="sd-value" id="sdYear"></span></div>
@@ -736,25 +726,24 @@
             <div class="sd-field"><span class="sd-label">Interview Date</span><span class="sd-value" id="sdInterview"></span></div>
             <div class="sd-field"><span class="sd-label">Start Date</span><span class="sd-value" id="sdStart"></span></div>
             <div class="sd-field"><span class="sd-label">Date Filed</span><span class="sd-value" id="sdFiled"></span></div>
-          </div>
+        </div>
         </div>
 
-      </div>
-      <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.08);padding:12px 24px;">
+    </div>
+    <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.08);padding:12px 24px;">
         <a id="sdReviewLink" class="btn-form btn-form--submit" style="text-decoration:none;">
             <i class="fa-solid fa-eye"></i> Review Application
         </a>
         <button type="button" class="btn-form btn-form--cancel" data-bs-dismiss="modal">
             <i class="fa-solid fa-xmark"></i> Close
         </button>
-      </div>
     </div>
-  </div>
+    </div>
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/* ── Auto-capitalize first letter of each word in text inputs (+ browser autofill) ── */
 document.addEventListener('DOMContentLoaded', function() {
     function capitalizeWords(el) {
         var pos = el.selectionStart;
@@ -773,7 +762,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 
-/* ── Generic select color mapping ── */
 function updateSelectColor(sel) {
     var opt = sel.options[sel.selectedIndex];
     var color = opt && opt.dataset.color ? opt.dataset.color : '#5eead4';
@@ -782,7 +770,6 @@ function updateSelectColor(sel) {
     sel.style.boxShadow = '0 0 0 3px ' + color + '33';
 }
 
-/* ── Staff Camera ── */
 var staffCameraStream = null;
 var staffCurrentField = null;
 var staffCameraModalEl = document.getElementById('staffCameraModal');
@@ -865,7 +852,6 @@ function staffResetUI() {
     document.getElementById('staffCameraStatus').textContent = '';
 }
 
-// Show file name on file inputs
 document.querySelectorAll('input[type="file"]').forEach(function(input) {
     input.addEventListener('change', function() {
         var wrapper = this.closest('.custom-file-upload');
@@ -896,7 +882,6 @@ function toggleEditForm(id) {
     }
 }
 
-// ── Table Filter Buttons ──
 (function() {
     var btns = document.querySelectorAll('.staff-filter-btn');
     var rows = document.querySelectorAll('#applicationsTable tbody tr[data-status]');
