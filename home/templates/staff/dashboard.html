@@ -230,9 +230,11 @@
                                         <form method="post" action="{% url 'home:staff_update_application_status' s.pk %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{% url 'home:staff_dashboard' %}">
+                                            {% if s.status != 'approved' %}
                                             <button type="submit" name="status" value="interview_scheduled" class="staff-dropdown-item">
                                                 <i class="fa-solid fa-calendar-check"></i> Schedule Interview
                                             </button>
+                                            {% endif %}
                                             {% if s.status == 'interview_done' or s.status == 'office_assigned' %}
                                             <button type="submit" name="status" value="approved" class="staff-dropdown-item" style="color: #16a34a;">
                                                 <i class="fa-solid fa-circle-check"></i> Approve
