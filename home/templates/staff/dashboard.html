@@ -980,20 +980,17 @@ function toggleEditForm(id) {
     }
 })();
 
-// ── Close dropdowns when clicking outside ──
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.staff-action-dropdown') && !e.target.closest('.staff-dropdown-menu')) {
         closeAllStatusDropdowns();
     }
 });
-// Prevent dropdown item clicks from bubbling to the row
 document.querySelectorAll('.staff-dropdown-menu').forEach(function(menu) {
     menu.addEventListener('click', function(e) {
         e.stopPropagation();
     });
 });
 
-// ── Close helper: hide & return menus to original parent ──
 function closeAllStatusDropdowns() {
     document.querySelectorAll('.staff-dropdown-menu.show').forEach(function(d) {
         d.classList.remove('show');
