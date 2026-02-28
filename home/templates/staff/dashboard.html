@@ -660,15 +660,15 @@
 
 <!-- ========== CAMERA MODAL ========== -->
 <div class="modal fade" id="staffCameraModal" tabindex="-1" aria-labelledby="staffCameraModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content camera-modal-card">
-      <div class="modal-header camera-modal-header">
+    <div class="modal-header camera-modal-header">
         <h5 class="modal-title" id="staffCameraModalLabel">
             <i class="fa-solid fa-camera"></i> Take a Photo
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
+    </div>
+    <div class="modal-body text-center">
         <div class="camera-feed-container">
             <video id="staffCameraFeed" autoplay playsinline></video>
             <canvas id="staffCameraCanvas" style="display:none;"></canvas>
@@ -962,7 +962,7 @@ function toggleEditForm(id) {
             if (visible) visibleCount++;
         });
 
-        // Show empty state message when no rows match
+        
         if (visibleCount === 0 && rows.length > 0) {
             var label = filterLabels[currentFilter] || 'applications';
             var icon = filterIcons[currentFilter] || 'fa-regular fa-folder-open';
