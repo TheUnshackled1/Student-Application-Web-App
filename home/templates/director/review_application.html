@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- ========== PAGE LOADER ========== -->
 <div class="page-loader" id="pageLoader">
     <span class="loader-text">LOADING...</span>
     <div class="loader-bar-wrapper">
@@ -37,8 +36,6 @@
     window.addEventListener('load',function(){loaded=true;var remaining=duration-(Date.now()-start);if(remaining<=0)finish();else{var iv2=setInterval(function(){w+=2;if(w>=100)w=100;fill.style.width=w+'%';pct.textContent=Math.floor(w)+'%';},30);setTimeout(function(){clearInterval(iv2);finish();},remaining);}});
 })();
 </script>
-
-<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
     <div class="navbar-left d-flex align-items-center gap-2">
         <div class="logo">
@@ -71,10 +68,7 @@
     </div>
 </nav>
 
-<!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
-
-    <!-- ── Application Header Banner ── -->
     <div class="status-banner">
         <div class="status-banner-bg"></div>
         <div class="status-banner-content">
@@ -115,7 +109,6 @@
         </div>
     </div>
 
-    <!-- ── Director Action Bar ── -->
     <div class="review-action-bar">
         <span class="review-action-label">Director Actions:</span>
         <div class="review-action-form" style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -138,8 +131,6 @@
             </form>
         </div>
     </div>
-
-    <!-- ── Interview / Office / Start Date Info Cards ── -->
     {% if app.interview_date or app.assigned_office or app.start_date %}
     <div class="review-workflow-cards">
         {% if app.interview_date %}
@@ -171,11 +162,7 @@
         {% endif %}
     </div>
     {% endif %}
-
-    <!-- ── Two-Column Info ── -->
     <div class="review-grid">
-
-        <!-- LEFT: Personal & Academic Info -->
         <div class="staff-panel">
             <div class="staff-panel-header">
                 <div class="staff-panel-header-left">
@@ -243,8 +230,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- RIGHT: Documents -->
         <div class="staff-panel">
             <div class="staff-panel-header">
                 <div class="staff-panel-header-left">
