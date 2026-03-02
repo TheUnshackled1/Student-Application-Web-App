@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- ========== PAGE LOADER ========== -->
 <div class="page-loader" id="pageLoader">
     <span class="loader-text">LOADING...</span>
     <div class="loader-bar-wrapper">
@@ -37,8 +36,6 @@
     window.addEventListener('load',function(){loaded=true;var remaining=duration-(Date.now()-start);if(remaining<=0)finish();else{var iv2=setInterval(function(){w+=2;if(w>=100)w=100;fill.style.width=w+'%';pct.textContent=Math.floor(w)+'%';},30);setTimeout(function(){clearInterval(iv2);finish();},remaining);}});
 })();
 </script>
-
-<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
     <div class="navbar-left d-flex align-items-center gap-2">
         <div class="logo">
@@ -62,11 +59,7 @@
         </span>
     </div>
 </nav>
-
-<!-- ========== MAIN CONTENT ========== -->
 <main class="main-content">
-
-    <!-- ── Page Header with Progress Steps ── -->
     <div class="applyform-hero">
         <div class="applyform-hero-bg"></div>
         <div class="applyform-hero-content">
@@ -93,8 +86,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ── Form Card ── -->
     <div class="applyform-card">
         <form method="post" enctype="multipart/form-data" id="applyNewForm">
             {% csrf_token %}
@@ -114,8 +105,6 @@
                 </div>
             </div>
             {% endif %}
-
-            <!-- ━━━ SECTION 1: PERSONAL INFORMATION ━━━ -->
             <div class="applyform-section" id="section-1">
                 <div class="applyform-section-head">
                     <span class="applyform-section-badge">1</span>
