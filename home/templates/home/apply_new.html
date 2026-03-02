@@ -457,13 +457,12 @@
             <video id="cameraFeed" autoplay playsinline></video>
             <canvas id="cameraCanvas" style="display:none;"></canvas>
         </div>
-        <!-- Captured photo preview -->
         <div class="captured-preview-container" id="capturedPreview" style="display:none;">
             <img id="capturedImage" alt="Captured photo">
         </div>
         <p class="camera-status" id="cameraStatus">Starting camera...</p>
-      </div>
-      <div class="modal-footer camera-modal-footer">
+    </div>
+    <div class="modal-footer camera-modal-footer">
         <button type="button" class="btn-form btn-form--cancel" data-bs-dismiss="modal">
             <i class="fa-solid fa-xmark"></i> Cancel
         </button>
@@ -476,14 +475,13 @@
         <button type="button" class="btn-form btn-form--submit" id="btnUsePhoto" style="display:none;" onclick="usePhoto()">
             <i class="fa-solid fa-check"></i> Use Photo
         </button>
-      </div>
     </div>
-  </div>
+    </div>
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Generic select color mapping (works for course, gender, year, semester, etc.)
     function updateSelectColor(sel) {
         var opt = sel.options[sel.selectedIndex];
         var color = opt && opt.dataset.color ? opt.dataset.color : '#5eead4';
@@ -491,11 +489,9 @@
         sel.style.borderColor = color;
         sel.style.boxShadow = '0 0 0 3px ' + color + '33';
     }
-    // Aliases for specific selects
     function updateCourseColor(sel) { updateSelectColor(sel); }
     function updateGenderColor(sel) { updateSelectColor(sel); }
 
-    // Auto-capitalize first letter of each word in text inputs (+ browser autofill)
     document.addEventListener('DOMContentLoaded', function() {
         function capitalizeWords(el) {
             var pos = el.selectionStart;
@@ -507,7 +503,6 @@
             input.addEventListener('input', function() { capitalizeWords(this); });
             input.addEventListener('change', function() { capitalizeWords(this); });
         });
-        // Handle browser autofill (fires after short delay)
         setTimeout(function() {
             textInputs.forEach(function(input) {
                 if (input.value) capitalizeWords(input);
@@ -519,19 +514,16 @@
     let currentField = null;
     const cameraModal = document.getElementById('cameraModal');
 
-    // Open webcam modal for a given field
     function openCameraModal(fieldName) {
         currentField = fieldName;
         const modal = new bootstrap.Modal(cameraModal);
         modal.show();
     }
 
-    // When the modal opens, start the webcam
     cameraModal.addEventListener('shown.bs.modal', function () {
         startCamera();
     });
 
-    // When the modal closes, stop the webcam
     cameraModal.addEventListener('hidden.bs.modal', function () {
         stopCamera();
         resetCameraUI();
@@ -571,13 +563,11 @@
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0);
 
-        // Show preview
         const dataUrl = canvas.toDataURL('image/png');
         document.getElementById('capturedImage').src = dataUrl;
         document.getElementById('capturedPreview').style.display = 'block';
         video.style.display = 'none';
 
-        // Toggle buttons
         document.getElementById('btnCapture').style.display = 'none';
         document.getElementById('btnRetake').style.display = 'inline-flex';
         document.getElementById('btnUsePhoto').style.display = 'inline-flex';
@@ -597,7 +587,6 @@
         const canvas = document.getElementById('cameraCanvas');
         const dataUrl = canvas.toDataURL('image/png');
 
-        // Send captured image to backend for cv2 processing
         fetch("{% url 'home:process_camera_photo' %}", {
             method: 'POST',
             headers: {
@@ -612,10 +601,8 @@
         .then(function(response) { return response.json(); })
         .then(function(data) {
             if (data.status === 'ok') {
-                // Store the processed image data in the hidden field
                 document.getElementById('photo_' + currentField).value = data.filename;
 
-                // Update the file-preview in the form
                 var preview = document.getElementById('preview_' + currentField);
                 preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <i class="fa-solid fa-camera" style="color:#6b7280;"></i> ' + data.filename;
                 preview.style.display = 'block';
@@ -625,7 +612,6 @@
             alert('Error processing photo: ' + err.message);
         });
 
-        // Close the modal
         bootstrap.Modal.getInstance(cameraModal).hide();
     }
 
@@ -638,7 +624,6 @@
         document.getElementById('cameraStatus').textContent = '';
     }
 
-    // ── Client-side File Validation ──
     var MAX_FILE_MB = 10;
     var ALLOWED_DOC_EXT = ['pdf', 'jpg', 'jpeg', 'png'];
     var ALLOWED_IMG_EXT = ['jpg', 'jpeg', 'png'];
@@ -650,7 +635,6 @@
     }
 
     function showFileWarning(card, message, type) {
-        /* type: 'error' | 'warning' | 'success' */
         var existing = card.querySelector('.file-validation-msg');
         if (existing) existing.remove();
         var div = document.createElement('div');
@@ -688,20 +672,17 @@
                 preview.style.display = 'block';
             }
 
-            // Client-side validation
             if (!this.files.length) { clearFileWarning(col); return; }
             var file = this.files[0];
             var fieldName = this.name;
             var ext = getFileExt(file.name);
             var allowed = fieldName === 'id_picture' ? ALLOWED_IMG_EXT : ALLOWED_DOC_EXT;
 
-            // Type check
             if (allowed.indexOf(ext) === -1) {
                 showFileWarning(col, 'Invalid file type ".' + ext + '". Allowed: ' + allowed.map(function(e){return '.'+e;}).join(', '), 'error');
                 return;
             }
 
-            // Size check
             var sizeMB = file.size / (1024 * 1024);
             if (sizeMB > MAX_FILE_MB) {
                 showFileWarning(col, 'File too large (' + sizeMB.toFixed(1) + ' MB). Max: ' + MAX_FILE_MB + ' MB.', 'error');
@@ -710,7 +691,6 @@
 
             clearFileWarning(col);
 
-            // AJAX server-side validation (OpenCV checks)
             var isImage = ['jpg','jpeg','png'].indexOf(ext) !== -1;
             if (isImage) {
                 var formData = new FormData();
@@ -737,7 +717,6 @@
         });
     });
 
-    // ── Progress Step Highlighting (scroll-based) ──
     (function() {
         var sections = [
             document.getElementById('section-1'),
@@ -823,7 +802,6 @@
         );
     }
 
-    // ── Student ID Auto-Detection (warn if already registered) ──
     (function() {
         var sidInput = document.getElementById('id_student_id_new');
         var warningBox = document.getElementById('studentIdWarning');
@@ -857,7 +835,6 @@
         });
     })();
 
-    // ── Year Level / Semester Eligibility Check ──
     (function() {
         var yearSel = document.getElementById('id_year_level');
         var semSel = document.getElementById('id_semester');
