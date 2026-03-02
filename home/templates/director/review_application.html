@@ -240,8 +240,6 @@
                     {{ uploaded_docs }}/{{ total_docs }}
                 </span>
             </div>
-
-            <!-- Progress bar -->
             <div class="review-doc-progress">
                 <div class="review-doc-progress-bar" style="width: {% widthratio uploaded_docs total_docs 100 %}%;"></div>
             </div>
@@ -298,8 +296,6 @@
     </div>
 
 </main>
-
-<!-- ========== FILE PREVIEW MODAL ========== -->
 <div class="file-preview-overlay" id="filePreviewOverlay" onclick="closeFilePreview(event)">
     <div class="file-preview-modal">
         <div class="file-preview-header">
@@ -335,7 +331,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-/* Set PDF.js worker */
 if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
