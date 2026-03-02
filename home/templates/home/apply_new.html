@@ -249,7 +249,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Eligibility alert (hidden by default) -->
                     <div class="student-id-alert student-id-alert--danger" id="eligibilityAlert" style="display:none;">
                         <div class="student-id-alert-icon"><i class="fa-solid fa-ban"></i></div>
                         <div class="student-id-alert-body">
@@ -257,7 +256,6 @@
                             <p id="eligibilityAlertText"></p>
                         </div>
                     </div>
-                    <!-- Detection banner (hidden by default) -->
                     <div class="student-id-alert student-id-alert--warning" id="studentIdWarning" style="display:none;">
                         <div class="student-id-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <div class="student-id-alert-body">
@@ -270,8 +268,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ━━━ SECTION 3: DOCUMENTS ━━━ -->
             <div class="applyform-section" id="section-3">
                 <div class="applyform-section-head">
                     <span class="applyform-section-badge applyform-section-badge--amber">3</span>
@@ -282,8 +278,6 @@
                 </div>
 
             <div class="applyform-docs-grid">
-
-                <!-- Doc 1 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">1</div>
                     <label class="applyform-doc-label">Application Form <span class="text-danger">*</span></label>
@@ -300,8 +294,6 @@
                     <div class="file-preview" id="preview_application_form"></div>
                     <input type="hidden" name="application_form_photo" id="photo_application_form">
                 </div>
-
-                <!-- Doc 2 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">2</div>
                     <label class="applyform-doc-label">(1) 1x1 ID Picture <span class="text-danger">*</span></label>
@@ -318,8 +310,6 @@
                     <div class="file-preview" id="preview_id_picture"></div>
                     <input type="hidden" name="id_picture_photo" id="photo_id_picture">
                 </div>
-
-                <!-- Doc 3 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">3</div>
                     <label class="applyform-doc-label">Barangay Clearance <span class="text-danger">*</span></label>
@@ -336,8 +326,6 @@
                     <div class="file-preview" id="preview_barangay_clearance"></div>
                     <input type="hidden" name="barangay_clearance_photo" id="photo_barangay_clearance">
                 </div>
-
-                <!-- Doc 4 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">4</div>
                     <label class="applyform-doc-label">Parents ITR / BIR Cert. / Cert. of Indigency <span class="text-danger">*</span></label>
@@ -354,8 +342,6 @@
                     <div class="file-preview" id="preview_parents_itr"></div>
                     <input type="hidden" name="parents_itr_photo" id="photo_parents_itr">
                 </div>
-
-                <!-- Doc 5 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">5</div>
                     <label class="applyform-doc-label">Photocopy of Enrolment Form <span class="text-danger">*</span></label>
@@ -372,8 +358,6 @@
                     <div class="file-preview" id="preview_enrolment_form"></div>
                     <input type="hidden" name="enrolment_form_photo" id="photo_enrolment_form">
                 </div>
-
-                <!-- Doc 6 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">6</div>
                     <label class="applyform-doc-label">Schedule of Classes <span class="text-danger">*</span></label>
@@ -390,8 +374,6 @@
                     <div class="file-preview" id="preview_schedule_classes"></div>
                     <input type="hidden" name="schedule_classes_photo" id="photo_schedule_classes">
                 </div>
-
-                <!-- Doc 7 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">7</div>
                     <label class="applyform-doc-label">Proof of Insurance (c/o OSAS) <span class="text-danger">*</span></label>
@@ -408,8 +390,6 @@
                     <div class="file-preview" id="preview_proof_insurance"></div>
                     <input type="hidden" name="proof_insurance_photo" id="photo_proof_insurance">
                 </div>
-
-                <!-- Doc 8 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">8</div>
                     <label class="applyform-doc-label">Grades for the last semester attended <span class="text-danger">*</span></label>
@@ -426,8 +406,6 @@
                     <div class="file-preview" id="preview_grades_last_sem"></div>
                     <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
                 </div>
-
-                <!-- Doc 9 -->
                 <div class="applyform-doc-card">
                     <div class="applyform-doc-num">9</div>
                     <label class="applyform-doc-label">Filled Out Official Time <span class="text-danger">*</span></label>
@@ -444,11 +422,8 @@
                     <div class="file-preview" id="preview_official_time"></div>
                     <input type="hidden" name="official_time_photo" id="photo_official_time">
                 </div>
-
             </div>
-            </div><!-- /section-3 -->
-
-            <!-- ━━━ SUBMIT AREA ━━━ -->
+            </div>
             <div class="applyform-submit-area">
                 <div class="applyform-submit-info">
                     <i class="fa-solid fa-shield-check"></i>
@@ -468,18 +443,16 @@
 
 </main>
 
-<!-- ========== CAMERA MODAL ========== -->
 <div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content camera-modal-card">
-      <div class="modal-header camera-modal-header">
+    <div class="modal-header camera-modal-header">
         <h5 class="modal-title" id="cameraModalLabel">
             <i class="fa-solid fa-camera"></i> Take a Photo
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <!-- Live camera feed -->
+    </div>
+    <div class="modal-body text-center">
         <div class="camera-feed-container">
             <video id="cameraFeed" autoplay playsinline></video>
             <canvas id="cameraCanvas" style="display:none;"></canvas>
