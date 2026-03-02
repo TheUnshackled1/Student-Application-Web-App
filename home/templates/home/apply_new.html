@@ -871,12 +871,10 @@
         semSel.addEventListener('change', checkEligibility);
     })();
 
-    // ── Date of Birth: enforce 18+, open picker at 2007 ──
     (function() {
         var dobInput = document.getElementById('id_date_of_birth');
         if (!dobInput) return;
 
-        // Calculate the max allowed date (exactly 18 years ago)
         var today = new Date();
         var maxYear = today.getFullYear() - 18;
         var maxMonth = String(today.getMonth() + 1).padStart(2, '0');
@@ -884,24 +882,19 @@
         var maxDateStr = maxYear + '-' + maxMonth + '-' + maxDay;
         dobInput.setAttribute('max', maxDateStr);
 
-        // On first click/focus, if empty, temporarily set value to 2007-01-01
-        // so the native date picker opens at year 2007 instead of current year.
         var seeded = false;
         dobInput.addEventListener('mousedown', function() {
             if (!this.value && !seeded) {
                 seeded = true;
                 this.value = maxYear + '-01-01';
-                // Clear after a brief moment if user hasn't picked yet
                 var self = this;
                 setTimeout(function() {
                     if (self.value === maxYear + '-01-01') {
-                        // Keep it so the picker opens at that year
                     }
                 }, 50);
             }
         });
 
-        // Validate on change — reject dates that would make the student under 18
         dobInput.addEventListener('change', function() {
             if (!this.value) {
                 document.getElementById('dobAgeDisplay').textContent = '';
@@ -910,28 +903,24 @@
             var chosen = new Date(this.value);
             var maxDate = new Date(maxYear, today.getMonth(), today.getDate());
 
-            // Calculate age in years and days
             var age = today.getFullYear() - chosen.getFullYear();
             var m = today.getMonth() - chosen.getMonth();
             if (m < 0 || (m === 0 && today.getDate() < chosen.getDate())) {
                 age--;
             }
 
-            // Calculate remaining days since last birthday
             var lastBirthday = new Date(today.getFullYear(), chosen.getMonth(), chosen.getDate());
             if (lastBirthday > today) {
                 lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
             }
             var days = Math.floor((today - lastBirthday) / (1000 * 60 * 60 * 24));
 
-            // Build age string with days
             var ageStr = age + ' years';
             if (days > 0) {
                 ageStr += ' and ' + days + ' day' + (days !== 1 ? 's' : '');
             }
             ageStr += ' old';
 
-            // Display age
             var ageDisplay = document.getElementById('dobAgeDisplay');
             if (age >= 18) {
                 ageDisplay.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <strong style="color:#e2e8f0;">' + ageStr + '</strong>';
