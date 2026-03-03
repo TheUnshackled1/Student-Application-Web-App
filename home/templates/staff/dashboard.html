@@ -389,7 +389,7 @@
             {% endfor %}
         </div>
         <div class="card">
-            <h3 class="card-title"><i class="fa-regular fa-calendar" style="color:#5eead4;"></i> Important Dates</h3>
+            <h3 class="card-title"><i class="fa-regular fa-calendar" style="color:#2563eb;"></i> Important Dates</h3>
             <form method="post" action="{% url 'home:staff_add_date' %}" class="staff-mgmt-form">
                 {% csrf_token %}
                 <div class="mb-2">
@@ -735,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function updateSelectColor(sel) {
     var opt = sel.options[sel.selectedIndex];
-    var color = opt && opt.dataset.color ? opt.dataset.color : '#5eead4';
+    var color = opt && opt.dataset.color ? opt.dataset.color : '#2563eb';
     sel.style.color = color;
     sel.style.borderColor = color;
     sel.style.boxShadow = '0 0 0 3px ' + color + '33';

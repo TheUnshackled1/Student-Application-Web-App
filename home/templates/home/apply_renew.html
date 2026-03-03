@@ -484,7 +484,7 @@
     // Generic select color mapping (works for course, gender, year, semester, office, etc.)
     function updateSelectColor(sel) {
         var opt = sel.options[sel.selectedIndex];
-        var color = opt && opt.dataset.color ? opt.dataset.color : '#5eead4';
+        var color = opt && opt.dataset.color ? opt.dataset.color : '#2563eb';
         sel.style.color = color;
         sel.style.borderColor = color;
         sel.style.boxShadow = '0 0 0 3px ' + color + '33';
