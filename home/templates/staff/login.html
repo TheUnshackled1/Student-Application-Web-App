@@ -94,7 +94,7 @@
                 <span class="logo-text" style="font-size:14px;">CHMSU</span>
             </div>
             <h2 style="font-size:22px; font-weight:700; color:#1e40af; margin:0 0 4px;">Staff Login</h2>
-            <p style="font-size:13px; color:rgba(255,255,255,0.55); margin:0;">Sign in to access the Staff Dashboard</p>
+            <p style="font-size:13px; color:#64748b; margin:0;">Sign in to access the Staff Dashboard</p>
         </div>
 
         {% if error %}
@@ -110,23 +110,23 @@
             {% csrf_token %}
 
             <div style="margin-bottom:16px;">
-                <label for="id_username" style="display:block; font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:6px;">Username</label>
+                <label for="id_username" style="display:block; font-size:13px; font-weight:600; color:#334155; margin-bottom:6px;">Username</label>
                 <div style="position:relative;">
-                    <i class="fa-solid fa-user-tie" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.4); font-size:14px;"></i>
+                    <i class="fa-solid fa-user-tie" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:14px;"></i>
                     <input type="text" name="username" id="id_username" autofocus required
-                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid rgba(255,255,255,0.15); border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s; background:rgba(255,255,255,0.06); color:#ffffff;"
-                        onfocus="this.style.borderColor='#5eead4'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
+                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s; background:#f8fafc; color:#1e293b;"
+                        onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#cbd5e1'"
                         placeholder="Staff username">
                 </div>
             </div>
 
             <div style="margin-bottom:24px;">
-                <label for="id_password" style="display:block; font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:6px;">Password</label>
+                <label for="id_password" style="display:block; font-size:13px; font-weight:600; color:#334155; margin-bottom:6px;">Password</label>
                 <div style="position:relative;">
-                    <i class="fa-solid fa-lock" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.4); font-size:14px;"></i>
+                    <i class="fa-solid fa-lock" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:14px;"></i>
                     <input type="password" name="password" id="id_password" required
-                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid rgba(255,255,255,0.15); border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s; background:rgba(255,255,255,0.06); color:#ffffff;"
-                        onfocus="this.style.borderColor='#5eead4'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
+                        style="width:100%; padding:11px 14px 11px 40px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s; background:#f8fafc; color:#1e293b;"
+                        onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#cbd5e1'"
                         placeholder="Enter your password">
                 </div>
             </div>
