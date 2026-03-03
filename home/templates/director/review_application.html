@@ -253,9 +253,9 @@
                 <div class="review-doc-item review-doc--{% if doc.uploaded %}uploaded{% else %}missing{% endif %}">
                     <div class="review-doc-status">
                         {% if doc.uploaded %}
-                            <i class="fa-solid fa-circle-check" style="color: #16a34a;"></i>
+                            <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i>
                         {% else %}
-                            <i class="fa-solid fa-circle-xmark" style="color: #dc2626;"></i>
+                            <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i>
                         {% endif %}
                     </div>
                     <div class="review-doc-info">
@@ -364,7 +364,7 @@
             {% if notes_log %}
             <div style="max-height:300px; overflow-y:auto;">
                 {% for note in notes_log %}
-                <div style="border-left:3px solid {% if note.note_type == 'staff' %}#3b82f6{% elif note.note_type == 'director' %}#8b5cf6{% elif note.note_type == 'schedule_mismatch' %}#ef4444{% elif note.note_type == 'document_request' %}#f59e0b{% else %}#64748b{% endif %}; padding:0.5rem 0.75rem; margin-bottom:0.5rem; background:rgba(255,255,255,0.03); border-radius:0 6px 6px 0;">
+                <div style="border-left:3px solid {% if note.note_type == 'staff' %}#3b82f6{% elif note.note_type == 'director' %}#8b5cf6{% elif note.note_type == 'schedule_mismatch' %}#ef4444{% elif note.note_type == 'document_request' %}#fbbf24{% else %}#94a3b8{% endif %}; padding:0.5rem 0.75rem; margin-bottom:0.5rem; background:rgba(255,255,255,0.03); border-radius:0 6px 6px 0;">
                     <div style="font-size:0.78rem; color:#94a3b8;">
                         <strong>{{ note.get_note_type_display }}</strong>
                         {% if note.author %} by {{ note.author.get_full_name|default:note.author.username }}{% endif %}
@@ -387,7 +387,7 @@
     <div class="file-preview-modal" style="max-width: 480px;">
         <div class="file-preview-header">
             <div class="file-preview-title-wrap">
-                <i class="fa-solid fa-file-circle-question" style="color: #f59e0b;"></i>
+                <i class="fa-solid fa-file-circle-question" style="color: #fbbf24;"></i>
                 <span class="file-preview-title">Request Additional Documents</span>
             </div>
             <div class="file-preview-actions">
