@@ -1,0 +1,297 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sa.full_name }} — SA Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'home/css/style.css' %}?v=7">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+<div class="page-loader" id="pageLoader">
+    <span class="loader-text">LOADING...</span>
+    <div class="loader-bar-wrapper"><div class="loader-bar-fill" id="loaderFill"></div></div>
+    <span class="loader-percent" id="loaderPercent">0%</span>
+</div>
+<script>
+(function(){var fill=document.getElementById('loaderFill'),pct=document.getElementById('loaderPercent'),loader=document.getElementById('pageLoader');var w=0;var start=Date.now(),duration=800,done=false;var iv=setInterval(function(){var elapsed=Date.now()-start,target=Math.min((elapsed/duration)*90,90);w+=(target-w)*0.18+0.3;if(w>90&&!done)w=90;fill.style.width=w+'%';pct.textContent=Math.floor(w)+'%';},30);function finish(){if(done)return;done=true;clearInterval(iv);fill.style.width='100%';pct.textContent='100%';setTimeout(function(){loader.classList.add('loader-hidden');},250);setTimeout(function(){loader.remove();},750);}window.addEventListener('load',function(){var remaining=duration-(Date.now()-start);if(remaining<=0)finish();else setTimeout(finish,remaining);});})();
+</script>
+
+<nav class="navbar">
+    <div class="navbar-left d-flex align-items-center gap-2">
+        <div class="logo"><div class="logo-circle"><span class="logo-text">CHMSU</span></div></div>
+        <a href="{% url 'home:staff_active_sa_list' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-arrow-left"></i><span>BACK TO SA LIST</span></a>
+        <a href="{% url 'home:staff_dashboard' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-gauge"></i><span>DASHBOARD</span></a>
+    </div>
+    <div class="navbar-right d-flex align-items-center gap-2">
+        <form method="post" action="{% url 'logout' %}" style="margin:0;">{% csrf_token %}
+            <button type="submit" class="btn btn-nav btn-nav--link" style="border:none;cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+        </form>
+    </div>
+</nav>
+
+<main class="main-content">
+
+    <!-- Messages -->
+    {% if messages %}
+    <div style="padding:0 1.5rem;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" style="border-radius:12px;margin-bottom:0.75rem;">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- SA Info Banner -->
+    <div class="status-banner">
+        <div class="status-banner-bg"></div>
+        <div class="status-banner-content">
+            <div class="status-icon-wrap"><i class="fa-solid fa-user-check"></i></div>
+            <div class="status-text">
+                <h2 class="status-title">{{ sa.full_name }}</h2>
+                <p class="status-message">
+                    {{ sa.student_id }} &bull; {{ sa.course }} &bull;
+                    {{ sa.assigned_office.name|default:"No office" }} &bull;
+                    <span class="status-badge status-badge--{{ sa.status }}">{{ sa.get_status_display }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="staff-stats-row">
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #3b82f6, #2563eb);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ sa.total_hours }}/{{ sa.required_hours }}</span>
+                <span class="staff-stat-lbl">Hours ({{ sa.hours_percentage }}%)</span>
+            </div>
+        </div>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #10b981, #059669);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ attendance_summary.present }}</span>
+                <span class="staff-stat-lbl">Days Present</span>
+            </div>
+        </div>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #f59e0b, #d97706);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ attendance_summary.late }}</span>
+                <span class="staff-stat-lbl">Days Late</span>
+            </div>
+        </div>
+        <div class="staff-stat-card staff-stat--rejected">
+            <div class="staff-stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ attendance_summary.absent }}</span>
+                <span class="staff-stat-lbl">Days Absent</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hours Progress Bar -->
+    <div class="staff-panel" style="margin-bottom:1.5rem;">
+        <div class="staff-panel-header">
+            <div class="staff-panel-header-left">
+                <span class="staff-panel-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fa-solid fa-chart-bar"></i></span>
+                <h3 class="staff-panel-title">Hours Progress</h3>
+            </div>
+        </div>
+        <div style="padding:1rem 1.5rem;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                <span style="font-weight:600;">{{ sa.total_hours }} hours completed</span>
+                <span style="opacity:0.7;">{{ sa.required_hours }} hours required</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.08);border-radius:8px;height:14px;overflow:hidden;">
+                <div style="background:linear-gradient(90deg,{% if sa.hours_percentage >= 100 %}#10b981,#059669{% elif sa.hours_percentage >= 50 %}#3b82f6,#2563eb{% else %}#f59e0b,#d97706{% endif %});height:100%;width:{{ sa.hours_percentage }}%;border-radius:8px;transition:width .4s ease;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" style="padding:0 1.5rem;">
+        <!-- Left Column: Log Attendance -->
+        <div class="col-lg-5">
+            <div class="staff-panel" style="margin-bottom:1.5rem;">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#10b981,#059669);"><i class="fa-solid fa-clipboard-check"></i></span>
+                        <h3 class="staff-panel-title">Log Attendance</h3>
+                    </div>
+                </div>
+                <div style="padding:1rem 1.5rem;">
+                    <form method="post" action="{% url 'home:staff_log_attendance' sa.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight:600;">Date</label>
+                            {{ attendance_form.date }}
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label" style="font-weight:600;">Time In</label>
+                                {{ attendance_form.time_in }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label" style="font-weight:600;">Time Out</label>
+                                {{ attendance_form.time_out }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight:600;">Status</label>
+                            {{ attendance_form.status }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight:600;">Remarks</label>
+                            {{ attendance_form.remarks }}
+                        </div>
+                        <button type="submit" class="btn w-100" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;padding:10px;font-weight:600;">
+                            <i class="fa-solid fa-plus"></i> Log Attendance
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Update Status -->
+            <div class="staff-panel">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);"><i class="fa-solid fa-sliders"></i></span>
+                        <h3 class="staff-panel-title">SA Settings</h3>
+                    </div>
+                </div>
+                <div style="padding:1rem 1.5rem;">
+                    <form method="post" action="{% url 'home:staff_update_sa_status' sa.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight:600;">Status</label>
+                            {{ status_form.status }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight:600;">End Date</label>
+                            {{ status_form.end_date }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight:600;">Required Hours</label>
+                            {{ status_form.required_hours }}
+                        </div>
+                        <button type="submit" class="btn w-100" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:10px;padding:10px;font-weight:600;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Settings
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Attendance History -->
+        <div class="col-lg-7">
+            <div class="staff-panel">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fa-solid fa-list-check"></i></span>
+                        <h3 class="staff-panel-title">Attendance History</h3>
+                        <span class="staff-panel-count">{{ attendance_summary.total_days }}</span>
+                    </div>
+                </div>
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th>Hours</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rec in attendance %}
+                            <tr>
+                                <td>{{ rec.date|date:"M d, Y" }}</td>
+                                <td>{{ rec.time_in|time:"h:i A"|default:"—" }}</td>
+                                <td>{{ rec.time_out|time:"h:i A"|default:"—" }}</td>
+                                <td style="font-weight:600;">{{ rec.hours_worked }}h</td>
+                                <td>
+                                    <span class="status-badge status-badge--{% if rec.status == 'present' %}approved{% elif rec.status == 'late' %}pending{% elif rec.status == 'absent' %}rejected{% else %}under_review{% endif %}">
+                                        {{ rec.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'home:staff_delete_attendance' sa.pk rec.pk %}"
+                                          style="display:inline;" onsubmit="return confirm('Delete this attendance record?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm" style="background:rgba(239,68,68,0.15);color:#ef4444;border:none;border-radius:6px;padding:4px 10px;">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center" style="padding:2rem;opacity:0.6;">
+                                    <i class="fa-solid fa-clipboard" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                                    No attendance records yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Performance Evaluations (read-only for staff) -->
+            {% if evaluations %}
+            <div class="staff-panel" style="margin-top:1.5rem;">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#ec4899,#db2777);"><i class="fa-solid fa-star"></i></span>
+                        <h3 class="staff-panel-title">Performance Evaluations</h3>
+                    </div>
+                </div>
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Quality</th>
+                                <th>Punctuality</th>
+                                <th>Initiative</th>
+                                <th>Cooperation</th>
+                                <th>Communication</th>
+                                <th>Overall</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ev in evaluations %}
+                            <tr>
+                                <td><span class="staff-app-type-tag staff-app-type--new">{{ ev.get_evaluation_period_display }}</span></td>
+                                <td>{{ ev.work_quality }}/5</td>
+                                <td>{{ ev.punctuality }}/5</td>
+                                <td>{{ ev.initiative }}/5</td>
+                                <td>{{ ev.cooperation }}/5</td>
+                                <td>{{ ev.communication }}/5</td>
+                                <td style="font-weight:700;color:#10b981;">{{ ev.overall_rating }}/5</td>
+                                <td>{{ ev.evaluated_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
