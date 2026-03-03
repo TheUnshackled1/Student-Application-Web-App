@@ -266,6 +266,67 @@
                                 </div>
                                 {% endfor %}
                             </div>
+
+                            {% if app.raw_status == 'schedule_mismatch' %}
+                            <!-- Schedule Resubmission -->
+                            <div style="margin-top:1rem; padding:1rem; border:1px solid #fbbf24; border-radius:8px; background:rgba(251,191,36,0.08);">
+                                <h6 style="color:#fbbf24; margin-bottom:0.5rem;"><i class="fa-solid fa-calendar-xmark"></i> Schedule Mismatch — Resubmission Required</h6>
+                                {% if app.schedule_mismatch_note %}
+                                <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:0.75rem;"><strong>Staff Note:</strong> {{ app.schedule_mismatch_note }}</p>
+                                {% endif %}
+                                <p style="font-size:0.82rem; color:#cbd5e1; margin-bottom:0.75rem;">Your availability schedule does not match your uploaded Schedule of Classes. Please update and resubmit below.</p>
+                                <form method="post" action="{% url 'home:resubmit_schedule' app.app_type_key app.obj.pk %}">
+                                    {% csrf_token %}
+                                    <div style="overflow-x:auto; margin-bottom:0.75rem;">
+                                    <table class="table table-bordered table-sm text-center" style="font-size:0.78rem;">
+                                        <thead class="table-dark">
+                                            <tr><th style="min-width:70px;">Time</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for ts_val, ts_label in time_slot_choices %}
+                                            <tr>
+                                                <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
+                                                {% for d_val, d_label in day_choices %}
+                                                <td><input type="checkbox" class="form-check-input resub-cb-{{ forloop.parentloop.parentloop.counter }}" data-day="{{ d_val }}" data-time="{{ ts_val }}" style="cursor:pointer;"></td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    </div>
+                                    <input type="hidden" name="availability_schedule" class="resub-hidden-{{ forloop.counter }}">
+                                    <button type="submit" class="btn btn-sm btn-warning text-dark" onclick="var s={};document.querySelectorAll('.resub-cb-{{ forloop.counter }}:checked').forEach(function(c){var d=c.getAttribute('data-day'),t=c.getAttribute('data-time');if(!s[d])s[d]=[];s[d].push(t);});this.closest('form').querySelector('input[name=availability_schedule]').value=JSON.stringify(s);">
+                                        <i class="fa-solid fa-paper-plane"></i> Resubmit Schedule
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+
+                            {% if app.raw_status == 'documents_requested' %}
+                            <!-- Document Resubmission -->
+                            <div style="margin-top:1rem; padding:1rem; border:1px solid #f59e0b; border-radius:8px; background:rgba(245,158,11,0.08);">
+                                <h6 style="color:#f59e0b; margin-bottom:0.5rem;"><i class="fa-solid fa-file-circle-question"></i> Documents Requested — Resubmission Required</h6>
+                                {% if app.requested_documents_note %}
+                                <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:0.75rem;"><strong>Staff Note:</strong> {{ app.requested_documents_note }}</p>
+                                {% endif %}
+                                <p style="font-size:0.82rem; color:#cbd5e1; margin-bottom:0.75rem;">Please re-upload the requested documents below. Only upload the files that need to be replaced.</p>
+                                <form method="post" action="{% url 'home:resubmit_documents' app.app_type_key app.obj.pk %}" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.82rem;">
+                                        <div><label class="form-label mb-1">Application Form</label><input type="file" name="application_form" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                                        <div><label class="form-label mb-1">2x2 ID Picture</label><input type="file" name="id_picture" class="form-control form-control-sm" accept="image/*"></div>
+                                        <div><label class="form-label mb-1">Barangay Clearance</label><input type="file" name="barangay_clearance" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                                        <div><label class="form-label mb-1">Parent's ITR</label><input type="file" name="parents_itr" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                                        <div><label class="form-label mb-1">Enrolment Form</label><input type="file" name="enrolment_form" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                                        <div><label class="form-label mb-1">Schedule of Classes</label><input type="file" name="schedule_classes" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                                        <div><label class="form-label mb-1">Proof of Insurance</label><input type="file" name="proof_insurance" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                                        <div><label class="form-label mb-1">Grades Last Sem</label><input type="file" name="grades_last_sem" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-warning text-dark mt-3"><i class="fa-solid fa-upload"></i> Resubmit Documents</button>
+                                </form>
+                            </div>
+                            {% endif %}
+
                         </td>
                     </tr>
                     {% endfor %}
