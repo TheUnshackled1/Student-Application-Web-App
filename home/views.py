@@ -1617,8 +1617,8 @@ def staff_active_sa_list(request):
     # Stats
     total = ActiveStudentAssistant.objects.count()
     active_count = ActiveStudentAssistant.objects.filter(status='active').count()
-    on_leave_count = ActiveStudentAssistant.objects.filter(status='on_leave').count()
     completed_count = ActiveStudentAssistant.objects.filter(status='completed').count()
+    expired_count = ActiveStudentAssistant.objects.filter(status='expired').count()
 
     context = {
         'active_sas': active_sas,
@@ -1626,8 +1626,8 @@ def staff_active_sa_list(request):
         'stats': {
             'total': total,
             'active': active_count,
-            'on_leave': on_leave_count,
             'completed': completed_count,
+            'expired': expired_count,
         },
         'current_status': status_filter,
         'current_office': office_filter,
@@ -1792,8 +1792,8 @@ def director_sa_list(request):
 
     total = ActiveStudentAssistant.objects.count()
     active_count = ActiveStudentAssistant.objects.filter(status='active').count()
-    on_leave_count = ActiveStudentAssistant.objects.filter(status='on_leave').count()
     completed_count = ActiveStudentAssistant.objects.filter(status='completed').count()
+    expired_count = ActiveStudentAssistant.objects.filter(status='expired').count()
 
     context = {
         'active_sas': active_sas,
@@ -1801,8 +1801,8 @@ def director_sa_list(request):
         'stats': {
             'total': total,
             'active': active_count,
-            'on_leave': on_leave_count,
             'completed': completed_count,
+            'expired': expired_count,
         },
         'current_status': status_filter,
         'current_office': office_filter,
