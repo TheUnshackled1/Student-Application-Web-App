@@ -85,7 +85,7 @@
             <p style="font-size:13px; color:#64748b; margin:0;">Sign in to access your dashboard</p>
         </div>
         {% if form.errors %}
-        <div style="background:rgba(220,38,38,0.15); border:1px solid rgba(248,113,113,0.3); border-radius:8px; padding:12px 16px; margin-bottom:20px;">
+        <div style="background:rgba(220,38,38,0.08); border:1px solid rgba(248,113,113,0.3); border-radius:8px; padding:12px 16px; margin-bottom:20px;">
             <p style="font-size:13px; color:#f87171; margin:0; font-weight:600;">
                 <i class="fa-solid fa-circle-exclamation"></i>
                 Invalid username or password. Please try again.
@@ -121,7 +121,7 @@
             </button>
         </form>
         <div style="text-align:center; margin-top:20px;">
-            <a href="{% url 'home:home' %}" style="font-size:13px; color:rgba(255,255,255,0.55); text-decoration:none;">
+            <a href="{% url 'home:home' %}" style="font-size:13px; color:#64748b; text-decoration:none;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Home
             </a>
         </div>
