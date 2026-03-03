@@ -43,4 +43,18 @@ urlpatterns = [
 
     # ---- Director: Move Office Marker ----
     path('director/offices/<int:pk>/move/', views.director_move_office, name='director_move_office'),
+
+    # ---- Staff: Active SA Management ----
+    path('staff/sa/', views.staff_active_sa_list, name='staff_active_sa_list'),
+    path('staff/sa/<int:pk>/', views.staff_sa_detail, name='staff_sa_detail'),
+    path('staff/sa/<int:pk>/attendance/', views.staff_log_attendance, name='staff_log_attendance'),
+    path('staff/sa/<int:pk>/attendance/<int:att_pk>/delete/', views.staff_delete_attendance, name='staff_delete_attendance'),
+    path('staff/sa/<int:pk>/status/', views.staff_update_sa_status, name='staff_update_sa_status'),
+
+    # ---- Director: Active SA Management ----
+    path('director/sa/', views.director_sa_list, name='director_sa_list'),
+    path('director/sa/<int:pk>/', views.director_sa_detail, name='director_sa_detail'),
+    path('director/sa/<int:pk>/attendance/', views.director_log_attendance, name='director_log_attendance'),
+    path('director/sa/<int:pk>/evaluate/', views.director_evaluate_sa, name='director_evaluate_sa'),
+    path('director/sa/<int:pk>/status/', views.director_update_sa_status, name='director_update_sa_status'),
 ]
