@@ -343,7 +343,6 @@
 
             <hr style="margin:16px 0; border-color:rgba(255,255,255,0.10);">
 
-            <!-- Existing Reminders List -->
             {% for r in reminders %}
             <div class="staff-item-row">
                 <div class="staff-item-info">
@@ -364,7 +363,6 @@
                     </form>
                 </div>
             </div>
-            <!-- Inline Edit Form (hidden by default) -->
             <form method="post" action="{% url 'home:staff_edit_reminder' r.pk %}" class="staff-edit-form" id="reminder-edit-{{ r.pk }}" style="display:none;">
                 {% csrf_token %}
                 <textarea name="message" class="form-control mb-1" rows="2">{{ r.message }}</textarea>
@@ -390,12 +388,8 @@
             <p style="font-size:13px; color:#9ca3af; text-align:center;">No reminders yet.</p>
             {% endfor %}
         </div>
-
-        <!-- ===== MANAGE UPCOMING DATES ===== -->
         <div class="card">
             <h3 class="card-title"><i class="fa-regular fa-calendar" style="color:#5eead4;"></i> Important Dates</h3>
-
-            <!-- Add Date Form -->
             <form method="post" action="{% url 'home:staff_add_date' %}" class="staff-mgmt-form">
                 {% csrf_token %}
                 <div class="mb-2">
@@ -421,7 +415,6 @@
 
             <hr style="margin:16px 0; border-color:rgba(255,255,255,0.10);">
 
-            <!-- Existing Dates List -->
             {% for d in upcoming_dates %}
             <div class="staff-item-row">
                 <div class="staff-item-info">
@@ -442,7 +435,6 @@
                     </form>
                 </div>
             </div>
-            <!-- Inline Edit Form -->
             <form method="post" action="{% url 'home:staff_edit_date' d.pk %}" class="staff-edit-form" id="date-edit-{{ d.pk }}" style="display:none;">
                 {% csrf_token %}
                 <input type="text" name="title" class="form-control mb-1" value="{{ d.title }}">
@@ -465,11 +457,9 @@
             {% endfor %}
         </div>
 
-        <!-- ===== MANAGE ANNOUNCEMENTS ===== -->
         <div class="card">
             <h3 class="card-title"><i class="fa-solid fa-bullhorn" style="color:#86efac;"></i> Announcements</h3>
 
-            <!-- Add Announcement Form -->
             <form method="post" action="{% url 'home:staff_add_announcement' %}" enctype="multipart/form-data" class="staff-mgmt-form">
                 {% csrf_token %}
                 <div class="mb-2">
