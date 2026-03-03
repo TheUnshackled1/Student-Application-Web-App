@@ -1,6 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication, Office
+from .models import (
+    Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication,
+    Office, ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
+)
 
 
 # ── Shared file validators ──
@@ -432,3 +435,83 @@ class OfficeForm(forms.ModelForm):
             self.initial.setdefault('hours', 'Mon\u2013Fri, 8:00 AM \u2013 5:00 PM')
             self.initial.setdefault('total_slots', 3)
             self.initial.setdefault('is_active', True)
+
+
+# ================================================================
+#  ACTIVE SA MANAGEMENT FORMS
+# ================================================================
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = AttendanceRecord
+        fields = ['date', 'time_in', 'time_out', 'status', 'remarks']
+        widgets = {
+            'date': forms.DateInput(attrs={
+                'class': 'form-control', 'type': 'date',
+            }),
+            'time_in': forms.TimeInput(attrs={
+                'class': 'form-control', 'type': 'time',
+            }),
+            'time_out': forms.TimeInput(attrs={
+                'class': 'form-control', 'type': 'time',
+            }),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'remarks': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 2,
+                'placeholder': 'Optional remarks...',
+            }),
+        }
+
+
+class PerformanceEvaluationForm(forms.ModelForm):
+    class Meta:
+        model = PerformanceEvaluation
+        fields = [
+            'evaluation_period', 'work_quality', 'punctuality',
+            'initiative', 'cooperation', 'communication', 'remarks',
+        ]
+        widgets = {
+            'evaluation_period': forms.Select(attrs={'class': 'form-select'}),
+            'work_quality': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': '1', 'max': '5',
+            }),
+            'punctuality': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': '1', 'max': '5',
+            }),
+            'initiative': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': '1', 'max': '5',
+            }),
+            'cooperation': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': '1', 'max': '5',
+            }),
+            'communication': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': '1', 'max': '5',
+            }),
+            'remarks': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 3,
+                'placeholder': 'Additional comments or recommendations...',
+            }),
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        for field in ['work_quality', 'punctuality', 'initiative', 'cooperation', 'communication']:
+            val = cleaned.get(field)
+            if val is not None and (val < 1 or val > 5):
+                self.add_error(field, 'Rating must be between 1 and 5.')
+        return cleaned
+
+
+class ActiveSAStatusForm(forms.ModelForm):
+    class Meta:
+        model = ActiveStudentAssistant
+        fields = ['status', 'end_date', 'required_hours']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'end_date': forms.DateInput(attrs={
+                'class': 'form-control', 'type': 'date',
+            }),
+            'required_hours': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': '1',
+            }),
+        }

@@ -9,8 +9,13 @@ from django.utils import timezone
 from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
+    ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
 )
-from .forms import ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm, RenewalApplicationForm, OfficeForm
+from .forms import (
+    ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm,
+    RenewalApplicationForm, OfficeForm, AttendanceForm, PerformanceEvaluationForm,
+    ActiveSAStatusForm,
+)
 from datetime import date as _date, timedelta
 import json
 import base64
@@ -102,6 +107,56 @@ def _validate_uploaded_file(file_field, field_name):
     except Exception:
         pass
     return result
+
+
+def _create_active_sa_from_application(app):
+    """
+    Create an ActiveStudentAssistant record from an approved application.
+    Handles both NewApplication and RenewalApplication.
+    Idempotent — skips if a record already exists.
+    """
+    is_renewal = isinstance(app, RenewalApplication)
+
+    # Check if record already exists
+    if is_renewal:
+        if ActiveStudentAssistant.objects.filter(renewal_application=app).exists():
+            return
+    else:
+        if ActiveStudentAssistant.objects.filter(new_application=app).exists():
+            return
+
+    # Resolve the office FK from the CharField assigned_office
+    office_fk = None
+    if app.assigned_office:
+        office_fk = Office.objects.filter(name=app.assigned_office, is_active=True).first()
+    if not office_fk and app.preferred_office:
+        office_fk = app.preferred_office
+
+    # Build the full_name
+    if is_renewal:
+        full_name = app.full_name
+    else:
+        full_name = f"{app.first_name} {app.middle_initial}. {app.last_name}"
+        if app.extension_name:
+            full_name += f" {app.extension_name}"
+
+    sa = ActiveStudentAssistant(
+        student_id=app.student_id,
+        full_name=full_name,
+        email=app.email,
+        course=app.course,
+        assigned_office=office_fk,
+        semester=app.semester,
+        start_date=app.start_date,
+        status='active',
+    )
+
+    if is_renewal:
+        sa.renewal_application = app
+    else:
+        sa.new_application = app
+
+    sa.save()
 
 
 def _build_documents_from_app(app):
@@ -1157,6 +1212,11 @@ def staff_update_application_status(request, pk):
                 app.assigned_office = app.preferred_office.name
 
         app.save()
+
+        # Auto-create ActiveStudentAssistant record on approval
+        if new_status == 'approved':
+            _create_active_sa_from_application(app)
+
     next_url = request.POST.get('next', '')
     if next_url:
         return redirect(next_url)
@@ -1414,6 +1474,11 @@ def director_update_application_status(request, pk):
                     pass
 
         app.save()
+
+        # Auto-create ActiveStudentAssistant record on approval
+        if new_status == 'approved':
+            _create_active_sa_from_application(app)
+
     next_url = request.POST.get('next', '')
     if next_url:
         return redirect(next_url)
@@ -1515,3 +1580,354 @@ def staff_get_office_json(request, pk):
         'description': office.description,
         'is_active': office.is_active,
     })
+
+
+# ================================================================
+#  ACTIVE SA MANAGEMENT — Staff Views
+# ================================================================
+
+@login_required
+def staff_active_sa_list(request):
+    """List all active student assistants for staff management."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+
+    active_sas = ActiveStudentAssistant.objects.select_related(
+        'assigned_office', 'new_application', 'renewal_application',
+    ).all()
+
+    status_filter = request.GET.get('status', '')
+    office_filter = request.GET.get('office', '')
+    search_q = request.GET.get('q', '')
+
+    if status_filter:
+        active_sas = active_sas.filter(status=status_filter)
+    if office_filter:
+        active_sas = active_sas.filter(assigned_office__pk=office_filter)
+    if search_q:
+        from django.db.models import Q
+        active_sas = active_sas.filter(
+            Q(full_name__icontains=search_q) |
+            Q(student_id__icontains=search_q) |
+            Q(email__icontains=search_q)
+        )
+
+    offices = Office.objects.filter(is_active=True).order_by('name')
+
+    # Stats
+    total = ActiveStudentAssistant.objects.count()
+    active_count = ActiveStudentAssistant.objects.filter(status='active').count()
+    on_leave_count = ActiveStudentAssistant.objects.filter(status='on_leave').count()
+    completed_count = ActiveStudentAssistant.objects.filter(status='completed').count()
+
+    context = {
+        'active_sas': active_sas,
+        'offices': offices,
+        'stats': {
+            'total': total,
+            'active': active_count,
+            'on_leave': on_leave_count,
+            'completed': completed_count,
+        },
+        'current_status': status_filter,
+        'current_office': office_filter,
+        'search_q': search_q,
+        'staff_name': request.user.get_full_name() or request.user.username,
+    }
+    return render(request, 'staff/active_sa_list.html', context)
+
+
+@login_required
+def staff_sa_detail(request, pk):
+    """View details of a single active SA — attendance history, evaluations, etc."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+
+    sa = get_object_or_404(
+        ActiveStudentAssistant.objects.select_related('assigned_office'),
+        pk=pk,
+    )
+    attendance = sa.attendance_records.all()
+    evaluations = sa.evaluations.all()
+
+    # Attendance summary
+    from django.db.models import Sum, Count
+    from decimal import Decimal
+    total_days = attendance.count()
+    present_days = attendance.filter(status='present').count()
+    late_days = attendance.filter(status='late').count()
+    absent_days = attendance.filter(status='absent').count()
+    excused_days = attendance.filter(status='excused').count()
+
+    # Recalculate total hours from records
+    total_hours = Decimal('0')
+    for rec in attendance:
+        total_hours += Decimal(str(rec.hours_worked))
+    # Update cached total_hours
+    if sa.total_hours != total_hours:
+        sa.total_hours = total_hours
+        sa.save(update_fields=['total_hours'])
+
+    attendance_form = AttendanceForm(initial={'date': _date.today()})
+    evaluation_form = PerformanceEvaluationForm()
+    status_form = ActiveSAStatusForm(instance=sa)
+
+    context = {
+        'sa': sa,
+        'attendance': attendance[:30],  # Last 30 records
+        'evaluations': evaluations,
+        'attendance_summary': {
+            'total_days': total_days,
+            'present': present_days,
+            'late': late_days,
+            'absent': absent_days,
+            'excused': excused_days,
+        },
+        'attendance_form': attendance_form,
+        'evaluation_form': evaluation_form,
+        'status_form': status_form,
+        'staff_name': request.user.get_full_name() or request.user.username,
+    }
+    return render(request, 'staff/sa_detail.html', context)
+
+
+@login_required
+@require_POST
+def staff_log_attendance(request, pk):
+    """Log an attendance record for an active SA."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk)
+    form = AttendanceForm(request.POST)
+    if form.is_valid():
+        record = form.save(commit=False)
+        record.student_assistant = sa
+        record.logged_by = request.user
+        record.save()
+
+        # Update cached total_hours
+        from decimal import Decimal
+        sa.total_hours += Decimal(str(record.hours_worked))
+        sa.save(update_fields=['total_hours'])
+
+        messages.success(request, f'Attendance logged for {sa.full_name}.')
+    else:
+        error_list = '; '.join(
+            f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()
+        )
+        messages.error(request, f'Failed to log attendance: {error_list}')
+
+    return redirect('home:staff_sa_detail', pk=pk)
+
+
+@login_required
+@require_POST
+def staff_delete_attendance(request, sa_pk, att_pk):
+    """Delete an attendance record."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+
+    record = get_object_or_404(AttendanceRecord, pk=att_pk, student_assistant__pk=sa_pk)
+    sa = record.student_assistant
+
+    # Subtract hours before deleting
+    from decimal import Decimal
+    sa.total_hours = max(Decimal('0'), sa.total_hours - Decimal(str(record.hours_worked)))
+    sa.save(update_fields=['total_hours'])
+
+    record.delete()
+    messages.success(request, 'Attendance record deleted.')
+    return redirect('home:staff_sa_detail', pk=sa_pk)
+
+
+@login_required
+@require_POST
+def staff_update_sa_status(request, pk):
+    """Update the status/settings of an active SA."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk)
+    form = ActiveSAStatusForm(request.POST, instance=sa)
+    if form.is_valid():
+        form.save()
+        messages.success(request, f'Status updated for {sa.full_name}.')
+    else:
+        messages.error(request, 'Failed to update SA status.')
+    return redirect('home:staff_sa_detail', pk=pk)
+
+
+# ================================================================
+#  ACTIVE SA MANAGEMENT — Director Views
+# ================================================================
+
+@login_required
+def director_sa_list(request):
+    """Director's view of all active SAs."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    active_sas = ActiveStudentAssistant.objects.select_related(
+        'assigned_office', 'new_application', 'renewal_application',
+    ).all()
+
+    status_filter = request.GET.get('status', '')
+    office_filter = request.GET.get('office', '')
+    search_q = request.GET.get('q', '')
+
+    if status_filter:
+        active_sas = active_sas.filter(status=status_filter)
+    if office_filter:
+        active_sas = active_sas.filter(assigned_office__pk=office_filter)
+    if search_q:
+        from django.db.models import Q
+        active_sas = active_sas.filter(
+            Q(full_name__icontains=search_q) |
+            Q(student_id__icontains=search_q) |
+            Q(email__icontains=search_q)
+        )
+
+    offices = Office.objects.filter(is_active=True).order_by('name')
+
+    total = ActiveStudentAssistant.objects.count()
+    active_count = ActiveStudentAssistant.objects.filter(status='active').count()
+    on_leave_count = ActiveStudentAssistant.objects.filter(status='on_leave').count()
+    completed_count = ActiveStudentAssistant.objects.filter(status='completed').count()
+
+    context = {
+        'active_sas': active_sas,
+        'offices': offices,
+        'stats': {
+            'total': total,
+            'active': active_count,
+            'on_leave': on_leave_count,
+            'completed': completed_count,
+        },
+        'current_status': status_filter,
+        'current_office': office_filter,
+        'search_q': search_q,
+        'director_name': request.user.get_full_name() or 'Director',
+    }
+    return render(request, 'director/active_sa_list.html', context)
+
+
+@login_required
+def director_sa_detail(request, pk):
+    """Director's detailed view of an active SA with evaluation capabilities."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    sa = get_object_or_404(
+        ActiveStudentAssistant.objects.select_related('assigned_office'),
+        pk=pk,
+    )
+    attendance = sa.attendance_records.all()
+    evaluations = sa.evaluations.all()
+
+    from decimal import Decimal
+    total_days = attendance.count()
+    present_days = attendance.filter(status='present').count()
+    late_days = attendance.filter(status='late').count()
+    absent_days = attendance.filter(status='absent').count()
+    excused_days = attendance.filter(status='excused').count()
+
+    # Recalculate total hours
+    total_hours = Decimal('0')
+    for rec in attendance:
+        total_hours += Decimal(str(rec.hours_worked))
+    if sa.total_hours != total_hours:
+        sa.total_hours = total_hours
+        sa.save(update_fields=['total_hours'])
+
+    attendance_form = AttendanceForm(initial={'date': _date.today()})
+    evaluation_form = PerformanceEvaluationForm()
+    status_form = ActiveSAStatusForm(instance=sa)
+
+    context = {
+        'sa': sa,
+        'attendance': attendance[:30],
+        'evaluations': evaluations,
+        'attendance_summary': {
+            'total_days': total_days,
+            'present': present_days,
+            'late': late_days,
+            'absent': absent_days,
+            'excused': excused_days,
+        },
+        'attendance_form': attendance_form,
+        'evaluation_form': evaluation_form,
+        'status_form': status_form,
+        'director_name': request.user.get_full_name() or 'Director',
+    }
+    return render(request, 'director/sa_detail.html', context)
+
+
+@login_required
+@require_POST
+def director_log_attendance(request, pk):
+    """Director can also log attendance."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk)
+    form = AttendanceForm(request.POST)
+    if form.is_valid():
+        record = form.save(commit=False)
+        record.student_assistant = sa
+        record.logged_by = request.user
+        record.save()
+
+        from decimal import Decimal
+        sa.total_hours += Decimal(str(record.hours_worked))
+        sa.save(update_fields=['total_hours'])
+
+        messages.success(request, f'Attendance logged for {sa.full_name}.')
+    else:
+        error_list = '; '.join(
+            f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()
+        )
+        messages.error(request, f'Failed to log attendance: {error_list}')
+
+    return redirect('home:director_sa_detail', pk=pk)
+
+
+@login_required
+@require_POST
+def director_evaluate_sa(request, pk):
+    """Submit a performance evaluation for an active SA."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk)
+    form = PerformanceEvaluationForm(request.POST)
+    if form.is_valid():
+        evaluation = form.save(commit=False)
+        evaluation.student_assistant = sa
+        evaluation.evaluated_by = request.user
+        evaluation.save()
+        messages.success(request, f'Evaluation submitted for {sa.full_name}.')
+    else:
+        error_list = '; '.join(
+            f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()
+        )
+        messages.error(request, f'Failed to submit evaluation: {error_list}')
+
+    return redirect('home:director_sa_detail', pk=pk)
+
+
+@login_required
+@require_POST
+def director_update_sa_status(request, pk):
+    """Director updates the status/settings of an active SA."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk)
+    form = ActiveSAStatusForm(request.POST, instance=sa)
+    if form.is_valid():
+        form.save()
+        messages.success(request, f'Status updated for {sa.full_name}.')
+    else:
+        messages.error(request, 'Failed to update SA status.')
+    return redirect('home:director_sa_detail', pk=pk)
