@@ -499,7 +499,6 @@
 
             <hr style="margin:16px 0; border-color:rgba(255,255,255,0.10);">
 
-            <!-- Existing Announcements List -->
             {% for a in announcements %}
             <div class="staff-item-row">
                 <div class="staff-item-info">
@@ -520,7 +519,6 @@
                     </form>
                 </div>
             </div>
-            <!-- Inline Edit Form -->
             <form method="post" action="{% url 'home:staff_edit_announcement' a.pk %}" enctype="multipart/form-data" class="staff-edit-form" id="ann-edit-{{ a.pk }}" style="display:none;">
                 {% csrf_token %}
                 <input type="text" name="title" class="form-control mb-1" value="{{ a.title }}">
@@ -558,8 +556,6 @@
         </div>
 
     </div>
-
-    <!-- ========== EXPIRED CONTENT TABLE ========== -->
     {% if expired_reminders or expired_dates or expired_announcements %}
     <div class="staff-panel expired-content-section">
         <div class="panel-header" style="margin-bottom: 16px;">
@@ -646,8 +642,8 @@
             <img id="staffCapturedImage" alt="Captured photo">
         </div>
         <p class="camera-status" id="staffCameraStatus">Starting camera...</p>
-      </div>
-      <div class="modal-footer camera-modal-footer">
+    </div>
+    <div class="modal-footer camera-modal-footer">
         <button type="button" class="btn-form btn-form--cancel" data-bs-dismiss="modal">
             <i class="fa-solid fa-xmark"></i> Cancel
         </button>
@@ -660,12 +656,11 @@
         <button type="button" class="btn-form btn-form--submit" id="staffBtnUsePhoto" style="display:none;" onclick="staffUsePhoto()">
             <i class="fa-solid fa-check"></i> Use Photo
         </button>
-      </div>
     </div>
-  </div>
+    </div>
+</div>
 </div>
 
-<!-- ========== STUDENT DETAIL MODAL ========== -->
 <div class="modal fade" id="studentDetailModal" tabindex="-1" aria-labelledby="studentDetailModalLabel" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content camera-modal-card">
@@ -677,7 +672,6 @@
     </div>
     <div class="modal-body" style="padding:24px;color:#e2e8f0;">
 
-        <!-- Status badge -->
         <div class="text-center mb-3">
         <span class="staff-status-pill" id="sdStatus" style="font-size:13px;padding:6px 18px;"></span>
         </div>
