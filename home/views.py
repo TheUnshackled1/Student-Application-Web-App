@@ -1206,7 +1206,7 @@ def staff_review_application(request, pk):
         'day_choices': DAY_CHOICES,
         'time_slot_choices': TIME_SLOT_CHOICES,
         'schedule_grid': schedule_grid,
-        'notes_log': app.notes_log.all(),
+        'notes_log': app.notes_log.exclude(note_type='status_change'),
     }
     return render(request, 'staff/review_application.html', context)
 
@@ -1282,16 +1282,6 @@ def staff_update_application_status(request, pk):
             if new_status == 'interview_scheduled' and app.interview_date:
                 extra = f'Interview date: {app.interview_date.strftime("%B %d, %Y — %I:%M %p")}'
             send_status_update_email(app, old_status, new_status, extra)
-
-        # Log status change
-        status_labels = dict(NewApplication.STATUS_CHOICES)
-        old_label = status_labels.get(old_status, old_status)
-        new_label = status_labels.get(new_status, new_status)
-        ApplicationNote.objects.create(
-            new_application=app, author=request.user,
-            note_type='status_change',
-            content=f'Status changed from {old_label} to {new_label}',
-        )
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
@@ -1513,10 +1503,10 @@ def director_review_application(request, pk):
             row['cells'].append(d_val in availability and ts_val in availability.get(d_val, []))
         schedule_grid.append(row)
 
-    # Notes log
+    # Notes log (exclude auto-generated status-change entries)
     notes_log = ApplicationNote.objects.filter(
         new_application=app
-    ).select_related('author').order_by('-created_at')
+    ).exclude(note_type='status_change').select_related('author').order_by('-created_at')
 
     context = {
         'app': app,
@@ -1592,16 +1582,6 @@ def director_update_application_status(request, pk):
             if new_status == 'interview_scheduled' and app.interview_date:
                 extra = f'Interview date: {app.interview_date.strftime("%B %d, %Y — %I:%M %p")}'
             send_status_update_email(app, old_status, new_status, extra)
-
-        # Log status change
-        status_labels = dict(NewApplication.STATUS_CHOICES)
-        old_label = status_labels.get(old_status, old_status)
-        new_label = status_labels.get(new_status, new_status)
-        ApplicationNote.objects.create(
-            new_application=app, author=request.user,
-            note_type='status_change',
-            content=f'Status changed from {old_label} to {new_label}',
-        )
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
