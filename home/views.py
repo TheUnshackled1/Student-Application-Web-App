@@ -1284,10 +1284,13 @@ def staff_update_application_status(request, pk):
             send_status_update_email(app, old_status, new_status, extra)
 
         # Log status change
+        status_labels = dict(NewApplication.STATUS_CHOICES)
+        old_label = status_labels.get(old_status, old_status)
+        new_label = status_labels.get(new_status, new_status)
         ApplicationNote.objects.create(
             new_application=app, author=request.user,
             note_type='status_change',
-            content=f'Status changed from {old_status} to {new_status}',
+            content=f'Status changed from {old_label} to {new_label}',
         )
 
         # Auto-create ActiveStudentAssistant record on approval
@@ -1591,10 +1594,13 @@ def director_update_application_status(request, pk):
             send_status_update_email(app, old_status, new_status, extra)
 
         # Log status change
+        status_labels = dict(NewApplication.STATUS_CHOICES)
+        old_label = status_labels.get(old_status, old_status)
+        new_label = status_labels.get(new_status, new_status)
         ApplicationNote.objects.create(
             new_application=app, author=request.user,
             note_type='status_change',
-            content=f'Status changed from {old_status} to {new_status}',
+            content=f'Status changed from {old_label} to {new_label}',
         )
 
         # Auto-create ActiveStudentAssistant record on approval
