@@ -6129,12 +6129,15 @@ button.review-doc-link:hover {
   overflow: hidden;
   margin-bottom: 18px;
   border: 1px solid rgba(255,255,255,0.06);
+  height: 300px;
+  background: #0f172a;
 }
 .content-popup-image img {
   width: 100%;
+  height: 100%;
   display: block;
-  max-height: 260px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 /* Date detail inside popup */
