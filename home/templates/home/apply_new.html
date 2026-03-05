@@ -118,19 +118,19 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="first_name" maxlength="15" placeholder="Juan" required>
+                            <input type="text" class="form-control" name="first_name" maxlength="15" placeholder="Juan" value="{{ form.first_name.value|default:'' }}" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">M.I. <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control text-center" name="middle_initial" maxlength="1" placeholder="A" required>
+                            <input type="text" class="form-control text-center" name="middle_initial" maxlength="1" placeholder="A" value="{{ form.middle_initial.value|default:'' }}" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="last_name" maxlength="10" placeholder="Dela Cruz" required>
+                            <input type="text" class="form-control" name="last_name" maxlength="10" placeholder="Dela Cruz" value="{{ form.last_name.value|default:'' }}" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Ext.</label>
-                            <input type="text" class="form-control text-center" name="extension_name" maxlength="5" placeholder="Jr">
+                            <input type="text" class="form-control text-center" name="extension_name" maxlength="5" placeholder="Jr" value="{{ form.extension_name.value|default:'' }}">
                         </div>
                     </div>
                 </div>
@@ -139,29 +139,29 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="date_of_birth" id="id_date_of_birth" required>
+                            <input type="date" class="form-control" name="date_of_birth" id="id_date_of_birth" value="{{ form.date_of_birth.value|default:'' }}" required>
                             <small class="form-text" id="dobAgeDisplay" style="color: rgba(255,255,255,0.55); margin-top: 4px;"></small>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
                             <select class="form-select gender-select" name="gender" required onchange="updateGenderColor(this)">
-                                <option value="" selected disabled>Select gender</option>
-                                <option value="male" data-color="#3b82f6">Male</option>
-                                <option value="female" data-color="#ec4899">Female</option>
+                                <option value="" {% if not form.gender.value %}selected{% endif %} disabled>Select gender</option>
+                                <option value="male" data-color="#3b82f6" {% if form.gender.value == 'male' %}selected{% endif %}>Male</option>
+                                <option value="female" data-color="#ec4899" {% if form.gender.value == 'female' %}selected{% endif %}>Female</option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Contact Number <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-mobile-screen-button"></i>
-                                <input type="text" class="form-control" name="contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" required>
+                                <input type="text" class="form-control" name="contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" value="{{ form.contact_number.value|default:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-at"></i>
-                                <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
+                                <input type="email" class="form-control" name="email" placeholder="name@example.com" value="{{ form.email.value|default:'' }}" required>
                             </div>
                         </div>
                     </div>
@@ -172,7 +172,7 @@
                         <div class="col-12">
                             <label class="form-label">Complete Address <span class="text-danger">*</span></label>
                             <div class="applyform-address-wrap">
-                                <textarea class="form-control" name="address" id="id_address" rows="2" placeholder="Street, Barangay, City / Municipality, Province" required></textarea>
+                                <textarea class="form-control" name="address" id="id_address" rows="2" placeholder="Street, Barangay, City / Municipality, Province" required>{{ form.address.value|default:'' }}</textarea>
                                 <button type="button" class="applyform-detect-btn" id="btnDetectAddress" onclick="detectAddress()">
                                     <i class="fa-solid fa-location-crosshairs"></i>
                                     <span>Detect Location</span>
@@ -198,7 +198,7 @@
                             <label class="form-label">Student ID <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-id-badge"></i>
-                                <input type="text" class="form-control" name="student_id" id="id_student_id_new" maxlength="8" inputmode="numeric" pattern="\d{1,8}" placeholder="12345678" title="Must be up to 8 digits" required>
+                                <input type="text" class="form-control" name="student_id" id="id_student_id_new" maxlength="8" minlength="8" inputmode="numeric" pattern="\d{8}" placeholder="12345678" title="Must be exactly 8 digits" value="{{ form.student_id.value|default:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-4">
