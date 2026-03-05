@@ -204,31 +204,31 @@
                         <div class="col-md-4">
                             <label class="form-label">Course / Program <span class="text-danger">*</span></label>
                             <select class="form-select course-select" name="course" id="id_course_new" required onchange="updateCourseColor(this)">
-                                <option value="" selected disabled>Select college / program</option>
-                                <option value="CAS" data-color="#22c55e">CAS — College of Arts and Sciences</option>
-                                <option value="CBMA" data-color="#eab308">CBMA — College of Business Management and Accountancy</option>
-                                <option value="CCS" data-color="#94a3b8">CCS — College of Computer Studies</option>
-                                <option value="COEd" data-color="#3b82f6">COEd — College of Education</option>
-                                <option value="CIT" data-color="#ef4444">CIT — College of Industrial Technology</option>
-                                <option value="COE" data-color="#f97316">COE — College of Engineering</option>
+                                <option value="" {% if not form.course.value %}selected{% endif %} disabled>Select college / program</option>
+                                <option value="CAS" data-color="#22c55e" {% if form.course.value == 'CAS' %}selected{% endif %}>CAS — College of Arts and Sciences</option>
+                                <option value="CBMA" data-color="#eab308" {% if form.course.value == 'CBMA' %}selected{% endif %}>CBMA — College of Business Management and Accountancy</option>
+                                <option value="CCS" data-color="#94a3b8" {% if form.course.value == 'CCS' %}selected{% endif %}>CCS — College of Computer Studies</option>
+                                <option value="COEd" data-color="#3b82f6" {% if form.course.value == 'COEd' %}selected{% endif %}>COEd — College of Education</option>
+                                <option value="CIT" data-color="#ef4444" {% if form.course.value == 'CIT' %}selected{% endif %}>CIT — College of Industrial Technology</option>
+                                <option value="COE" data-color="#f97316" {% if form.course.value == 'COE' %}selected{% endif %}>COE — College of Engineering</option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Year Level <span class="text-danger">*</span></label>
                             <select class="form-select year-select" name="year_level" id="id_year_level" required onchange="updateSelectColor(this)">
-                                <option value="" selected disabled>Select year</option>
-                                <option value="1" data-color="#94a3b8">1st Year</option>
-                                <option value="2" data-color="#22d3ee">2nd Year</option>
-                                <option value="3" data-color="#a78bfa">3rd Year</option>
-                                <option value="4" data-color="#fbbf24">4th Year</option>
+                                <option value="" {% if not form.year_level.value %}selected{% endif %} disabled>Select year</option>
+                                <option value="1" data-color="#94a3b8" {% if form.year_level.value == '1' %}selected{% endif %}>1st Year</option>
+                                <option value="2" data-color="#22d3ee" {% if form.year_level.value == '2' %}selected{% endif %}>2nd Year</option>
+                                <option value="3" data-color="#a78bfa" {% if form.year_level.value == '3' %}selected{% endif %}>3rd Year</option>
+                                <option value="4" data-color="#fbbf24" {% if form.year_level.value == '4' %}selected{% endif %}>4th Year</option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Semester <span class="text-danger">*</span></label>
                             <select class="form-select semester-select" name="semester" id="id_semester" required onchange="updateSelectColor(this)">
-                                <option value="" selected disabled>Select semester</option>
-                                <option value="1st" data-color="#34d399">1st Semester</option>
-                                <option value="2nd" data-color="#f472b6">2nd Semester</option>
+                                <option value="" {% if not form.semester.value %}selected{% endif %} disabled>Select semester</option>
+                                <option value="1st" data-color="#34d399" {% if form.semester.value == '1st' %}selected{% endif %}>1st Semester</option>
+                                <option value="2nd" data-color="#f472b6" {% if form.semester.value == '2nd' %}selected{% endif %}>2nd Semester</option>
                             </select>
                         </div>
                     </div>
@@ -238,9 +238,10 @@
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-building"></i>
                                 <select class="form-select office-select" name="preferred_office" id="id_preferred_office" required onchange="updateSelectColor(this)">
-                                    <option value="" selected disabled>Select available office</option>
+                                    <option value="" {% if not form.preferred_office.value %}selected{% endif %} disabled>Select available office</option>
                                     {% for office in available_offices %}
                                     <option value="{{ office.id }}" data-color="#22d3ee"
+                                        {% if form.preferred_office.value|stringformat:'s' == office.id|stringformat:'s' %}selected{% endif %}
                                         {% if office.available == 0 %}disabled{% endif %}>
                                         {{ office.name }}{% if office.available == 0 %} (Full){% else %} — {{ office.available }} slot{{ office.available|pluralize }} available{% endif %}
                                     </option>
@@ -457,7 +458,7 @@
                     </tbody>
                 </table>
                 </div>
-                <input type="hidden" name="availability_schedule" id="id_availability_schedule">
+                <input type="hidden" name="availability_schedule" id="id_availability_schedule" value="{{ form.availability_schedule.value|default:'' }}">
             </div>
 
                 <div class="applyform-submit-info">
@@ -977,6 +978,20 @@
         var form = document.getElementById('applyNewForm');
         var hidden = document.getElementById('id_availability_schedule');
         if (!form || !hidden) return;
+
+        // Restore checkboxes from saved form data on validation error
+        if (hidden.value) {
+            try {
+                var saved = JSON.parse(hidden.value);
+                Object.keys(saved).forEach(function(day) {
+                    saved[day].forEach(function(time) {
+                        var cb = document.querySelector('.avail-cb[data-day="' + day + '"][data-time="' + time + '"]');
+                        if (cb) cb.checked = true;
+                    });
+                });
+            } catch(e) {}
+        }
+
         form.addEventListener('submit', function() {
             var schedule = {};
             document.querySelectorAll('.avail-cb:checked').forEach(function(cb) {
