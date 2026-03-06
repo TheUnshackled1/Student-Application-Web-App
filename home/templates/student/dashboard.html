@@ -1,0 +1,306 @@
+{% load static %}
+{% load app_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard — CHMSU</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'home/css/style.css' %}?v=7">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-left d-flex align-items-center gap-2">
+        <div class="logo">
+            <div class="logo-circle">
+                <span class="logo-text">CHMSU</span>
+            </div>
+        </div>
+        <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--link">
+            <i class="fa-solid fa-house"></i>
+            <span>HOME</span>
+        </a>
+        <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link">
+            <i class="fa-solid fa-building"></i>
+            <span>OFFICES</span>
+        </a>
+        <button class="navbar-toggle" id="navToggle"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="navbar-right d-flex align-items-center gap-2" id="navMenu">
+        <div class="mobile-nav-links">
+            <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-house"></i><span>HOME</span></a>
+            <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-building"></i><span>OFFICES</span></a>
+        </div>
+        <form method="post" action="{% url 'logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-nav btn-nav--link" style="border:none; cursor:pointer;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </button>
+        </form>
+    </div>
+</nav>
+
+<main class="main-content">
+
+    <!-- ── Banner ── -->
+    <div class="status-banner">
+        <div class="status-banner-bg"></div>
+        <div class="status-banner-content">
+            <div class="status-icon-wrap">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="status-text">
+                <h2 class="status-title">Welcome, {{ profile.full_name }}</h2>
+                <p class="status-message">Student ID: {{ profile.student_id }} &mdash; Your application dashboard</p>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ── Quick Actions ── -->
+    <div class="container mt-4">
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <a href="{% url 'home:apply_new' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+                <i class="fa-solid fa-file-circle-plus me-1"></i> New Application
+            </a>
+            <a href="{% url 'home:apply_renew' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">
+                <i class="fa-solid fa-arrows-rotate me-1"></i> Renewal Application
+            </a>
+        </div>
+    </div>
+
+    <!-- ── Applications Section ── -->
+    {% if applications %}
+    <div class="container mb-4">
+        <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-lines me-2"></i>My Applications</h4>
+
+        {% for app_card in applications %}
+        <div class="card mb-3" style="border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                    <div>
+                        <span class="badge {% if app_card.app_type_key == 'new' %}bg-primary{% else %}bg-info text-dark{% endif %} mb-1">{{ app_card.app_type }}</span>
+                        <h5 class="mb-0 fw-bold">{{ app_card.student_name }}</h5>
+                        <small class="text-muted">Submitted {{ app_card.submitted_at|date:"M d, Y" }}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge
+                            {% if app_card.raw_status == 'approved' %}bg-success
+                            {% elif app_card.raw_status == 'rejected' %}bg-danger
+                            {% elif app_card.raw_status == 'pending' %}bg-warning text-dark
+                            {% else %}bg-secondary{% endif %}
+                            " style="font-size:.85rem;">{{ app_card.application_status }}</span>
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-2">{{ app_card.status_message }}</p>
+
+                <!-- Progress -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Progress</span>
+                        <span>{{ app_card.completed_steps }}/{{ app_card.total_steps }} steps</span>
+                    </div>
+                    <div class="progress" style="height:8px; border-radius:4px;">
+                        <div class="progress-bar" role="progressbar" style="width:{{ app_card.progress_percent }}%; background:linear-gradient(90deg,#6366f1,#4f46e5);"></div>
+                    </div>
+                </div>
+
+                <!-- Documents summary -->
+                <div class="d-flex gap-3 small text-muted mb-2">
+                    <span><i class="fa-solid fa-file-check me-1"></i>{{ app_card.completed_docs }}/{{ app_card.total_docs }} docs uploaded</span>
+                    {% if app_card.pending_docs > 0 %}
+                    <span class="text-warning"><i class="fa-solid fa-triangle-exclamation me-1"></i>{{ app_card.pending_docs }} missing</span>
+                    {% endif %}
+                </div>
+
+                <!-- Schedule mismatch alert -->
+                {% if app_card.schedule_mismatch_note %}
+                <div class="alert alert-warning py-2 px-3 small mb-2">
+                    <i class="fa-solid fa-calendar-xmark me-1"></i>
+                    <strong>Schedule Mismatch:</strong> {{ app_card.schedule_mismatch_note }}
+                    <br>
+                    <a href="{% url 'home:resubmit_schedule' app_card.app_type_key app_card.obj.pk %}" class="fw-semibold">Resubmit Schedule</a>
+                </div>
+                {% endif %}
+
+                <!-- Document request alert -->
+                {% if app_card.requested_documents_note %}
+                <div class="alert alert-info py-2 px-3 small mb-2">
+                    <i class="fa-solid fa-file-circle-question me-1"></i>
+                    <strong>Documents Requested:</strong> {{ app_card.requested_documents_note }}
+                    <br>
+                    <a href="{% url 'home:resubmit_documents' app_card.app_type_key app_card.obj.pk %}" class="fw-semibold">Upload Documents</a>
+                </div>
+                {% endif %}
+
+                <!-- Interview date -->
+                {% if app_card.obj.interview_date %}
+                <div class="small">
+                    <i class="fa-solid fa-calendar-check me-1 text-primary"></i>
+                    <strong>Interview:</strong> {{ app_card.obj.interview_date|date:"M d, Y — g:i A" }}
+                </div>
+                {% endif %}
+
+                <!-- Approval info -->
+                {% if app_card.raw_status == 'approved' and app_card.obj.start_date %}
+                <div class="alert alert-success py-2 px-3 small mt-2 mb-0">
+                    <i class="fa-solid fa-circle-check me-1"></i>
+                    <strong>Start Date:</strong> {{ app_card.obj.start_date|date:"M d, Y" }}
+                    {% if app_card.obj.assigned_office %} &mdash; Office: {{ app_card.obj.assigned_office }}{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="container mb-4">
+        <div class="card p-4 text-center" style="border-radius:12px;">
+            <i class="fa-solid fa-file-circle-plus fa-3x text-muted mb-3"></i>
+            <h5 class="fw-bold">No Applications Yet</h5>
+            <p class="text-muted">Submit your first application to get started.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Active SA / Duty Section ── -->
+    {% for item in sa_data %}
+    <div class="container mb-4">
+        <h4 class="fw-bold mb-3"><i class="fa-solid fa-id-badge me-2"></i>Active Duty — {{ item.sa.assigned_office.name|default:"Unassigned" }}</h4>
+
+        <div class="card" style="border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06);">
+            <div class="card-body">
+                <!-- Duty period info -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3 col-6">
+                        <div class="text-muted small">Status</div>
+                        <span class="badge {% if item.sa.status == 'active' %}bg-success{% elif item.sa.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %}">{{ item.sa.get_status_display }}</span>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="text-muted small">Start Date</div>
+                        <strong>{{ item.sa.start_date|date:"M d, Y"|default:"—" }}</strong>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="text-muted small">End Date</div>
+                        <strong>{{ item.sa.end_date|date:"M d, Y"|default:"—" }}</strong>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="text-muted small">Remaining Weekdays</div>
+                        <strong>{{ item.remaining_days }}</strong>
+                    </div>
+                </div>
+
+                <!-- Hours progress -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Hours Rendered</span>
+                        <span>{{ item.sa.total_hours }}/{{ item.sa.required_hours }} hrs ({{ item.sa.hours_percentage }}%)</span>
+                    </div>
+                    <div class="progress" style="height:8px; border-radius:4px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width:{{ item.sa.hours_percentage }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- No-Duty Days -->
+                {% if item.no_duty_days %}
+                <div class="mb-3">
+                    <h6 class="fw-semibold"><i class="fa-solid fa-calendar-xmark me-1 text-danger"></i>Upcoming No-Duty Days</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0" style="font-size:.85rem;">
+                            <thead><tr><th>Date</th><th>Reason</th></tr></thead>
+                            <tbody>
+                            {% for ndd in item.no_duty_days %}
+                            <tr>
+                                <td>{{ ndd.date|date:"M d, Y" }}</td>
+                                <td>{{ ndd.reason }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Recent Attendance -->
+                {% if item.attendance %}
+                <div class="mb-3">
+                    <h6 class="fw-semibold"><i class="fa-solid fa-clock me-1"></i>Recent Attendance</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0" style="font-size:.85rem;">
+                            <thead><tr><th>Date</th><th>In</th><th>Out</th><th>Status</th><th>Hours</th></tr></thead>
+                            <tbody>
+                            {% for rec in item.attendance %}
+                            <tr>
+                                <td>{{ rec.date|date:"M d" }}</td>
+                                <td>{{ rec.time_in|time:"g:i A"|default:"—" }}</td>
+                                <td>{{ rec.time_out|time:"g:i A"|default:"—" }}</td>
+                                <td>
+                                    <span class="badge {% if rec.status == 'present' %}bg-success{% elif rec.status == 'late' %}bg-warning text-dark{% elif rec.status == 'absent' %}bg-danger{% else %}bg-secondary{% endif %}" style="font-size:.75rem;">
+                                        {{ rec.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ rec.hours_worked }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Evaluations -->
+                {% if item.evaluations %}
+                <div>
+                    <h6 class="fw-semibold"><i class="fa-solid fa-star me-1"></i>Performance Evaluations</h6>
+                    {% for ev in item.evaluations %}
+                    <div class="border rounded p-2 mb-2" style="font-size:.85rem;">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ ev.get_evaluation_period_display }}</strong>
+                            <span class="badge bg-primary">{{ ev.overall_rating }}/5.00</span>
+                        </div>
+                        <div class="text-muted small mt-1">
+                            Quality: {{ ev.work_quality }} | Punctuality: {{ ev.punctuality }} |
+                            Initiative: {{ ev.initiative }} | Cooperation: {{ ev.cooperation }} |
+                            Communication: {{ ev.communication }}
+                        </div>
+                        {% if ev.remarks %}<div class="small mt-1"><em>{{ ev.remarks }}</em></div>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var toggle = document.getElementById('navToggle');
+    var menu = document.getElementById('navMenu');
+    if(toggle && menu){
+        toggle.addEventListener('click', function(){ menu.classList.toggle('open'); });
+    }
+});
+</script>
+</body>
+</html>
