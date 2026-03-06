@@ -2585,7 +2585,8 @@ def student_dashboard(request):
         ph_now = timezone.localtime()
         day_name = ph_now.strftime('%A')
         now_time = ph_now.time()
-        today_shifts_labels = (sa.duty_schedule or {}).get(day_name, [])
+        raw_slots = (sa.duty_schedule or {}).get(day_name, [])
+        today_shifts_labels = _merge_consecutive_slots(raw_slots)
         today_records = {r.shift: r for r in sa.attendance_records.filter(date=today)}
 
         # Build per-shift status for the template
@@ -2729,13 +2730,46 @@ def _parse_slot_times(slot_label):
         return None, None
 
 
+def _fmt_time_no_pad(t):
+    """Format a time as '7:30 AM' (no leading zero on hour)."""
+    return t.strftime('%I:%M %p').lstrip('0')
+
+
+def _merge_consecutive_slots(slot_labels):
+    """Merge consecutive 30-min slots into continuous shifts.
+
+    ['7:30 AM - 8:00 AM', '8:00 AM - 8:30 AM', '8:30 AM - 9:00 AM']
+    → ['7:30 AM - 9:00 AM']
+    """
+    if not slot_labels:
+        return []
+    parsed = []
+    for label in slot_labels:
+        start, end = _parse_slot_times(label)
+        if start and end:
+            parsed.append((start, end))
+    parsed.sort(key=lambda x: (x[0].hour, x[0].minute))
+
+    merged = []
+    cur_start, cur_end = parsed[0]
+    for s, e in parsed[1:]:
+        if s == cur_end:
+            cur_end = e          # consecutive → extend
+        else:
+            merged.append(f'{_fmt_time_no_pad(cur_start)} - {_fmt_time_no_pad(cur_end)}')
+            cur_start, cur_end = s, e
+    merged.append(f'{_fmt_time_no_pad(cur_start)} - {_fmt_time_no_pad(cur_end)}')
+    return merged
+
+
 def _get_today_shifts(sa):
-    """Return list of shift slot labels for today based on the SA's duty_schedule."""
+    """Return list of merged shift labels for today based on the SA's duty_schedule."""
     if not sa.duty_schedule:
         return []
     ph_now = timezone.localtime()
     day_name = ph_now.strftime('%A')  # e.g. 'Monday'
-    return sa.duty_schedule.get(day_name, [])
+    raw_slots = sa.duty_schedule.get(day_name, [])
+    return _merge_consecutive_slots(raw_slots)
 
 
 @login_required
@@ -2756,10 +2790,11 @@ def student_save_duty_schedule(request, pk):
         messages.error(request, 'Please select at least one time slot.')
         return redirect('home:student_dashboard')
 
-    # Validate max 4 hours (4 slots) per day
+    # Validate max 4 hours per day (each slot = 0.5 hrs)
     for day, slots in schedule.items():
-        if len(slots) > 4:
-            messages.error(request, f'Maximum 4 hours per day — {day} has {len(slots)} slots.')
+        day_hours = len(slots) * 0.5
+        if day_hours > 4:
+            messages.error(request, f'Maximum 4 hours per day — {day} has {day_hours:.1f} hours.')
             return redirect('home:student_dashboard')
 
     sa.duty_schedule = schedule
