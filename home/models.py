@@ -28,7 +28,7 @@ class Office(models.Model):
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     student_id = models.CharField(
-        max_length=8, unique=True,
+        max_length=8, unique=True, default='00000000',
         validators=[MinLengthValidator(8), RegexValidator(r'^\d{8}$', 'Student ID must be exactly 8 digits.')],
     )
     full_name = models.CharField(max_length=200)
