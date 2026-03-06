@@ -87,6 +87,10 @@
             </button>
         </form>
         {% else %}
+        <a href="{% url 'home:student_login' %}" class="btn btn-nav btn-nav--student">
+            <i class="fa-solid fa-user-graduate"></i>
+            <span>Log in as Student</span>
+        </a>
         <a href="{% url 'home:staff_login' %}" class="btn btn-nav btn-nav--staff">
             <i class="fa-solid fa-user-tie"></i>
             <span>Log in as Staff</span>

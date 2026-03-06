@@ -270,6 +270,23 @@ body {
 .btn-nav--director:active {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
+.btn-nav--student {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.btn-nav--student:hover {
+  background: #ffffff;
+  color: #0e7490;
+  border-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+.btn-nav--student:active {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
 .main-content {
   max-width: 1200px;
