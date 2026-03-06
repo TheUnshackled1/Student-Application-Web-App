@@ -2548,11 +2548,36 @@ def student_dashboard(request):
             'no_duty_days': no_duty_days,
         })
 
+    # ── Approved Student Assistants (public list) ──
+    approved_new = NewApplication.objects.filter(status='approved').order_by('-submitted_at')
+    approved_renewal = RenewalApplication.objects.filter(status='approved').order_by('-submitted_at')
+    approved_students = []
+    for app in approved_new:
+        approved_students.append({
+            'name': f"{app.first_name} {app.last_name}",
+            'student_id': app.student_id,
+            'course': app.course,
+            'office': app.assigned_office or '—',
+            'start_date': app.start_date,
+            'submitted_at': app.submitted_at,
+        })
+    for app in approved_renewal:
+        approved_students.append({
+            'name': app.full_name,
+            'student_id': app.student_id,
+            'course': app.course,
+            'office': app.assigned_office or '—',
+            'start_date': app.start_date,
+            'submitted_at': app.submitted_at,
+        })
+    approved_students.sort(key=lambda x: x['submitted_at'], reverse=True)
+
     context = {
         'profile': profile,
         'applications': applications,
         'has_application': len(applications) > 0,
         'sa_data': sa_data,
+        'approved_students': approved_students,
         'today': today,
         'day_choices': DAY_CHOICES,
         'time_slot_choices': TIME_SLOT_CHOICES,
