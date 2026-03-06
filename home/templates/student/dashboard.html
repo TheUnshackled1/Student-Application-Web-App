@@ -249,30 +249,33 @@
 
                 <!-- Duty Schedule & Time Tracker -->
                 {% if item.sa.status == 'active' %}
-                <div class="mb-3 p-3 rounded" style="background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid #bbf7d0;">
+                <div class="mb-4 p-3 rounded-3" style="background:#f0fdf4; border:1px solid #bbf7d0;">
 
                     {% if not item.has_schedule %}
                     <!-- No schedule set — prompt student to fill it -->
-                    <h6 class="fw-semibold mb-2"><i class="fa-solid fa-calendar-days me-1 text-warning"></i>Set Your Duty Schedule</h6>
-                    <p class="small text-muted mb-2">You must set your duty schedule before you can clock in. Select your available time slots below (max 4 hours per day).</p>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-calendar-days text-warning" style="font-size:1.1rem;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.95rem;">Set Your Duty Schedule</h6>
+                    </div>
+                    <p class="text-muted mb-3" style="font-size:.84rem;">You must set your duty schedule before you can clock in. Select your available time slots below <strong>(max 4 hours per day)</strong>.</p>
                     <form method="post" action="{% url 'home:student_save_duty_schedule' item.sa.pk %}" id="scheduleForm-{{ item.sa.pk }}">
                         {% csrf_token %}
                         <input type="hidden" name="duty_schedule" id="dutyScheduleInput-{{ item.sa.pk }}">
-                        <div class="table-responsive mb-2">
-                            <table class="table table-sm table-bordered mb-0" style="font-size:.78rem;">
-                                <thead>
+                        <div class="table-responsive mb-3" style="border:1px solid #d1d5db; border-radius:10px; overflow:hidden;">
+                            <table class="table table-sm table-bordered mb-0" style="font-size:.78rem; background:#fff;">
+                                <thead style="background:#f1f5f9;">
                                     <tr>
-                                        <th style="width:130px;">Time Slot</th>
-                                        {% for d in day_choices %}<th class="text-center">{{ d.0|truncatechars:3 }}</th>{% endfor %}
+                                        <th style="width:130px; padding:8px 10px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Time Slot</th>
+                                        {% for d in day_choices %}<th class="text-center" style="padding:8px 6px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">{{ d.0|truncatechars:3 }}</th>{% endfor %}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for ts in time_slot_choices %}
                                     <tr>
-                                        <td class="small fw-medium">{{ ts.0 }}</td>
+                                        <td class="fw-medium" style="font-size:.78rem; padding:6px 10px; color:#334155;">{{ ts.0 }}</td>
                                         {% for d in day_choices %}
-                                        <td class="text-center">
-                                            <input type="checkbox" class="form-check-input sched-cb sched-cb-{{ item.sa.pk }}" data-day="{{ d.0 }}" data-slot="{{ ts.0 }}" style="cursor:pointer;">
+                                        <td class="text-center" style="padding:6px;">
+                                            <input type="checkbox" class="form-check-input sched-cb sched-cb-{{ item.sa.pk }}" data-day="{{ d.0 }}" data-slot="{{ ts.0 }}" style="cursor:pointer; width:16px; height:16px;">
                                         </td>
                                         {% endfor %}
                                     </tr>
@@ -280,7 +283,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <button type="submit" class="btn btn-success btn-sm">
+                        <button type="submit" class="btn btn-success btn-sm" style="border-radius:8px; font-weight:600; padding:6px 16px;">
                             <i class="fa-solid fa-check me-1"></i> Save Schedule
                         </button>
                     </form>
@@ -304,14 +307,17 @@
 
                     {% else %}
                     <!-- Schedule is set — show today's shifts -->
-                    <h6 class="fw-semibold mb-2"><i class="fa-solid fa-clock me-1 text-success"></i>Time Tracker — {{ item.today_day }}</h6>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="fa-solid fa-clock text-success" style="font-size:1.1rem;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.95rem;">Time Tracker &mdash; {{ item.today_day }}</h6>
+                    </div>
 
                     {% if not item.shifts_status %}
-                    <p class="small text-muted mb-0">No duty shifts scheduled for today.</p>
+                    <p class="text-muted mb-0" style="font-size:.84rem;">No duty shifts scheduled for today.</p>
                     {% else %}
                     {% for shift in item.shifts_status %}
-                    <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded border bg-white">
-                        <span class="small fw-semibold" style="min-width:145px;">{{ shift.label }}</span>
+                    <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded-3" style="background:#fff; border:1px solid #e2e8f0;">
+                        <span class="fw-semibold" style="min-width:150px; font-size:.84rem; color:#334155;">{{ shift.label }}</span>
 
                         {% if shift.is_on_duty %}
                         <span class="badge bg-success" style="font-size:.78rem;"><i class="fa-solid fa-circle me-1" style="font-size:.45rem;vertical-align:middle;"></i>On Duty</span>
@@ -369,30 +375,30 @@
                     {% endif %}
 
                     <!-- Link to edit schedule -->
-                    <div class="mt-2">
-                        <a href="#" class="small text-primary" onclick="document.getElementById('editSchedule-{{ item.sa.pk }}').classList.toggle('d-none'); return false;">
-                            <i class="fa-solid fa-pen me-1"></i>Edit Duty Schedule
+                    <div class="mt-3 pt-2" style="border-top:1px solid #d1fae5;">
+                        <a href="#" class="text-primary fw-semibold" style="font-size:.84rem; text-decoration:none;" onclick="document.getElementById('editSchedule-{{ item.sa.pk }}').classList.toggle('d-none'); return false;">
+                            <i class="fa-solid fa-pen-to-square me-1"></i>Edit Duty Schedule
                         </a>
                     </div>
-                    <div id="editSchedule-{{ item.sa.pk }}" class="d-none mt-2">
+                    <div id="editSchedule-{{ item.sa.pk }}" class="d-none mt-3">
                         <form method="post" action="{% url 'home:student_save_duty_schedule' item.sa.pk %}" id="editSchedForm-{{ item.sa.pk }}">
                             {% csrf_token %}
                             <input type="hidden" name="duty_schedule" id="editSchedInput-{{ item.sa.pk }}">
-                            <div class="table-responsive mb-2">
-                                <table class="table table-sm table-bordered mb-0" style="font-size:.78rem;">
-                                    <thead>
+                            <div class="table-responsive mb-3" style="border:1px solid #d1d5db; border-radius:10px; overflow:hidden;">
+                                <table class="table table-sm table-bordered mb-0" style="font-size:.78rem; background:#fff;">
+                                    <thead style="background:#f1f5f9;">
                                         <tr>
-                                            <th style="width:130px;">Time Slot</th>
-                                            {% for d in day_choices %}<th class="text-center">{{ d.0|truncatechars:3 }}</th>{% endfor %}
+                                            <th style="width:130px; padding:8px 10px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Time Slot</th>
+                                            {% for d in day_choices %}<th class="text-center" style="padding:8px 6px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">{{ d.0|truncatechars:3 }}</th>{% endfor %}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for ts in time_slot_choices %}
                                         <tr>
-                                            <td class="small fw-medium">{{ ts.0 }}</td>
+                                            <td class="fw-medium" style="font-size:.78rem; padding:6px 10px; color:#334155;">{{ ts.0 }}</td>
                                             {% for d in day_choices %}
-                                            <td class="text-center">
-                                                <input type="checkbox" class="form-check-input edit-sched-cb edit-sched-cb-{{ item.sa.pk }}" data-day="{{ d.0 }}" data-slot="{{ ts.0 }}" style="cursor:pointer;">
+                                            <td class="text-center" style="padding:6px;">
+                                                <input type="checkbox" class="form-check-input edit-sched-cb edit-sched-cb-{{ item.sa.pk }}" data-day="{{ d.0 }}" data-slot="{{ ts.0 }}" style="cursor:pointer; width:16px; height:16px;">
                                             </td>
                                             {% endfor %}
                                         </tr>
@@ -400,7 +406,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="submit" class="btn btn-success btn-sm">
+                            <button type="submit" class="btn btn-success btn-sm" style="border-radius:8px; font-weight:600; padding:6px 16px;">
                                 <i class="fa-solid fa-check me-1"></i> Update Schedule
                             </button>
                         </form>
@@ -430,18 +436,22 @@
 
                 <!-- Monthly Payout Summary -->
                 {% if item.monthly_payout %}
-                <div class="mb-3">
-                    <h6 class="fw-semibold"><i class="fa-solid fa-peso-sign me-1 text-primary"></i>Monthly Payout Summary <span class="text-muted fw-normal small">(₱35.00/hr — record only)</span></h6>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover mb-0" style="font-size:.85rem;">
-                            <thead>
+                <div class="mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-peso-sign text-primary" style="font-size:1rem;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.92rem;">Monthly Payout Summary</h6>
+                        <span class="text-muted" style="font-size:.78rem;">(&#8369;35.00/hr &mdash; record only)</span>
+                    </div>
+                    <div class="table-responsive" style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+                        <table class="table table-sm table-hover mb-0" style="font-size:.84rem;">
+                            <thead style="background:#f1f5f9;">
                                 <tr>
-                                    <th>Month</th>
-                                    <th class="text-end">Days</th>
-                                    <th class="text-end">Weekdays</th>
-                                    <th class="text-end">Hours</th>
-                                    <th class="text-end">Rate</th>
-                                    <th class="text-end">Payout</th>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Month</th>
+                                    <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Days</th>
+                                    <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Weekdays</th>
+                                    <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Hours</th>
+                                    <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Rate</th>
+                                    <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Payout</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -473,16 +483,24 @@
 
                 <!-- No-Duty Days -->
                 {% if item.no_duty_days %}
-                <div class="mb-3">
-                    <h6 class="fw-semibold"><i class="fa-solid fa-calendar-xmark me-1 text-danger"></i>Upcoming No-Duty Days</h6>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover mb-0" style="font-size:.85rem;">
-                            <thead><tr><th>Date</th><th>Reason</th></tr></thead>
+                <div class="mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-calendar-xmark text-danger" style="font-size:1rem;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.92rem;">Upcoming No-Duty Days</h6>
+                    </div>
+                    <div class="table-responsive" style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+                        <table class="table table-sm table-hover mb-0" style="font-size:.84rem;">
+                            <thead style="background:#f1f5f9;">
+                                <tr>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Date</th>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Reason</th>
+                                </tr>
+                            </thead>
                             <tbody>
                             {% for ndd in item.no_duty_days %}
                             <tr>
-                                <td>{{ ndd.date|date:"M d, Y" }}</td>
-                                <td>{{ ndd.reason }}</td>
+                                <td style="padding:8px 12px;">{{ ndd.date|date:"M d, Y" }}</td>
+                                <td style="padding:8px 12px;">{{ ndd.reason }}</td>
                             </tr>
                             {% endfor %}
                             </tbody>
@@ -493,23 +511,34 @@
 
                 <!-- Recent Attendance -->
                 {% if item.attendance %}
-                <div class="mb-3">
-                    <h6 class="fw-semibold"><i class="fa-solid fa-clock me-1"></i>Recent Attendance</h6>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover mb-0" style="font-size:.85rem;">
-                            <thead><tr><th>Date</th><th>In</th><th>Out</th><th>Status</th><th>Hours</th></tr></thead>
+                <div class="mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-clock text-primary" style="font-size:1rem;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.92rem;">Recent Attendance</h6>
+                    </div>
+                    <div class="table-responsive" style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+                        <table class="table table-sm table-hover mb-0" style="font-size:.84rem;">
+                            <thead style="background:#f1f5f9;">
+                                <tr>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Date</th>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">In</th>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Out</th>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Status</th>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Hours</th>
+                                </tr>
+                            </thead>
                             <tbody>
                             {% for rec in item.attendance %}
                             <tr>
-                                <td>{{ rec.date|date:"M d" }}</td>
-                                <td>{{ rec.time_in|time:"g:i A"|default:"—" }}</td>
-                                <td>{{ rec.time_out|time:"g:i A"|default:"—" }}</td>
-                                <td>
-                                    <span class="badge {% if rec.status == 'present' %}bg-success{% elif rec.status == 'late' %}bg-warning text-dark{% elif rec.status == 'absent' %}bg-danger{% else %}bg-secondary{% endif %}" style="font-size:.75rem;">
+                                <td style="padding:8px 12px;">{{ rec.date|date:"M d" }}</td>
+                                <td style="padding:8px 12px;">{{ rec.time_in|time:"g:i A"|default:"—" }}</td>
+                                <td style="padding:8px 12px;">{{ rec.time_out|time:"g:i A"|default:"—" }}</td>
+                                <td style="padding:8px 12px;">
+                                    <span class="badge {% if rec.status == 'present' %}bg-success{% elif rec.status == 'late' %}bg-warning text-dark{% elif rec.status == 'absent' %}bg-danger{% else %}bg-secondary{% endif %}" style="font-size:.72rem; padding:4px 10px; border-radius:6px;">
                                         {{ rec.get_status_display }}
                                     </span>
                                 </td>
-                                <td>{{ rec.hours_worked }}</td>
+                                <td style="padding:8px 12px; font-weight:600;">{{ rec.hours_worked }}</td>
                             </tr>
                             {% endfor %}
                             </tbody>
@@ -520,20 +549,25 @@
 
                 <!-- Evaluations -->
                 {% if item.evaluations %}
-                <div>
-                    <h6 class="fw-semibold"><i class="fa-solid fa-star me-1"></i>Performance Evaluations</h6>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-star text-warning" style="font-size:1rem;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.92rem;">Performance Evaluations</h6>
+                    </div>
                     {% for ev in item.evaluations %}
-                    <div class="border rounded p-2 mb-2" style="font-size:.85rem;">
-                        <div class="d-flex justify-content-between">
+                    <div class="p-3 mb-2 rounded-3" style="font-size:.84rem; background:#f8fafc; border:1px solid #e2e8f0;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
                             <strong>{{ ev.get_evaluation_period_display }}</strong>
-                            <span class="badge bg-primary">{{ ev.overall_rating }}/5.00</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#6366f1,#4f46e5); font-size:.8rem; padding:5px 12px; border-radius:6px;">{{ ev.overall_rating }}/5.00</span>
                         </div>
-                        <div class="text-muted small mt-1">
-                            Quality: {{ ev.work_quality }} | Punctuality: {{ ev.punctuality }} |
-                            Initiative: {{ ev.initiative }} | Cooperation: {{ ev.cooperation }} |
-                            Communication: {{ ev.communication }}
+                        <div class="d-flex flex-wrap gap-3 text-muted" style="font-size:.8rem;">
+                            <span>Quality: <strong class="text-dark">{{ ev.work_quality }}</strong></span>
+                            <span>Punctuality: <strong class="text-dark">{{ ev.punctuality }}</strong></span>
+                            <span>Initiative: <strong class="text-dark">{{ ev.initiative }}</strong></span>
+                            <span>Cooperation: <strong class="text-dark">{{ ev.cooperation }}</strong></span>
+                            <span>Communication: <strong class="text-dark">{{ ev.communication }}</strong></span>
                         </div>
-                        {% if ev.remarks %}<div class="small mt-1"><em>{{ ev.remarks }}</em></div>{% endif %}
+                        {% if ev.remarks %}<div class="mt-2 text-muted" style="font-size:.82rem;"><i class="fa-solid fa-quote-left me-1" style="font-size:.65rem;"></i><em>{{ ev.remarks }}</em></div>{% endif %}
                     </div>
                     {% endfor %}
                 </div>
@@ -544,41 +578,48 @@
     {% endfor %}
 
     <!-- ===== APPROVED STUDENT ASSISTANTS ===== -->
-    <div class="app-log-section">
-        <div class="dash-section-header">
-            <span class="dash-section-icon dash-section-icon--teal"><i class="fa-solid fa-user-check"></i></span>
-            <h3 class="dash-section-title">Approved Student Assistants</h3>
-            <p class="dash-section-hint">Students who have been approved for the SA program</p>
+    <div class="container mb-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#14b8a6,#0d9488); color:#fff; font-size:.95rem;">
+                <i class="fa-solid fa-user-check"></i>
+            </span>
+            <div>
+                <h4 class="fw-bold mb-0" style="letter-spacing:-.3px;">Approved Student Assistants</h4>
+                <p class="text-muted mb-0" style="font-size:.82rem;">Students who have been approved for the SA program</p>
+            </div>
         </div>
-        <div class="dash-status-table-wrap">
-            <table class="dash-status-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Student ID</th>
-                        <th>Course</th>
-                        <th>Assigned Office</th>
-                        <th>Start Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sa in approved_students %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td class="dash-st-name">{{ sa.name }}</td>
-                        <td><code>{{ sa.student_id }}</code></td>
-                        <td>{{ sa.course }}</td>
-                        <td>{{ sa.office }}</td>
-                        <td class="dash-st-date">{% if sa.start_date %}{{ sa.start_date|date:"M d, Y" }}{% else %}—{% endif %}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="dash-st-empty">No approved student assistants yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card" style="border:none; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06); overflow:hidden;">
+            <div style="height:4px; background:linear-gradient(90deg,#14b8a6,#0d9488);"></div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="font-size:.84rem;">
+                    <thead style="background:#f1f5f9;">
+                        <tr>
+                            <th style="padding:12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">#</th>
+                            <th style="padding:12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Name</th>
+                            <th style="padding:12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Student ID</th>
+                            <th style="padding:12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Course</th>
+                            <th style="padding:12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Assigned Office</th>
+                            <th style="padding:12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Start Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sa in approved_students %}
+                        <tr>
+                            <td style="padding:10px 12px; color:#64748b;">{{ forloop.counter }}</td>
+                            <td style="padding:10px 12px; font-weight:600;">{{ sa.name }}</td>
+                            <td style="padding:10px 12px;"><code style="background:#f1f5f9; padding:2px 8px; border-radius:4px; font-size:.82rem; color:#334155;">{{ sa.student_id }}</code></td>
+                            <td style="padding:10px 12px;">{{ sa.course }}</td>
+                            <td style="padding:10px 12px;">{{ sa.office }}</td>
+                            <td style="padding:10px 12px;">{% if sa.start_date %}{{ sa.start_date|date:"M d, Y" }}{% else %}&mdash;{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4" style="font-size:.88rem;">No approved student assistants yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
