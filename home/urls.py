@@ -19,6 +19,7 @@ urlpatterns = [
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('student/clock-in/<int:pk>/', views.student_clock_in, name='student_clock_in'),
     path('student/clock-out/<int:pk>/', views.student_clock_out, name='student_clock_out'),
+    path('student/duty-schedule/<int:pk>/', views.student_save_duty_schedule, name='student_save_duty_schedule'),
 
     path('staff/login/', views.staff_login, name='staff_login'),
     path('director/login/', views.director_login, name='director_login'),

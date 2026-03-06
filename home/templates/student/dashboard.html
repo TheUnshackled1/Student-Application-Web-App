@@ -218,58 +218,182 @@
                     </div>
                 </div>
 
-                <!-- Clock In / Clock Out -->
+                <!-- Duty Schedule & Time Tracker -->
                 {% if item.sa.status == 'active' %}
                 <div class="mb-3 p-3 rounded" style="background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid #bbf7d0;">
-                    <h6 class="fw-semibold mb-2"><i class="fa-solid fa-clock me-1 text-success"></i>Time Tracker — Today</h6>
-                    {% if not item.today_record %}
-                    <p class="small text-muted mb-2">You haven't clocked in yet today. Start your duty shift below.</p>
-                    <form method="post" action="{% url 'home:student_clock_in' item.sa.pk %}">
+
+                    {% if not item.has_schedule %}
+                    <!-- No schedule set — prompt student to fill it -->
+                    <h6 class="fw-semibold mb-2"><i class="fa-solid fa-calendar-days me-1 text-warning"></i>Set Your Duty Schedule</h6>
+                    <p class="small text-muted mb-2">You must set your duty schedule before you can clock in. Select your available time slots below (max 4 hours per day).</p>
+                    <form method="post" action="{% url 'home:student_save_duty_schedule' item.sa.pk %}" id="scheduleForm-{{ item.sa.pk }}">
                         {% csrf_token %}
+                        <input type="hidden" name="duty_schedule" id="dutyScheduleInput-{{ item.sa.pk }}">
+                        <div class="table-responsive mb-2">
+                            <table class="table table-sm table-bordered mb-0" style="font-size:.78rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:130px;">Time Slot</th>
+                                        {% for d in day_choices %}<th class="text-center">{{ d.0|truncatechars:3 }}</th>{% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ts in time_slot_choices %}
+                                    <tr>
+                                        <td class="small fw-medium">{{ ts.0 }}</td>
+                                        {% for d in day_choices %}
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input sched-cb sched-cb-{{ item.sa.pk }}" data-day="{{ d.0 }}" data-slot="{{ ts.0 }}" style="cursor:pointer;">
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                         <button type="submit" class="btn btn-success btn-sm">
-                            <i class="fa-solid fa-right-to-bracket me-1"></i> Clock In
+                            <i class="fa-solid fa-check me-1"></i> Save Schedule
                         </button>
                     </form>
-                    {% elif item.today_record and not item.today_record.time_out %}
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <span class="badge bg-success" style="font-size:.85rem;"><i class="fa-solid fa-circle me-1" style="font-size:.5rem;vertical-align:middle;"></i>On Duty</span>
-                        <span class="small text-muted">Clocked in at <strong>{{ item.today_record.time_in|time:"g:i A" }}</strong></span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="fa-solid fa-stopwatch text-success"></i>
-                        <span id="dutyTimer-{{ item.sa.pk }}" style="font-size:1.4rem; font-weight:700; font-variant-numeric:tabular-nums; color:#16a34a;">00:00:00</span>
-                        <span class="small text-muted">elapsed</span>
-                    </div>
                     <script>
                     (function(){
-                        var h={{ item.today_record.time_in.hour }}, m={{ item.today_record.time_in.minute }}, s={{ item.today_record.time_in.second }};
-                        var startMs = new Date();
-                        startMs.setHours(h, m, s, 0);
-                        var el = document.getElementById('dutyTimer-{{ item.sa.pk }}');
-                        function tick(){
-                            var diff = Math.max(0, Math.floor((Date.now() - startMs.getTime()) / 1000));
-                            var hh = Math.floor(diff / 3600);
-                            var mm = Math.floor((diff % 3600) / 60);
-                            var ss = diff % 60;
-                            el.textContent = String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
-                        }
-                        tick();
-                        setInterval(tick, 1000);
+                        var formId = 'scheduleForm-{{ item.sa.pk }}';
+                        var inputId = 'dutyScheduleInput-{{ item.sa.pk }}';
+                        var cbClass = 'sched-cb-{{ item.sa.pk }}';
+                        document.getElementById(formId).addEventListener('submit', function(e){
+                            var schedule = {};
+                            document.querySelectorAll('.' + cbClass + ':checked').forEach(function(cb){
+                                var day = cb.dataset.day;
+                                var slot = cb.dataset.slot;
+                                if (!schedule[day]) schedule[day] = [];
+                                schedule[day].push(slot);
+                            });
+                            document.getElementById(inputId).value = JSON.stringify(schedule);
+                        });
                     })();
                     </script>
-                    <form method="post" action="{% url 'home:student_clock_out' item.sa.pk %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                            <i class="fa-solid fa-right-from-bracket me-1"></i> Clock Out
-                        </button>
-                    </form>
+
                     {% else %}
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge bg-secondary" style="font-size:.85rem;"><i class="fa-solid fa-check me-1"></i>Completed</span>
+                    <!-- Schedule is set — show today's shifts -->
+                    <h6 class="fw-semibold mb-2"><i class="fa-solid fa-clock me-1 text-success"></i>Time Tracker — {{ item.today_day }}</h6>
+
+                    {% if not item.shifts_status %}
+                    <p class="small text-muted mb-0">No duty shifts scheduled for today.</p>
+                    {% else %}
+                    {% for shift in item.shifts_status %}
+                    <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded border bg-white">
+                        <span class="small fw-semibold" style="min-width:145px;">{{ shift.label }}</span>
+
+                        {% if shift.is_on_duty %}
+                        <span class="badge bg-success" style="font-size:.78rem;"><i class="fa-solid fa-circle me-1" style="font-size:.45rem;vertical-align:middle;"></i>On Duty</span>
+                        <span class="small text-muted">In: <strong>{{ shift.record.time_in|time:"g:i A" }}</strong></span>
+                        <span id="dutyTimer-{{ item.sa.pk }}-{{ forloop.counter }}" style="font-size:1.1rem; font-weight:700; font-variant-numeric:tabular-nums; color:#16a34a;">00:00:00</span>
+                        <script>
+                        (function(){
+                            var h={{ shift.record.time_in.hour }}, m={{ shift.record.time_in.minute }}, s={{ shift.record.time_in.second }};
+                            var startMs = new Date(); startMs.setHours(h, m, s, 0);
+                            var el = document.getElementById('dutyTimer-{{ item.sa.pk }}-{{ forloop.counter }}');
+                            function tick(){
+                                var diff = Math.max(0, Math.floor((Date.now() - startMs.getTime()) / 1000));
+                                var hh = Math.floor(diff / 3600), mm = Math.floor((diff % 3600) / 60), ss = diff % 60;
+                                el.textContent = String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+                            }
+                            tick(); setInterval(tick, 1000);
+                        })();
+                        </script>
+                        <form method="post" action="{% url 'home:student_clock_out' item.sa.pk %}" class="ms-auto">
+                            {% csrf_token %}
+                            <input type="hidden" name="shift" value="{{ shift.label }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size:.78rem;">
+                                <i class="fa-solid fa-right-from-bracket me-1"></i>Clock Out
+                            </button>
+                        </form>
+
+                        {% elif shift.is_done %}
+                        <span class="badge bg-secondary" style="font-size:.78rem;"><i class="fa-solid fa-check me-1"></i>Done</span>
                         <span class="small text-muted">
-                            {{ item.today_record.time_in|time:"g:i A" }} — {{ item.today_record.time_out|time:"g:i A" }}
-                            &nbsp;|&nbsp; <strong>{{ item.today_record.hours_worked }} hrs</strong>
+                            {{ shift.record.time_in|time:"g:i A" }} — {{ shift.record.time_out|time:"g:i A" }}
+                            &nbsp;|&nbsp; <strong>{{ shift.record.hours_worked }} hrs</strong>
                         </span>
+
+                        {% elif shift.can_clock_in %}
+                        <form method="post" action="{% url 'home:student_clock_in' item.sa.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="shift" value="{{ shift.label }}">
+                            <button type="submit" class="btn btn-success btn-sm py-0 px-2" style="font-size:.78rem;">
+                                <i class="fa-solid fa-right-to-bracket me-1"></i>Clock In
+                            </button>
+                        </form>
+
+                        {% elif shift.not_yet %}
+                        <span class="badge bg-light text-muted border" style="font-size:.75rem;">
+                            <i class="fa-regular fa-clock me-1"></i>Opens at {{ shift.earliest_in|time:"g:i A" }}
+                        </span>
+
+                        {% elif shift.past %}
+                        <span class="badge bg-light text-danger border" style="font-size:.75rem;">
+                            <i class="fa-solid fa-xmark me-1"></i>Missed
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <!-- Link to edit schedule -->
+                    <div class="mt-2">
+                        <a href="#" class="small text-primary" onclick="document.getElementById('editSchedule-{{ item.sa.pk }}').classList.toggle('d-none'); return false;">
+                            <i class="fa-solid fa-pen me-1"></i>Edit Duty Schedule
+                        </a>
+                    </div>
+                    <div id="editSchedule-{{ item.sa.pk }}" class="d-none mt-2">
+                        <form method="post" action="{% url 'home:student_save_duty_schedule' item.sa.pk %}" id="editSchedForm-{{ item.sa.pk }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="duty_schedule" id="editSchedInput-{{ item.sa.pk }}">
+                            <div class="table-responsive mb-2">
+                                <table class="table table-sm table-bordered mb-0" style="font-size:.78rem;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:130px;">Time Slot</th>
+                                            {% for d in day_choices %}<th class="text-center">{{ d.0|truncatechars:3 }}</th>{% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ts in time_slot_choices %}
+                                        <tr>
+                                            <td class="small fw-medium">{{ ts.0 }}</td>
+                                            {% for d in day_choices %}
+                                            <td class="text-center">
+                                                <input type="checkbox" class="form-check-input edit-sched-cb edit-sched-cb-{{ item.sa.pk }}" data-day="{{ d.0 }}" data-slot="{{ ts.0 }}" style="cursor:pointer;">
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fa-solid fa-check me-1"></i> Update Schedule
+                            </button>
+                        </form>
+                        <script>
+                        (function(){
+                            var schedule = {{ item.sa.duty_schedule|safe }};
+                            var cbClass = 'edit-sched-cb-{{ item.sa.pk }}';
+                            document.querySelectorAll('.' + cbClass).forEach(function(cb){
+                                var day = cb.dataset.day, slot = cb.dataset.slot;
+                                if (schedule[day] && schedule[day].indexOf(slot) !== -1) cb.checked = true;
+                            });
+                            document.getElementById('editSchedForm-{{ item.sa.pk }}').addEventListener('submit', function(){
+                                var s = {};
+                                document.querySelectorAll('.' + cbClass + ':checked').forEach(function(cb){
+                                    var d = cb.dataset.day, sl = cb.dataset.slot;
+                                    if (!s[d]) s[d] = [];
+                                    s[d].push(sl);
+                                });
+                                document.getElementById('editSchedInput-{{ item.sa.pk }}').value = JSON.stringify(s);
+                            });
+                        })();
+                        </script>
                     </div>
                     {% endif %}
                 </div>

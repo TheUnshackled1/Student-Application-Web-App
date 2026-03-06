@@ -2581,8 +2581,51 @@ def student_dashboard(request):
             ndd_qs = ndd_qs.filter(date__lte=sa.end_date)
         no_duty_days = list(ndd_qs.order_by('date')[:20])
 
-        # ── Today's attendance record (for clock-in / clock-out) ──
-        today_record = sa.attendance_records.filter(date=today).first()
+        # ── Today's shifts and attendance records ──
+        ph_now = timezone.localtime()
+        day_name = ph_now.strftime('%A')
+        now_time = ph_now.time()
+        today_shifts_labels = (sa.duty_schedule or {}).get(day_name, [])
+        today_records = {r.shift: r for r in sa.attendance_records.filter(date=today)}
+
+        # Build per-shift status for the template
+        shifts_status = []
+        for slot in today_shifts_labels:
+            slot_start, slot_end = _parse_slot_times(slot)
+            rec = today_records.get(slot)
+            earliest_in = (_datetime.combine(today, slot_start) - timedelta(minutes=2)).time() if slot_start else None
+            auto_out = (_datetime.combine(today, slot_end) + timedelta(minutes=2)).time() if slot_end else None
+
+            # Auto clock-out: if clocked in but not out, and we're past slot_end + 2 min
+            if rec and rec.time_in and not rec.time_out and auto_out and now_time > auto_out:
+                rec.time_out = slot_end
+                rec.save(update_fields=['time_out'])
+                # recalculate total hours
+                total = Decimal('0')
+                for r in sa.attendance_records.all():
+                    total += Decimal(str(r.hours_worked))
+                sa.total_hours = total
+                sa.save(update_fields=['total_hours'])
+
+            can_clock_in = (
+                slot_start and earliest_in and not rec
+                and earliest_in <= now_time <= slot_end
+            )
+            is_on_duty = rec and rec.time_in and not rec.time_out
+            is_done = rec and rec.time_in and rec.time_out
+
+            shifts_status.append({
+                'label': slot,
+                'start': slot_start,
+                'end': slot_end,
+                'record': rec,
+                'can_clock_in': can_clock_in,
+                'is_on_duty': is_on_duty,
+                'is_done': is_done,
+                'not_yet': slot_start and now_time < earliest_in if earliest_in else False,
+                'earliest_in': earliest_in,
+                'past': slot_end and now_time > slot_end and not rec,
+            })
 
         # ── Monthly payout summary (₱35/hr, 4 months from start_date) ──
         HOURLY_RATE = Decimal('35.00')
@@ -2624,7 +2667,9 @@ def student_dashboard(request):
             'evaluations': evaluations,
             'remaining_days': remaining_days,
             'no_duty_days': no_duty_days,
-            'today_record': today_record,
+            'shifts_status': shifts_status,
+            'has_schedule': bool(sa.duty_schedule),
+            'today_day': day_name,
             'monthly_payout': monthly_payout,
         })
 
@@ -2666,65 +2711,158 @@ def student_dashboard(request):
 
 
 # ================================================================
-#  STUDENT CLOCK-IN / CLOCK-OUT
+#  STUDENT CLOCK-IN / CLOCK-OUT  &  DUTY SCHEDULE
 # ================================================================
+
+def _parse_slot_times(slot_label):
+    """Parse '8:00 AM - 9:00 AM' → (time(8,0), time(9,0))."""
+    from datetime import time as _time
+    parts = slot_label.split(' - ')
+    if len(parts) != 2:
+        return None, None
+    fmt = '%I:%M %p'
+    try:
+        start = _datetime.strptime(parts[0].strip(), fmt).time()
+        end = _datetime.strptime(parts[1].strip(), fmt).time()
+        return start, end
+    except ValueError:
+        return None, None
+
+
+def _get_today_shifts(sa):
+    """Return list of shift slot labels for today based on the SA's duty_schedule."""
+    if not sa.duty_schedule:
+        return []
+    ph_now = timezone.localtime()
+    day_name = ph_now.strftime('%A')  # e.g. 'Monday'
+    return sa.duty_schedule.get(day_name, [])
+
+
+@login_required
+@require_POST
+def student_save_duty_schedule(request, pk):
+    """Student sets or updates their duty schedule."""
+    if not hasattr(request.user, 'student_profile'):
+        return redirect('home:home')
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk, student_id=request.user.student_profile.student_id)
+
+    raw = request.POST.get('duty_schedule', '{}')
+    try:
+        schedule = json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        schedule = {}
+
+    if not schedule:
+        messages.error(request, 'Please select at least one time slot.')
+        return redirect('home:student_dashboard')
+
+    # Validate max 4 hours (4 slots) per day
+    for day, slots in schedule.items():
+        if len(slots) > 4:
+            messages.error(request, f'Maximum 4 hours per day — {day} has {len(slots)} slots.')
+            return redirect('home:student_dashboard')
+
+    sa.duty_schedule = schedule
+    sa.save(update_fields=['duty_schedule'])
+    messages.success(request, 'Duty schedule saved successfully!')
+    return redirect('home:student_dashboard')
+
 
 @login_required
 @require_POST
 def student_clock_in(request, pk):
-    """Student clocks in for the day."""
+    """Student clocks in for a specific shift."""
     if not hasattr(request.user, 'student_profile'):
         return redirect('home:home')
     sa = get_object_or_404(ActiveStudentAssistant, pk=pk, student_id=request.user.student_profile.student_id, status='active')
+
+    if not sa.duty_schedule:
+        messages.error(request, 'Please set your duty schedule first.')
+        return redirect('home:student_dashboard')
+
     ph_now = timezone.localtime()
     today = ph_now.date()
     now = ph_now.time()
+    shift_label = request.POST.get('shift', '')
+
+    if not shift_label:
+        messages.error(request, 'No shift specified.')
+        return redirect('home:student_dashboard')
+
+    # Verify this shift is in today's schedule
+    today_shifts = _get_today_shifts(sa)
+    if shift_label not in today_shifts:
+        messages.error(request, 'This shift is not in your schedule for today.')
+        return redirect('home:student_dashboard')
+
+    # Check 2-min-before window
+    slot_start, slot_end = _parse_slot_times(shift_label)
+    if not slot_start:
+        messages.error(request, 'Invalid shift format.')
+        return redirect('home:student_dashboard')
+
+    # Allow clock-in from 2 minutes before shift start until shift end
+    earliest = (_datetime.combine(today, slot_start) - timedelta(minutes=2)).time()
+    if now < earliest:
+        messages.info(request, f'Clock-in opens at {earliest.strftime("%I:%M %p")} (2 min before shift).')
+        return redirect('home:student_dashboard')
+    if now > slot_end:
+        messages.info(request, 'This shift has already ended.')
+        return redirect('home:student_dashboard')
+
+    # Check daily 4-hour cap
+    today_records = AttendanceRecord.objects.filter(student_assistant=sa, date=today)
+    today_total = sum(Decimal(str(r.hours_worked)) for r in today_records)
+    if today_total >= 4:
+        messages.info(request, 'You have already reached the 4-hour daily limit.')
+        return redirect('home:student_dashboard')
 
     record, created = AttendanceRecord.objects.get_or_create(
         student_assistant=sa,
         date=today,
+        shift=shift_label,
         defaults={'time_in': now, 'status': 'present', 'logged_by': request.user},
     )
     if created:
-        messages.success(request, f'Clocked in at {now.strftime("%I:%M %p")}.')
+        messages.success(request, f'Clocked in at {now.strftime("%I:%M %p")} for {shift_label}.')
     else:
-        messages.info(request, 'You have already clocked in today.')
+        messages.info(request, f'Already clocked in for {shift_label}.')
     return redirect('home:student_dashboard')
 
 
 @login_required
 @require_POST
 def student_clock_out(request, pk):
-    """Student clocks out for the day and updates total hours."""
+    """Student clocks out for a specific shift and updates total hours."""
     if not hasattr(request.user, 'student_profile'):
         return redirect('home:home')
     sa = get_object_or_404(ActiveStudentAssistant, pk=pk, student_id=request.user.student_profile.student_id, status='active')
     ph_now = timezone.localtime()
     today = ph_now.date()
     now = ph_now.time()
+    shift_label = request.POST.get('shift', '')
 
     try:
-        record = AttendanceRecord.objects.get(student_assistant=sa, date=today)
+        record = AttendanceRecord.objects.get(student_assistant=sa, date=today, shift=shift_label)
     except AttendanceRecord.DoesNotExist:
         messages.error(request, 'You need to clock in first.')
         return redirect('home:student_dashboard')
 
     if record.time_out:
-        messages.info(request, 'You have already clocked out today.')
+        messages.info(request, f'Already clocked out for {shift_label}.')
         return redirect('home:student_dashboard')
 
     record.time_out = now
     record.save(update_fields=['time_out'])
 
     # Update the SA's cached total_hours
-    all_records = sa.attendance_records.all()
     total = Decimal('0')
-    for rec in all_records:
+    for rec in sa.attendance_records.all():
         total += Decimal(str(rec.hours_worked))
     sa.total_hours = total
     sa.save(update_fields=['total_hours'])
 
-    messages.success(request, f'Clocked out at {now.strftime("%I:%M %p")}. Hours today: {record.hours_worked}')
+    messages.success(request, f'Clocked out at {now.strftime("%I:%M %p")}. Hours: {record.hours_worked}')
     return redirect('home:student_dashboard')
 
 

@@ -444,6 +444,12 @@ class ActiveStudentAssistant(models.Model):
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='active')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # ── Duty schedule (set by student) ──
+    duty_schedule = models.JSONField(
+        blank=True, null=True,
+        help_text='Duty time slots as {"Monday": ["8:00 AM - 9:00 AM", ...], ...}',
+    )
+
     class Meta:
         ordering = ['-created_at']
         verbose_name = 'Active Student Assistant'
@@ -479,6 +485,10 @@ class AttendanceRecord(models.Model):
         related_name='attendance_records',
     )
     date = models.DateField()
+    shift = models.CharField(
+        max_length=30, blank=True, default='',
+        help_text='Time slot label, e.g. "8:00 AM - 9:00 AM"',
+    )
     time_in = models.TimeField(null=True, blank=True)
     time_out = models.TimeField(null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='present')
@@ -491,7 +501,7 @@ class AttendanceRecord(models.Model):
 
     class Meta:
         ordering = ['-date', '-time_in']
-        unique_together = ['student_assistant', 'date']
+        unique_together = ['student_assistant', 'date', 'shift']
         verbose_name = 'Attendance Record'
         verbose_name_plural = 'Attendance Records'
 
