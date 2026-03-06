@@ -17,6 +17,8 @@ urlpatterns = [
     path('student/login/', views.student_login, name='student_login'),
     path('verify-email/<str:uidb64>/<str:token>/', views.verify_email, name='verify_email'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('student/clock-in/<int:pk>/', views.student_clock_in, name='student_clock_in'),
+    path('student/clock-out/<int:pk>/', views.student_clock_out, name='student_clock_out'),
 
     path('staff/login/', views.staff_login, name='staff_login'),
     path('director/login/', views.director_login, name='director_login'),

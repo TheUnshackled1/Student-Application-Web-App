@@ -218,6 +218,78 @@
                     </div>
                 </div>
 
+                <!-- Clock In / Clock Out -->
+                {% if item.sa.status == 'active' %}
+                <div class="mb-3 p-3 rounded" style="background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid #bbf7d0;">
+                    <h6 class="fw-semibold mb-2"><i class="fa-solid fa-clock me-1 text-success"></i>Time Tracker — Today</h6>
+                    {% if not item.today_record %}
+                    <p class="small text-muted mb-2">You haven't clocked in yet today. Start your duty shift below.</p>
+                    <form method="post" action="{% url 'home:student_clock_in' item.sa.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-right-to-bracket me-1"></i> Clock In
+                        </button>
+                    </form>
+                    {% elif item.today_record and not item.today_record.time_out %}
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <span class="badge bg-success" style="font-size:.85rem;"><i class="fa-solid fa-circle me-1" style="font-size:.5rem;vertical-align:middle;"></i>On Duty</span>
+                        <span class="small text-muted">Clocked in at <strong>{{ item.today_record.time_in|time:"g:i A" }}</strong></span>
+                    </div>
+                    <form method="post" action="{% url 'home:student_clock_out' item.sa.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fa-solid fa-right-from-bracket me-1"></i> Clock Out
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-secondary" style="font-size:.85rem;"><i class="fa-solid fa-check me-1"></i>Completed</span>
+                        <span class="small text-muted">
+                            {{ item.today_record.time_in|time:"g:i A" }} — {{ item.today_record.time_out|time:"g:i A" }}
+                            &nbsp;|&nbsp; <strong>{{ item.today_record.hours_worked }} hrs</strong>
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Monthly Payout Summary -->
+                {% if item.monthly_payout %}
+                <div class="mb-3">
+                    <h6 class="fw-semibold"><i class="fa-solid fa-peso-sign me-1 text-primary"></i>Monthly Payout Summary <span class="text-muted fw-normal small">(₱35.00/hr — record only)</span></h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0" style="font-size:.85rem;">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-end">Hours</th>
+                                    <th class="text-end">Rate</th>
+                                    <th class="text-end">Payout</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for mp in item.monthly_payout %}
+                            <tr>
+                                <td>{{ mp.month }}</td>
+                                <td class="text-end">{{ mp.hours }}</td>
+                                <td class="text-end">₱{{ mp.rate }}</td>
+                                <td class="text-end fw-semibold">₱{{ mp.payout }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold" style="border-top:2px solid #dee2e6;">
+                                    <td>Total</td>
+                                    <td class="text-end" id="payoutTotalHrs-{{ forloop.counter }}">—</td>
+                                    <td class="text-end">₱35.00</td>
+                                    <td class="text-end" id="payoutTotalAmt-{{ forloop.counter }}">—</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- No-Duty Days -->
                 {% if item.no_duty_days %}
                 <div class="mb-3">
@@ -339,6 +411,22 @@ document.addEventListener('DOMContentLoaded', function(){
     if(toggle && menu){
         toggle.addEventListener('click', function(){ menu.classList.toggle('open'); });
     }
+
+    // Calculate payout totals for each SA card
+    document.querySelectorAll('tfoot [id^="payoutTotalHrs-"]').forEach(function(el){
+        var idx = el.id.split('-')[1];
+        var table = el.closest('table');
+        var rows = table.querySelectorAll('tbody tr');
+        var totalHrs = 0, totalAmt = 0;
+        rows.forEach(function(row){
+            var cells = row.querySelectorAll('td');
+            totalHrs += parseFloat(cells[1].textContent) || 0;
+            var amt = cells[3].textContent.replace('₱','').trim();
+            totalAmt += parseFloat(amt) || 0;
+        });
+        el.textContent = totalHrs.toFixed(2);
+        document.getElementById('payoutTotalAmt-' + idx).textContent = '₱' + totalAmt.toFixed(2);
+    });
 });
 </script>
 </body>

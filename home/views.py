@@ -26,8 +26,10 @@ from .email_utils import (
     send_schedule_mismatch_email, send_document_request_email,
     send_verification_email,
 )
-from datetime import date as _date, timedelta
+from datetime import date as _date, datetime as _datetime, timedelta
 import json
+from collections import defaultdict
+from decimal import Decimal
 import base64
 import os
 import uuid
@@ -2578,12 +2580,44 @@ def student_dashboard(request):
             ndd_qs = ndd_qs.filter(date__lte=sa.end_date)
         no_duty_days = list(ndd_qs.order_by('date')[:20])
 
+        # ── Today's attendance record (for clock-in / clock-out) ──
+        today_record = sa.attendance_records.filter(date=today).first()
+
+        # ── Monthly payout summary (₱35/hr, 4 months from start_date) ──
+        HOURLY_RATE = Decimal('35.00')
+        monthly_payout = []
+        if sa.start_date:
+            all_records = sa.attendance_records.all()
+            hours_by_month = defaultdict(Decimal)
+            for rec in all_records:
+                if rec.time_in and rec.time_out:
+                    hours_by_month[(rec.date.year, rec.date.month)] += Decimal(str(rec.hours_worked))
+
+            # Build 4 months starting from the SA's start_date month
+            for i in range(4):
+                m = sa.start_date.month + i
+                y = sa.start_date.year
+                if m > 12:
+                    m -= 12
+                    y += 1
+                month_label = _date(y, m, 1).strftime('%B %Y')
+                hours = hours_by_month.get((y, m), Decimal('0'))
+                payout = round(hours * HOURLY_RATE, 2)
+                monthly_payout.append({
+                    'month': month_label,
+                    'hours': float(hours),
+                    'rate': float(HOURLY_RATE),
+                    'payout': float(payout),
+                })
+
         sa_data.append({
             'sa': sa,
             'attendance': attendance,
             'evaluations': evaluations,
             'remaining_days': remaining_days,
             'no_duty_days': no_duty_days,
+            'today_record': today_record,
+            'monthly_payout': monthly_payout,
         })
 
     # ── Approved Student Assistants (public list) ──
@@ -2621,6 +2655,67 @@ def student_dashboard(request):
         'time_slot_choices': TIME_SLOT_CHOICES,
     }
     return render(request, 'student/dashboard.html', context)
+
+
+# ================================================================
+#  STUDENT CLOCK-IN / CLOCK-OUT
+# ================================================================
+
+@login_required
+@require_POST
+def student_clock_in(request, pk):
+    """Student clocks in for the day."""
+    if not hasattr(request.user, 'student_profile'):
+        return redirect('home:home')
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk, student_id=request.user.student_profile.student_id, status='active')
+    today = _date.today()
+    now = timezone.localtime().time()
+
+    record, created = AttendanceRecord.objects.get_or_create(
+        student_assistant=sa,
+        date=today,
+        defaults={'time_in': now, 'status': 'present', 'logged_by': request.user},
+    )
+    if created:
+        messages.success(request, f'Clocked in at {now.strftime("%I:%M %p")}.')
+    else:
+        messages.info(request, 'You have already clocked in today.')
+    return redirect('home:student_dashboard')
+
+
+@login_required
+@require_POST
+def student_clock_out(request, pk):
+    """Student clocks out for the day and updates total hours."""
+    if not hasattr(request.user, 'student_profile'):
+        return redirect('home:home')
+    sa = get_object_or_404(ActiveStudentAssistant, pk=pk, student_id=request.user.student_profile.student_id, status='active')
+    today = _date.today()
+    now = timezone.localtime().time()
+
+    try:
+        record = AttendanceRecord.objects.get(student_assistant=sa, date=today)
+    except AttendanceRecord.DoesNotExist:
+        messages.error(request, 'You need to clock in first.')
+        return redirect('home:student_dashboard')
+
+    if record.time_out:
+        messages.info(request, 'You have already clocked out today.')
+        return redirect('home:student_dashboard')
+
+    record.time_out = now
+    record.save(update_fields=['time_out'])
+
+    # Update the SA's cached total_hours
+    all_records = sa.attendance_records.all()
+    total = Decimal('0')
+    for rec in all_records:
+        total += Decimal(str(rec.hours_worked))
+    sa.total_hours = total
+    sa.save(update_fields=['total_hours'])
+
+    messages.success(request, f'Clocked out at {now.strftime("%I:%M %p")}. Hours today: {record.hours_worked}')
+    return redirect('home:student_dashboard')
 
 
 # ================================================================
