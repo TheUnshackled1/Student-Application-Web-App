@@ -147,7 +147,19 @@
                 {% endif %}
 
                 <!-- Document request alert -->
-                {% if app_card.requested_documents_note %}
+                <!-- Document return alert (per-document) -->
+                {% if app_card.returned_documents %}
+                <div class="alert alert-warning py-2 px-3 mb-3" style="font-size:.84rem; border-radius:8px; border-left:4px solid #f59e0b;">
+                    <i class="fa-solid fa-rotate-left me-1"></i>
+                    <strong>Documents Returned for Correction:</strong>
+                    <ul class="mb-1 mt-1 ps-3" style="font-size:.82rem;">
+                        {% for field_key, return_reason in app_card.returned_documents.items %}
+                        <li><strong>{{ field_key|doc_label }}</strong>: {{ return_reason }}</li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'home:resubmit_documents' app_card.app_type_key app_card.obj.pk %}" class="fw-semibold">Re-upload Documents</a>
+                </div>
+                {% elif app_card.requested_documents_note %}
                 <div class="alert alert-info py-2 px-3 mb-3" style="font-size:.84rem; border-radius:8px; border-left:4px solid #0ea5e9;">
                     <i class="fa-solid fa-file-circle-question me-1"></i>
                     <strong>Documents Requested:</strong> {{ app_card.requested_documents_note }}

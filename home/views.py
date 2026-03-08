@@ -1332,6 +1332,7 @@ def staff_review_application(request, pk):
             'file': file_field if file_field else None,
             'uploaded': bool(file_field),
             'validation': None,
+            'returned_reason': (app.returned_documents or {}).get(field_name, ''),
         }
         # Run inline OpenCV validation on uploaded image files
         if file_field:
@@ -1450,6 +1451,49 @@ def staff_update_application_status(request, pk):
     if next_url:
         return redirect(next_url)
     return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_return_document(request, pk):
+    """Staff returns a specific document with a reason."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+    field_name = request.POST.get('field_name', '').strip()
+    reason = request.POST.get('reason', '').strip()
+    doc_label = request.POST.get('doc_label', field_name)
+
+    # Validate field_name against known document fields
+    valid_fields = [
+        'application_form', 'id_picture', 'barangay_clearance', 'parents_itr',
+        'enrolment_form', 'schedule_classes', 'proof_insurance', 'grades_last_sem',
+        'official_time',
+    ]
+    if field_name not in valid_fields or not reason:
+        messages.error(request, 'Invalid document return request.')
+        return redirect('home:staff_review_application', pk=pk)
+
+    # Update returned_documents JSONField
+    returned = app.returned_documents or {}
+    returned[field_name] = reason
+    app.returned_documents = returned
+    old_status = app.status
+    app.status = 'documents_requested'
+    app.save()
+
+    ApplicationNote.objects.create(
+        new_application=app, author=request.user,
+        note_type='document_request',
+        content=f'Document returned — {doc_label}: {reason}',
+    )
+
+    # Build per-document summary for email
+    doc_summary = '\n'.join(f'  • {k}: {v}' for k, v in returned.items())
+    send_document_request_email(app, f'The following document(s) need to be re-uploaded:\n{doc_summary}')
+
+    messages.success(request, f'"{doc_label}" has been returned to the student.')
+    return redirect('home:staff_review_application', pk=pk)
 
 
 # ================================================================
@@ -1699,6 +1743,7 @@ def director_review_application(request, pk):
             'file': file_field if file_field else None,
             'uploaded': bool(file_field),
             'validation': None,
+            'returned_reason': (app.returned_documents or {}).get(field_name, ''),
         }
         if file_field:
             doc_entry['validation'] = _validate_uploaded_file(file_field, field_name)
@@ -1811,6 +1856,46 @@ def director_update_application_status(request, pk):
     if next_url:
         return redirect(next_url)
     return redirect('home:director_dashboard')
+
+
+@login_required
+@require_POST
+def director_return_document(request, pk):
+    """Director returns a specific document with a reason."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+    field_name = request.POST.get('field_name', '').strip()
+    reason = request.POST.get('reason', '').strip()
+    doc_label = request.POST.get('doc_label', field_name)
+
+    valid_fields = [
+        'application_form', 'id_picture', 'barangay_clearance', 'parents_itr',
+        'enrolment_form', 'schedule_classes', 'proof_insurance', 'grades_last_sem',
+        'official_time',
+    ]
+    if field_name not in valid_fields or not reason:
+        messages.error(request, 'Invalid document return request.')
+        return redirect('home:director_review_application', pk=pk)
+
+    returned = app.returned_documents or {}
+    returned[field_name] = reason
+    app.returned_documents = returned
+    old_status = app.status
+    app.status = 'documents_requested'
+    app.save()
+
+    ApplicationNote.objects.create(
+        new_application=app, author=request.user,
+        note_type='document_request',
+        content=f'Document returned — {doc_label}: {reason}',
+    )
+
+    doc_summary = '\n'.join(f'  • {k}: {v}' for k, v in returned.items())
+    send_document_request_email(app, f'The following document(s) need to be re-uploaded:\n{doc_summary}')
+
+    messages.success(request, f'"{doc_label}" has been returned to the student.')
+    return redirect('home:director_review_application', pk=pk)
 
 
 # ================================================================
@@ -2362,6 +2447,7 @@ def resubmit_documents(request, app_type, pk):
                     setattr(app, field_name, uploaded)
             app.status = 'under_review'
             app.requested_documents_note = ''
+            app.returned_documents = {}
             app.save()
 
             ApplicationNote.objects.create(
@@ -2631,6 +2717,7 @@ def student_dashboard(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'returned_documents': app.returned_documents if app.status == 'documents_requested' else {},
             'availability_schedule': app.availability_schedule or {},
         })
 
@@ -2658,6 +2745,7 @@ def student_dashboard(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'returned_documents': app.returned_documents if app.status == 'documents_requested' else {},
             'availability_schedule': app.availability_schedule or {},
         })
 

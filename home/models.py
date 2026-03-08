@@ -240,6 +240,10 @@ class NewApplication(models.Model):
         blank=True, default='',
         help_text='Description of which additional documents are needed from the student.',
     )
+    returned_documents = models.JSONField(
+        blank=True, default=dict,
+        help_text='Per-document return reasons, e.g. {"id_picture": "Photo is blurry"}',
+    )
 
     # ── Workflow / Scheduling ──
     interview_date = models.DateTimeField(null=True, blank=True)
@@ -336,6 +340,10 @@ class RenewalApplication(models.Model):
     requested_documents_note = models.TextField(
         blank=True, default='',
         help_text='Description of which additional documents are needed from the student.',
+    )
+    returned_documents = models.JSONField(
+        blank=True, default=dict,
+        help_text='Per-document return reasons, e.g. {"id_picture": "Photo is blurry"}',
     )
 
     # ── Workflow / Scheduling ──
