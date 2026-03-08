@@ -447,7 +447,7 @@
                     <thead class="table-dark">
                         <tr>
                             <th style="min-width:80px;">Time</th>
-                            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                            {% for d_val, d_label in day_choices %}<th>{{ d_label|slice:":3" }}</th>{% endfor %}
                         </tr>
                     </thead>
                     <tbody>

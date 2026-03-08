@@ -355,7 +355,7 @@
                                     <div style="overflow-x:auto; margin-bottom:0.75rem;">
                                     <table class="table table-bordered table-sm text-center" style="font-size:0.78rem;">
                                         <thead class="table-dark">
-                                            <tr><th style="min-width:70px;">Time</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
+                                            <tr><th style="min-width:70px;">Time</th>{% for d_val, d_label in day_choices %}<th>{{ d_label|slice:":3" }}</th>{% endfor %}</tr>
                                         </thead>
                                         <tbody>
                                             {% for ts_val, ts_label in time_slot_choices %}
