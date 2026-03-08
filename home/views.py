@@ -502,6 +502,61 @@ def home(request):
         for a in db_announcements
     ]
 
+    # ── All Applications (public list for Application History table) ──
+    all_applications = []
+    for app in NewApplication.objects.all().order_by('-submitted_at'):
+        student_name = f"{app.first_name} {app.last_name}"
+        documents = _build_documents_from_app(app)
+        display_status, status_message = STATUS_DISPLAY_MAP.get(
+            app.status,
+            ('Under Review', "Your documents are currently being verified.")
+        )
+        total_docs = len(documents)
+        completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
+        all_applications.append({
+            'obj': app,
+            'app_type': 'New Application',
+            'app_type_icon': 'fa-file-circle-plus',
+            'app_type_class': 'new',
+            'app_type_key': 'new',
+            'student_name': student_name,
+            'application_id': app.student_id,
+            'documents': documents,
+            'application_status': display_status,
+            'raw_status': app.status,
+            'total_docs': total_docs,
+            'completed_docs': completed_docs,
+            'submitted_at': app.submitted_at,
+            'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
+            'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+        })
+    for app in RenewalApplication.objects.all().order_by('-submitted_at'):
+        documents = _build_documents_from_renewal(app)
+        display_status, status_message = STATUS_DISPLAY_MAP.get(
+            app.status,
+            ('Under Review', "Your documents are currently being verified.")
+        )
+        total_docs = len(documents)
+        completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
+        all_applications.append({
+            'obj': app,
+            'app_type': 'Renewal Application',
+            'app_type_icon': 'fa-arrows-rotate',
+            'app_type_class': 'renewal',
+            'app_type_key': 'renewal',
+            'student_name': app.full_name,
+            'application_id': app.student_id,
+            'documents': documents,
+            'application_status': display_status,
+            'raw_status': app.status,
+            'total_docs': total_docs,
+            'completed_docs': completed_docs,
+            'submitted_at': app.submitted_at,
+            'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
+            'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+        })
+    all_applications.sort(key=lambda x: x['submitted_at'], reverse=True)
+
     # ── Approved Student Assistants (public list) ──
     approved_new = NewApplication.objects.filter(status='approved').order_by('-submitted_at')
     approved_renewal = RenewalApplication.objects.filter(status='approved').order_by('-submitted_at')
