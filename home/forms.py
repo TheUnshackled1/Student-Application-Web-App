@@ -17,7 +17,6 @@ DAY_CHOICES = [
     ('Wednesday', 'Wednesday'),
     ('Thursday', 'Thursday'),
     ('Friday', 'Friday'),
-    ('Saturday', 'Saturday'),
 ]
 
 TIME_SLOT_CHOICES = [
