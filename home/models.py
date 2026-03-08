@@ -369,7 +369,10 @@ class ApplicationNote(models.Model):
         ('staff', 'Staff Note'),
         ('director', 'Director Note'),
         ('schedule_mismatch', 'Schedule Mismatch'),
+        ('schedule_resubmit', 'Schedule Resubmitted'),
         ('document_request', 'Document Request'),
+        ('document_return', 'Document Returned'),
+        ('document_resubmit', 'Documents Resubmitted'),
         ('status_change', 'Status Change'),
     ]
 

@@ -1484,7 +1484,7 @@ def staff_return_document(request, pk):
 
     ApplicationNote.objects.create(
         new_application=app, author=request.user,
-        note_type='document_request',
+        note_type='document_return',
         content=f'Document returned — {doc_label}: {reason}',
     )
 
@@ -1887,7 +1887,7 @@ def director_return_document(request, pk):
 
     ApplicationNote.objects.create(
         new_application=app, author=request.user,
-        note_type='document_request',
+        note_type='document_return',
         content=f'Document returned — {doc_label}: {reason}',
     )
 
@@ -2418,7 +2418,7 @@ def resubmit_schedule(request, app_type, pk):
 
             ApplicationNote.objects.create(
                 **{('new_application' if app_type == 'new' else 'renewal_application'): app},
-                note_type='schedule_mismatch',
+                note_type='schedule_resubmit',
                 content='Student resubmitted availability schedule.',
             )
             send_status_update_email(app, 'schedule_mismatch', 'under_review',
@@ -2520,7 +2520,7 @@ def resubmit_documents(request, app_type, pk):
 
             ApplicationNote.objects.create(
                 **{('new_application' if app_type == 'new' else 'renewal_application'): app},
-                note_type='document_request',
+                note_type='document_resubmit',
                 content='Student resubmitted requested documents.',
             )
             send_status_update_email(app, 'documents_requested', 'under_review',

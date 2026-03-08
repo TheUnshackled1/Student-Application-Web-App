@@ -399,7 +399,7 @@
             {% if notes_log %}
             <div style="max-height:300px; overflow-y:auto;">
                 {% for note in notes_log %}
-                <div style="border-left:3px solid {% if note.note_type == 'staff' %}#3b82f6{% elif note.note_type == 'director' %}#8b5cf6{% elif note.note_type == 'schedule_mismatch' %}#ef4444{% elif note.note_type == 'document_request' %}#fbbf24{% else %}#94a3b8{% endif %}; padding:0.5rem 0.75rem; margin-bottom:0.5rem; background:rgba(255,255,255,0.03); border-radius:0 6px 6px 0;">
+                <div style="border-left:3px solid {% if note.note_type == 'staff' %}#3b82f6{% elif note.note_type == 'director' %}#8b5cf6{% elif note.note_type == 'schedule_mismatch' %}#ef4444{% elif note.note_type == 'schedule_resubmit' %}#22c55e{% elif note.note_type == 'document_return' %}#ef4444{% elif note.note_type == 'document_resubmit' %}#22c55e{% elif note.note_type == 'document_request' %}#fbbf24{% else %}#94a3b8{% endif %}; padding:0.5rem 0.75rem; margin-bottom:0.5rem; background:rgba(255,255,255,0.03); border-radius:0 6px 6px 0;">
                     <div style="font-size:0.78rem; color:#94a3b8;">
                         <strong>{{ note.get_note_type_display }}</strong>
                         {% if note.author %} by {{ note.author.get_full_name|default:note.author.username }}{% endif %}
