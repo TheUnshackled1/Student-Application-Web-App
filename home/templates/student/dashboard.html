@@ -117,15 +117,42 @@
 
                 <p class="text-muted mb-3" style="font-size:.88rem; line-height:1.5;">{{ app_card.status_message }}</p>
 
-                <!-- Progress bar -->
+                <!-- Workflow Steps -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between mb-1" style="font-size:.82rem;">
                         <span class="text-muted">Progress</span>
                         <span class="fw-semibold">{{ app_card.completed_steps }}/{{ app_card.total_steps }} steps</span>
                     </div>
-                    <div class="progress" style="height:6px; border-radius:3px; background:#e2e8f0;">
-                        <div class="progress-bar" role="progressbar" style="width:{{ app_card.progress_percent }}%; background:linear-gradient(90deg,#6366f1,#4f46e5); border-radius:3px;"></div>
+                    {% if app_card.raw_status == 'rejected' %}
+                    <div class="d-flex align-items-center gap-2 p-2 rounded" style="background:#fef2f2; border:1px solid #fecaca;">
+                        <i class="fa-solid fa-circle-xmark text-danger"></i>
+                        <span style="font-size:.84rem; color:#dc2626; font-weight:600;">Application Rejected</span>
                     </div>
+                    {% else %}
+                    <div class="d-flex align-items-start" style="position:relative; padding:4px 0;">
+                        {% for step in app_card.steps %}
+                        <div class="d-flex align-items-center {% if not forloop.last %}flex-grow-1{% endif %}">
+                            <div class="d-flex flex-column align-items-center" style="min-width:40px;">
+                                <div style="width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; transition:all .2s;
+                                    {% if step.status == 'done' %}background:#22c55e; color:#fff;
+                                    {% elif step.status == 'current' %}background:#6366f1; color:#fff; box-shadow:0 0 0 3px rgba(99,102,241,.3);
+                                    {% else %}background:#e2e8f0; color:#94a3b8;{% endif %}">
+                                    {% if step.status == 'done' %}<i class="fa-solid fa-check" style="font-size:.7rem;"></i>{% else %}{{ step.step_number }}{% endif %}
+                                </div>
+                                <span style="font-size:.65rem; font-weight:600; margin-top:4px; text-align:center; line-height:1.15; width:72px;
+                                    {% if step.status == 'done' %}color:#16a34a;
+                                    {% elif step.status == 'current' %}color:#6366f1;
+                                    {% else %}color:#94a3b8;{% endif %}">{{ step.title }}</span>
+                            </div>
+                            {% if not forloop.last %}
+                            <div class="flex-grow-1" style="height:2px; margin:0 2px; margin-bottom:22px;
+                                {% if step.status == 'done' %}background:#22c55e;
+                                {% else %}background:#e2e8f0;{% endif %}"></div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
 
                 <!-- Document summary -->

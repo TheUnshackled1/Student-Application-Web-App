@@ -442,6 +442,8 @@ def home(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'returned_documents': app.returned_documents if app.status == 'documents_requested' else {},
+            'availability_schedule': app.availability_schedule or {},
         })
 
     for app in renewal_apps:
@@ -481,6 +483,8 @@ def home(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'returned_documents': app.returned_documents if app.status == 'documents_requested' else {},
+            'availability_schedule': app.availability_schedule or {},
         })
 
     # Sort all applications by submitted date descending
@@ -1828,6 +1832,18 @@ def director_update_application_status(request, pk):
                 except (ValueError, TypeError):
                     pass
 
+        # Handle schedule mismatch
+        if new_status == 'schedule_mismatch':
+            mismatch_note = request.POST.get('schedule_mismatch_note', '')
+            app.schedule_mismatch_note = mismatch_note
+            app.schedule_verified = False
+            send_schedule_mismatch_email(app, mismatch_note)
+            ApplicationNote.objects.create(
+                new_application=app, author=request.user,
+                note_type='schedule_mismatch',
+                content=f'Schedule mismatch flagged: {mismatch_note}',
+            )
+
         # Handle document request
         if new_status == 'documents_requested':
             docs_note = request.POST.get('requested_documents_note', '')
@@ -1841,8 +1857,8 @@ def director_update_application_status(request, pk):
 
         app.save()
 
-        # Send status email for all non-document-request transitions
-        if new_status != 'documents_requested':
+        # Send status email for all other transitions
+        if new_status not in ('schedule_mismatch', 'documents_requested'):
             extra = ''
             if new_status == 'interview_scheduled' and app.interview_date:
                 extra = f'Interview date: {app.interview_date.strftime("%B %d, %Y — %I:%M %p")}'
