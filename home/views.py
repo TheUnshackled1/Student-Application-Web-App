@@ -1410,7 +1410,7 @@ def staff_update_application_status(request, pk):
         if new_status == 'approved':
             start = request.POST.get('start_date')
             if start:
-                app.start_date = start
+                app.start_date = _date.fromisoformat(start)
             # Always assign from the student's preferred office
             if app.preferred_office:
                 app.assigned_office = app.preferred_office.name
@@ -1818,7 +1818,7 @@ def director_update_application_status(request, pk):
         if new_status == 'approved':
             start = request.POST.get('start_date')
             if start:
-                app.start_date = start
+                app.start_date = _date.fromisoformat(start)
             # Always assign from the student's preferred office
             if app.preferred_office:
                 app.assigned_office = app.preferred_office.name
