@@ -529,6 +529,7 @@ def home(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'assigned_office': app.assigned_office or (app.preferred_office.name if app.preferred_office else '—'),
         })
     for app in RenewalApplication.objects.all().order_by('-submitted_at'):
         documents = _build_documents_from_renewal(app)
@@ -554,6 +555,7 @@ def home(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'assigned_office': app.assigned_office or '—',
         })
     all_applications.sort(key=lambda x: x['submitted_at'], reverse=True)
 
