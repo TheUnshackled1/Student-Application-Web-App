@@ -120,11 +120,6 @@
             <button type="button" class="review-status-btn review-btn--interview {% if app.status == 'interview_scheduled' %}review-btn--current{% endif %}" onclick="document.getElementById('interviewModal').classList.add('active'); document.body.style.overflow='hidden';">
                 <i class="fa-solid fa-calendar-check"></i> Schedule Interview
             </button>
-            {% if app.status == 'interview_scheduled' %}
-            <button type="submit" name="status" value="interview_done" class="review-status-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color:#fff; border-color:#7c3aed;">
-                <i class="fa-solid fa-clipboard-check"></i> Done Interview
-            </button>
-            {% endif %}
             <button type="submit" name="status" value="rejected" class="review-status-btn review-btn--rejected {% if app.status == 'rejected' %}review-btn--current{% endif %}">
                 <i class="fa-solid fa-circle-xmark"></i> Reject
             </button>
