@@ -66,107 +66,94 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- ━━━ RETURNED DOCUMENTS PANEL ━━━ -->
+        <!-- ━━━ RETURNED DOCUMENTS ━━━ -->
         {% if returned_docs %}
-        <div class="staff-panel" style="margin-top:1.5rem;">
-            <div class="staff-panel-header">
-                <div class="staff-panel-header-left">
-                    <span class="staff-panel-icon staff-panel-icon--amber"><i class="fa-solid fa-rotate-left"></i></span>
-                    <h3 class="staff-panel-title">Returned Documents</h3>
+        <div class="applyform-section" style="margin-top:1.5rem;">
+            <div class="applyform-section-header">
+                <span class="applyform-section-badge applyform-section-badge--amber"><i class="fa-solid fa-rotate-left"></i></span>
+                <div>
+                    <h4 class="applyform-section-title">Returned Documents</h4>
+                    <p class="applyform-section-hint">These documents were returned. Please re-upload them.</p>
                 </div>
-                <span class="staff-panel-count" style="background:#fef3c7; color:#92400e;">
-                    {{ returned_docs|length }} to fix
-                </span>
             </div>
 
-            <div class="review-doc-list">
+            <div class="applyform-docs-grid">
                 {% for doc in returned_docs %}
-                <div class="review-doc-item" style="border-left:3px solid #f59e0b; padding-left:12px; flex-direction:column; align-items:stretch; gap:8px;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div class="review-doc-status">
-                            <i class="fa-solid fa-rotate-left" style="color: #f59e0b;"></i>
-                        </div>
-                        <div class="review-doc-info" style="flex:1;">
-                            <span class="review-doc-name">{{ doc.label }}</span>
-                            <div style="margin-top:2px;">
-                                <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#92400e; background:rgba(251,191,36,0.15); padding:2px 8px; border-radius:4px;">
-                                    <i class="fa-solid fa-comment-dots"></i> {{ doc.reason }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="review-doc-badge">
-                            <span class="staff-status-tag" style="font-size:10px; background:#fef3c7; color:#92400e;">Returned</span>
-                        </div>
+                <div class="applyform-doc-card" style="border: 2px solid #f59e0b;">
+                    <div class="applyform-doc-num" style="background:linear-gradient(135deg,#f59e0b,#d97706);">{{ forloop.counter }}</div>
+                    <label class="applyform-doc-label">{{ doc.label }} <span class="text-danger">*</span></label>
+                    <div style="margin-bottom:8px;">
+                        <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#92400e; background:#fef3c7; padding:3px 10px; border-radius:6px; font-weight:600;">
+                            <i class="fa-solid fa-comment-dots"></i> {{ doc.reason }}
+                        </span>
                     </div>
-                    <div style="padding-left:28px;">
-                        <input type="file" name="{{ doc.field }}" class="form-control form-control-sm"
-                               accept=".pdf,.jpg,.jpeg,.png" style="font-size:.82rem; background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12); color:inherit;">
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="{{ doc.field }}" accept=".pdf,.jpg,.png,.jpeg">
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
+                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('{{ doc.field }}')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
                     </div>
+                    <div class="file-preview" id="preview_{{ doc.field }}"></div>
+                    <input type="hidden" name="{{ doc.field }}_photo" id="photo_{{ doc.field }}">
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- ━━━ OTHER DOCUMENTS PANEL ━━━ -->
+        <!-- ━━━ OTHER DOCUMENTS ━━━ -->
         {% if other_docs %}
-        <div class="staff-panel" style="margin-top:1.5rem;">
-            <div class="staff-panel-header">
-                <div class="staff-panel-header-left">
-                    <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-folder-open"></i></span>
-                    <h3 class="staff-panel-title">Other Documents</h3>
+        <div class="applyform-section" style="margin-top:1.5rem;">
+            <div class="applyform-section-header">
+                <span class="applyform-section-badge" style="background:linear-gradient(135deg,#059669,#10b981);"><i class="fa-solid fa-folder-open"></i></span>
+                <div>
+                    <h4 class="applyform-section-title">Other Documents</h4>
+                    <p class="applyform-section-hint">These are already on file. You may optionally replace any of them.</p>
                 </div>
-                <span class="staff-panel-count" style="background:#dcfce7; color:#166534;">
-                    Optional
-                </span>
             </div>
 
-            <div style="padding:0 24px 8px; font-size:.78rem; color:#94a3b8;">
-                These documents are already on file. You may optionally replace any of them.
-            </div>
-
-            <div class="review-doc-list">
+            <div class="applyform-docs-grid">
                 {% for doc in other_docs %}
-                <div class="review-doc-item" style="flex-direction:column; align-items:stretch; gap:8px;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div class="review-doc-status">
-                            {% if doc.has_file %}
-                                <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i>
-                            {% else %}
-                                <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i>
-                            {% endif %}
+                <div class="applyform-doc-card">
+                    <div class="applyform-doc-num">{{ forloop.counter }}</div>
+                    <label class="applyform-doc-label">
+                        {{ doc.label }}
+                        {% if doc.has_file %}
+                        <span style="font-size:.7rem; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:4px; font-weight:600; margin-left:6px;">On File</span>
+                        {% else %}
+                        <span style="font-size:.7rem; background:#fee2e2; color:#991b1b; padding:2px 8px; border-radius:4px; font-weight:600; margin-left:6px;">Missing</span>
+                        {% endif %}
+                    </label>
+                    <div class="input-with-camera">
+                        <div class="custom-file-upload">
+                            <input type="file" name="{{ doc.field }}" accept=".pdf,.jpg,.png,.jpeg">
+                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
+                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
                         </div>
-                        <div class="review-doc-info" style="flex:1;">
-                            <span class="review-doc-name">{{ doc.label }}</span>
-                        </div>
-                        <div class="review-doc-badge">
-                            {% if doc.has_file %}
-                                <span class="staff-status-tag staff-status--approved" style="font-size:10px;">On File</span>
-                            {% else %}
-                                <span class="staff-status-tag staff-status--rejected" style="font-size:10px;">Missing</span>
-                            {% endif %}
-                        </div>
+                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('{{ doc.field }}')">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
                     </div>
-                    <div style="padding-left:28px;">
-                        <input type="file" name="{{ doc.field }}" class="form-control form-control-sm"
-                               accept=".pdf,.jpg,.jpeg,.png" style="font-size:.82rem; background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12); color:inherit;">
-                    </div>
+                    <div class="file-preview" id="preview_{{ doc.field }}"></div>
+                    <input type="hidden" name="{{ doc.field }}_photo" id="photo_{{ doc.field }}">
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- ━━━ SUBMIT BAR ━━━ -->
-        <div class="review-action-bar" style="margin-top:1.5rem;">
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button type="submit" class="review-status-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; border-color:#d97706;">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Submit Documents
-                </button>
-                <a href="{% url 'home:student_dashboard' %}" class="review-status-btn review-btn--rejected" style="text-decoration:none;">
-                    <i class="fa-solid fa-arrow-left"></i> Cancel
-                </a>
-            </div>
+        <!-- ━━━ SUBMIT AREA ━━━ -->
+        <div class="applyform-submit-area">
+            <button type="submit" class="btn-form btn-form--submit">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Submit Documents
+            </button>
+            <a href="{% url 'home:student_dashboard' %}" class="btn-form btn-form--cancel" style="text-decoration:none;">
+                <i class="fa-solid fa-arrow-left"></i> Cancel
+            </a>
         </div>
     </form>
 
@@ -174,11 +161,173 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- ========== FILE UPLOAD DISPLAY ========== -->
+<script>
+document.querySelectorAll('input[type="file"]').forEach(function(input) {
+    input.addEventListener('change', function() {
+        var card = this.closest('.applyform-doc-card');
+        if (!card) return;
+        var textSpan = card.querySelector('.custom-file-text');
+        var preview = card.querySelector('.file-preview');
+        if (this.files && this.files.length > 0) {
+            var file = this.files[0];
+            if (textSpan) textSpan.textContent = file.name;
+            if (preview) {
+                var ext = file.name.split('.').pop().toLowerCase();
+                if (['jpg','jpeg','png'].indexOf(ext) !== -1) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.innerHTML = '<img src="' + e.target.result + '" style="max-width:100%;max-height:120px;border-radius:8px;margin-top:8px;">';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.innerHTML = '<span style="font-size:.8rem;color:#94a3b8;margin-top:6px;display:block;"><i class="fa-solid fa-file-pdf"></i> ' + file.name + '</span>';
+                }
+            }
+        } else {
+            if (textSpan) textSpan.textContent = textSpan.dataset.default || 'No file chosen';
+            if (preview) preview.innerHTML = '';
+        }
+    });
+});
+</script>
+
+<!-- ========== CAMERA MODAL ========== -->
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content camera-modal-card">
+    <div class="modal-header camera-modal-header">
+        <h5 class="modal-title" id="cameraModalLabel">
+            <i class="fa-solid fa-camera"></i> Take a Photo
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body text-center">
+        <div class="camera-feed-container">
+            <video id="cameraFeed" autoplay playsinline></video>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+        </div>
+        <div class="captured-preview-container" id="capturedPreview" style="display:none;">
+            <img id="capturedImage" alt="Captured photo">
+        </div>
+        <p class="camera-status" id="cameraStatus">Starting camera...</p>
+    </div>
+    <div class="modal-footer camera-modal-footer">
+        <button type="button" class="btn-form btn-form--cancel" data-bs-dismiss="modal">
+            <i class="fa-solid fa-xmark"></i> Close
+        </button>
+        <button type="button" class="btn-camera-retake" id="btnRetake" style="display:none;" onclick="retakePhoto()">
+            <i class="fa-solid fa-arrows-rotate"></i> Retake
+        </button>
+        <button type="button" class="btn-camera-capture" id="btnCapture" onclick="capturePhoto()">
+            <i class="fa-solid fa-camera"></i> Capture
+        </button>
+        <button type="button" class="btn-form btn-form--submit" id="btnUsePhoto" style="display:none;" onclick="usePhoto()">
+            <i class="fa-solid fa-check"></i> Use This Photo
+        </button>
+    </div>
+    </div>
+</div>
+</div>
+
+<!-- ========== CAMERA JS ========== -->
+<script>
+let cameraStream = null;
+let currentField = null;
+const cameraModal = document.getElementById('cameraModal');
+
+function openCameraModal(fieldName) {
+    currentField = fieldName;
+    const modal = new bootstrap.Modal(cameraModal);
+    modal.show();
+}
+
+cameraModal.addEventListener('shown.bs.modal', function () { startCamera(); });
+cameraModal.addEventListener('hidden.bs.modal', function () { stopCamera(); resetCameraUI(); });
+
+function startCamera() {
+    const video = document.getElementById('cameraFeed');
+    const status = document.getElementById('cameraStatus');
+    status.textContent = 'Starting camera...';
+    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' } })
+        .then(function(stream) {
+            cameraStream = stream;
+            video.srcObject = stream;
+            status.textContent = 'Camera ready — click Capture to take a photo';
+        })
+        .catch(function(err) {
+            status.textContent = 'Could not access camera: ' + err.message;
+        });
+}
+
+function stopCamera() {
+    if (cameraStream) { cameraStream.getTracks().forEach(function(t){ t.stop(); }); cameraStream = null; }
+    document.getElementById('cameraFeed').srcObject = null;
+}
+
+function capturePhoto() {
+    const video = document.getElementById('cameraFeed');
+    const canvas = document.getElementById('cameraCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL('image/png');
+    document.getElementById('capturedImage').src = dataUrl;
+    document.getElementById('capturedPreview').style.display = 'block';
+    video.style.display = 'none';
+    document.getElementById('btnCapture').style.display = 'none';
+    document.getElementById('btnRetake').style.display = 'inline-flex';
+    document.getElementById('btnUsePhoto').style.display = 'inline-flex';
+    document.getElementById('cameraStatus').textContent = 'Photo captured! Use it or retake.';
+}
+
+function retakePhoto() {
+    document.getElementById('capturedPreview').style.display = 'none';
+    document.getElementById('cameraFeed').style.display = 'block';
+    document.getElementById('btnCapture').style.display = 'inline-flex';
+    document.getElementById('btnRetake').style.display = 'none';
+    document.getElementById('btnUsePhoto').style.display = 'none';
+    document.getElementById('cameraStatus').textContent = 'Camera ready — click Capture to take a photo';
+}
+
+function usePhoto() {
+    const canvas = document.getElementById('cameraCanvas');
+    const dataUrl = canvas.toDataURL('image/png');
+    fetch("{% url 'home:process_camera_photo' %}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+        body: JSON.stringify({ image: dataUrl, field_name: currentField })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.status === 'ok') {
+            var hiddenInput = document.getElementById('photo_' + currentField);
+            if (hiddenInput) hiddenInput.value = dataUrl;
+            var preview = document.getElementById('preview_' + currentField);
+            if (preview) preview.innerHTML = '<img src="' + dataUrl + '" style="max-width:100%;max-height:120px;border-radius:8px;margin-top:8px;">';
+            var textSpan = document.querySelector('#preview_' + currentField).closest('.applyform-doc-card').querySelector('.custom-file-text');
+            if (textSpan) textSpan.textContent = 'Camera photo taken';
+        }
+    })
+    .catch(function(err) { alert('Error processing photo: ' + err.message); });
+    bootstrap.Modal.getInstance(cameraModal).hide();
+}
+
+function resetCameraUI() {
+    document.getElementById('capturedPreview').style.display = 'none';
+    document.getElementById('cameraFeed').style.display = 'block';
+    document.getElementById('btnCapture').style.display = 'inline-flex';
+    document.getElementById('btnRetake').style.display = 'none';
+    document.getElementById('btnUsePhoto').style.display = 'none';
+    document.getElementById('cameraStatus').textContent = '';
+}
+</script>
+
 <!-- ========== 3D TILT / PARALLAX EFFECT ========== -->
 <script>
 (function(){
     var tiltCards = document.querySelectorAll(
-        '.status-banner, .staff-panel, .review-action-bar'
+        '.status-banner, .applyform-section, .applyform-doc-card'
     );
     var maxTilt = 0.5, perspective = 1200, scale = 1.005, glowStrength = 0.08;
     tiltCards.forEach(function(card){
