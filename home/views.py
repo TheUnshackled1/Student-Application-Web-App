@@ -2438,6 +2438,50 @@ def resubmit_documents(request, app_type, pk):
         messages.error(request, 'This application does not require document resubmission.')
         return redirect('home:home')
 
+    # Build list of returned documents for the template
+    returned = app.returned_documents or {}
+
+    # Map of all document fields with labels
+    if app_type == 'new':
+        all_doc_fields = [
+            ('application_form', 'Application Form'),
+            ('id_picture', '2x2 ID Picture'),
+            ('barangay_clearance', 'Barangay Clearance'),
+            ('parents_itr', "Parent's ITR / Certificate of Indigency"),
+            ('enrolment_form', 'Certificate of Enrolment'),
+            ('schedule_classes', 'Schedule of Classes'),
+            ('proof_insurance', 'Proof of Insurance'),
+            ('grades_last_sem', 'Grades Last Semester'),
+            ('official_time', 'Official Time'),
+        ]
+    else:
+        all_doc_fields = [
+            ('id_picture', 'Updated 2x2 ID Picture'),
+            ('enrolment_form', 'Certificate of Enrolment'),
+            ('schedule_classes', 'Schedule of Classes'),
+            ('grades_last_sem', 'Grades Last Semester'),
+            ('proof_insurance', 'Proof of Insurance'),
+            ('recommendation_letter', 'Recommendation Letter'),
+            ('evaluation_form', 'Evaluation Form'),
+        ]
+
+    # Build document items for template — returned docs first, then others
+    returned_docs = []
+    other_docs = []
+    for field_name, label in all_doc_fields:
+        current_file = getattr(app, field_name, None)
+        entry = {
+            'field': field_name,
+            'label': label,
+            'reason': returned.get(field_name, ''),
+            'has_file': bool(current_file),
+            'file_url': current_file.url if current_file else '',
+        }
+        if field_name in returned:
+            returned_docs.append(entry)
+        else:
+            other_docs.append(entry)
+
     if request.method == 'POST':
         form = DocumentResubmitForm(request.POST, request.FILES)
         if form.is_valid():
@@ -2458,11 +2502,27 @@ def resubmit_documents(request, app_type, pk):
             send_status_update_email(app, 'documents_requested', 'under_review',
                                      'Your updated documents have been received and are now under review.')
             messages.success(request, 'Your documents have been re-uploaded successfully.')
+            if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+                return redirect('home:student_dashboard')
+            return redirect('home:home')
         else:
             messages.error(request, 'Please correct the errors below and try again.')
-    if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
-        return redirect('home:student_dashboard')
-    return redirect('home:home')
+
+    student_name = ''
+    if app_type == 'new':
+        student_name = f"{app.first_name} {app.last_name}"
+    else:
+        student_name = app.full_name
+
+    context = {
+        'app': app,
+        'app_type': app_type,
+        'student_name': student_name,
+        'returned_docs': returned_docs,
+        'other_docs': other_docs,
+        'requested_documents_note': app.requested_documents_note,
+    }
+    return render(request, 'student/resubmit_documents.html', context)
 
 
 @login_required
