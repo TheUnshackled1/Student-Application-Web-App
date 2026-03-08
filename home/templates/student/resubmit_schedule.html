@@ -1,0 +1,225 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resubmit Schedule — CHMSU</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'home/css/style.css' %}?v=7">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-left d-flex align-items-center gap-2">
+        <div class="logo">
+            <div class="logo-circle">
+                <span class="logo-text">CHMSU</span>
+            </div>
+        </div>
+        <a href="{% url 'home:student_dashboard' %}" class="btn btn-nav btn-nav--link">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Dashboard</span>
+        </a>
+    </div>
+</nav>
+
+<main class="main-content">
+
+    <!-- ━━━ STATUS BANNER ━━━ -->
+    <div class="status-banner">
+        <div class="status-banner-bg"></div>
+        <div class="status-banner-content">
+            <div class="status-icon-wrap">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+            <div class="status-text">
+                <div class="status-label-row">
+                    <span class="status-label">Schedule Resubmission</span>
+                    <span class="status-badge status-badge--review">
+                        <i class="fa-solid fa-circle" style="font-size:6px;"></i>
+                        Action Required
+                    </span>
+                </div>
+                <h2 class="status-title">{{ student_name }}</h2>
+                <p class="status-message">Student ID: {{ app.student_id }} &mdash; Please update your availability schedule below</p>
+            </div>
+        </div>
+        <div class="status-decoration">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mx-auto" style="max-width:900px; font-size:.85rem; border-radius:10px; margin-top:1rem;">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- ━━━ MISMATCH NOTE ━━━ -->
+    {% if mismatch_note %}
+    <div class="applyform-section" style="margin-top:1.5rem;">
+        <div class="applyform-section-header">
+            <span class="applyform-section-badge applyform-section-badge--amber"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <div>
+                <h4 class="applyform-section-title">Staff Feedback</h4>
+                <p class="applyform-section-hint">The staff found a mismatch with your submitted schedule.</p>
+            </div>
+        </div>
+        <div style="padding: 0 24px 20px;">
+            <div style="display:inline-flex; align-items:center; gap:6px; font-size:.88rem; color:#92400e; background:#fef3c7; padding:8px 16px; border-radius:8px; font-weight:600;">
+                <i class="fa-solid fa-comment-dots"></i> {{ mismatch_note }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" id="scheduleForm">
+        {% csrf_token %}
+
+        <!-- ━━━ AVAILABILITY SCHEDULE GRID ━━━ -->
+        <div class="applyform-section" style="margin-top:1.5rem;">
+            <div class="applyform-section-header">
+                <span class="applyform-section-badge" style="background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 3px 10px rgba(5,150,105,0.25);"><i class="fa-solid fa-calendar-check"></i></span>
+                <div>
+                    <h4 class="applyform-section-title">Availability Schedule</h4>
+                    <p class="applyform-section-sub">Select all time slots when you are available for duty. Staff will compare this with your uploaded Schedule of Classes.</p>
+                </div>
+            </div>
+            <div style="overflow-x:auto; padding: 0 24px 20px;">
+            <table class="table table-bordered table-sm text-center" id="availabilityGrid" style="font-size: 0.82rem;">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="min-width:80px;">Time</th>
+                        {% for d_val, d_label in day_choices %}<th>{{ d_label|slice:":3" }}</th>{% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ts_val, ts_label in time_slot_choices %}
+                    <tr>
+                        <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
+                        {% for d_val, d_label in day_choices %}
+                        <td>
+                            <input type="checkbox" class="form-check-input avail-cb" data-day="{{ d_val }}" data-time="{{ ts_val }}" style="cursor:pointer;">
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            <input type="hidden" name="availability_schedule" id="id_availability_schedule" value="">
+        </div>
+
+        <!-- ━━━ SUBMIT AREA ━━━ -->
+        <div class="applyform-submit-area">
+            <button type="submit" class="btn-form btn-form--submit">
+                <i class="fa-solid fa-paper-plane"></i> Resubmit Schedule
+            </button>
+            <a href="{% url 'home:student_dashboard' %}" class="btn-form btn-form--cancel" style="text-decoration:none;">
+                <i class="fa-solid fa-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ========== SCHEDULE GRID JS ========== -->
+<script>
+(function() {
+    var form = document.getElementById('scheduleForm');
+    var hidden = document.getElementById('id_availability_schedule');
+    if (!form || !hidden) return;
+
+    // Pre-check boxes from the old (mismatched) schedule so student can adjust
+    var oldSchedule = {{ old_schedule_json|safe }};
+    if (oldSchedule && typeof oldSchedule === 'object') {
+        Object.keys(oldSchedule).forEach(function(day) {
+            oldSchedule[day].forEach(function(time) {
+                var cb = document.querySelector('.avail-cb[data-day="' + day + '"][data-time="' + time + '"]');
+                if (cb) cb.checked = true;
+            });
+        });
+    }
+
+    form.addEventListener('submit', function(e) {
+        var schedule = {};
+        document.querySelectorAll('.avail-cb:checked').forEach(function(cb) {
+            var day = cb.getAttribute('data-day');
+            var time = cb.getAttribute('data-time');
+            if (!schedule[day]) schedule[day] = [];
+            schedule[day].push(time);
+        });
+
+        // Validate: at least one slot selected
+        if (Object.keys(schedule).length === 0) {
+            e.preventDefault();
+            alert('Please select at least one available time slot.');
+            return;
+        }
+
+        // Validate min 1 hour (2 slots) / max 4 hours (8 slots) per day
+        var days = Object.keys(schedule);
+        for (var i = 0; i < days.length; i++) {
+            var cnt = schedule[days[i]].length;
+            if (cnt < 2) {
+                e.preventDefault();
+                alert('Minimum 1 hour per day — ' + days[i] + ' has only ' + (cnt * 0.5).toFixed(1) + ' hours. Please select at least 2 slots.');
+                return;
+            }
+            if (cnt > 8) {
+                e.preventDefault();
+                alert('Maximum 4 hours per day — ' + days[i] + ' has ' + (cnt * 0.5).toFixed(1) + ' hours. Please deselect some slots.');
+                return;
+            }
+        }
+
+        hidden.value = JSON.stringify(schedule);
+    });
+})();
+</script>
+
+<!-- ========== 3D TILT / PARALLAX EFFECT ========== -->
+<script>
+(function(){
+    var tiltCards = document.querySelectorAll(
+        '.status-banner, .applyform-section'
+    );
+    var maxTilt = 0.5, perspective = 1200, scale = 1.005, glowStrength = 0.08;
+    tiltCards.forEach(function(card){
+        card.style.perspective = perspective + 'px';
+        card.addEventListener('mouseenter', function(){
+            card.style.transition = 'transform 0.08s ease-out, box-shadow 0.08s ease-out';
+        });
+        card.addEventListener('mousemove', function(e){
+            var rect = card.getBoundingClientRect();
+            var x = e.clientX - rect.left, y = e.clientY - rect.top;
+            var centerX = rect.width / 2, centerY = rect.height / 2;
+            var rotateY = ((x - centerX) / centerX) * maxTilt;
+            var rotateX = ((centerY - y) / centerY) * maxTilt;
+            var shadowX = -rotateY * 2.5, shadowY = rotateX * 2.5;
+            card.style.transform = 'perspective(' + perspective + 'px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(' + scale + ',' + scale + ',' + scale + ')';
+            card.style.boxShadow = shadowX + 'px ' + (8 + shadowY) + 'px 30px rgba(37,99,235,' + glowStrength + '), 0 0 60px rgba(59,130,246,0.08), inset 0 0 0 1px rgba(59,130,246,0.15)';
+        });
+        card.addEventListener('mouseleave', function(){
+            card.style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 1s ease';
+            card.style.transform = 'perspective(' + perspective + 'px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+            card.style.boxShadow = '';
+        });
+    });
+})();
+</script>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Tyrone, Ramsey, Gracee &amp; Dhenby. All rights reserved.</p>
+</footer>
+</body>
+</html>

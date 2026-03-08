@@ -2424,11 +2424,32 @@ def resubmit_schedule(request, app_type, pk):
             send_status_update_email(app, 'schedule_mismatch', 'under_review',
                                      'Your updated availability schedule has been received and is now under review.')
             messages.success(request, 'Your availability schedule has been updated and resubmitted.')
+            if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+                return redirect('home:student_dashboard')
+            return redirect('home:home')
         else:
             messages.error(request, 'Invalid schedule data. Please try again.')
-    if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
-        return redirect('home:student_dashboard')
-    return redirect('home:home')
+
+    # GET — render the schedule grid form
+    student_name = ''
+    if app_type == 'new':
+        student_name = f"{app.first_name} {app.last_name}"
+    else:
+        student_name = app.full_name
+
+    # Serialize old schedule as JSON so the template JS can pre-check the boxes
+    old_schedule_json = json.dumps(app.availability_schedule or {})
+
+    context = {
+        'app': app,
+        'app_type': app_type,
+        'student_name': student_name,
+        'mismatch_note': app.schedule_mismatch_note,
+        'old_schedule_json': old_schedule_json,
+        'day_choices': DAY_CHOICES,
+        'time_slot_choices': TIME_SLOT_CHOICES,
+    }
+    return render(request, 'student/resubmit_schedule.html', context)
 
 
 def resubmit_documents(request, app_type, pk):
@@ -2483,6 +2504,9 @@ def resubmit_documents(request, app_type, pk):
             other_docs.append(entry)
 
     if request.method == 'POST':
+        # Inject camera-captured photos into request.FILES before form binding
+        _inject_camera_photos(request, [f for f, _ in all_doc_fields])
+
         form = DocumentResubmitForm(request.POST, request.FILES)
         if form.is_valid():
             for field_name in form.fields:

@@ -296,17 +296,17 @@ function usePhoto() {
     fetch("{% url 'home:process_camera_photo' %}", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-        body: JSON.stringify({ image: dataUrl, field_name: currentField })
+        body: JSON.stringify({ image: dataUrl, field: currentField })
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.status === 'ok') {
             var hiddenInput = document.getElementById('photo_' + currentField);
-            if (hiddenInput) hiddenInput.value = dataUrl;
+            if (hiddenInput) hiddenInput.value = data.filename;
             var preview = document.getElementById('preview_' + currentField);
-            if (preview) preview.innerHTML = '<img src="' + dataUrl + '" style="max-width:100%;max-height:120px;border-radius:8px;margin-top:8px;">';
+            if (preview) preview.innerHTML = '<img src="' + data.path + '" style="max-width:100%;max-height:120px;border-radius:8px;margin-top:8px;">';
             var textSpan = document.querySelector('#preview_' + currentField).closest('.applyform-doc-card').querySelector('.custom-file-text');
-            if (textSpan) textSpan.textContent = 'Camera photo taken';
+            if (textSpan) textSpan.textContent = data.filename;
         }
     })
     .catch(function(err) { alert('Error processing photo: ' + err.message); });
