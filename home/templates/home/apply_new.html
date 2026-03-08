@@ -650,7 +650,12 @@
                 preview.style.display = 'block';
 
                 var card = preview.closest('.applyform-doc-card');
-                if (card) hideFileUpload(card);
+                if (card) {
+                    hideFileUpload(card);
+                    // Remove required from the file input so HTML5 validation doesn't block submit
+                    var fileInput = card.querySelector('input[type="file"]');
+                    if (fileInput) fileInput.removeAttribute('required');
+                }
             }
         })
         .catch(function(err) {
@@ -721,7 +726,7 @@
             if (camBtn) camBtn.style.display = '';
             if (upload) upload.style.display = '';
             if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
-            if (fileInput) { fileInput.value = ''; }
+            if (fileInput) { fileInput.value = ''; fileInput.setAttribute('required', ''); }
             if (hiddenPhoto) { hiddenPhoto.value = ''; }
             var textSpan = card.querySelector('.custom-file-text');
             if (textSpan) { textSpan.textContent = textSpan.dataset.default; textSpan.classList.remove('has-file'); }

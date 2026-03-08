@@ -36,6 +36,40 @@ import os
 import uuid
 import cv2
 import numpy as np
+from django.core.files.base import ContentFile
+
+
+def _inject_camera_photos(request, doc_fields):
+    """Move camera-captured photos from hidden POST fields into request.FILES.
+
+    For each document field, check if ``<field>_photo`` exists in POST data
+    (a filename saved by process_camera_photo). If the corresponding file
+    input is empty (no regular upload), open the camera photo from disk and
+    inject it as an InMemoryUploadedFile so the form sees a normal file.
+    """
+    # request.FILES may be immutable; ensure we can write to it
+    mutable_before = getattr(request.FILES, '_mutable', None)
+    if mutable_before is not None:
+        request.FILES._mutable = True
+
+    for field in doc_fields:
+        photo_key = f"{field}_photo"
+        filename = request.POST.get(photo_key, '').strip()
+        if not filename or field in request.FILES:
+            continue  # no camera photo, or user already uploaded a file
+        photo_path = os.path.join(settings.MEDIA_ROOT, 'camera_photos', filename)
+        if not os.path.isfile(photo_path):
+            continue
+        # Security: ensure filename doesn't escape the camera_photos dir
+        real_dir = os.path.realpath(os.path.join(settings.MEDIA_ROOT, 'camera_photos'))
+        real_path = os.path.realpath(photo_path)
+        if not real_path.startswith(real_dir):
+            continue
+        with open(photo_path, 'rb') as fh:
+            request.FILES[field] = ContentFile(fh.read(), name=filename)
+
+    if mutable_before is not None:
+        request.FILES._mutable = mutable_before
 
 
 def _urgency_for_days(days_left):
@@ -695,6 +729,12 @@ def available_offices(request):
 def apply_new(request):
     """Application form for new student assistants."""
     if request.method == 'POST':
+        # Inject camera-captured photos into request.FILES before form binding
+        _inject_camera_photos(request, [
+            'application_form', 'id_picture', 'barangay_clearance',
+            'parents_itr', 'enrolment_form', 'schedule_classes',
+            'proof_insurance', 'grades_last_sem', 'official_time',
+        ])
         form = NewApplicationForm(request.POST, request.FILES)
         if form.is_valid():
             application = form.save(commit=False)
@@ -745,6 +785,12 @@ def apply_new(request):
 def apply_renew(request):
     """Renewal form for existing student assistants."""
     if request.method == 'POST':
+        # Inject camera-captured photos into request.FILES before form binding
+        _inject_camera_photos(request, [
+            'id_picture', 'enrolment_form', 'schedule_classes',
+            'grades_last_sem', 'official_time', 'recommendation_letter',
+            'evaluation_form',
+        ])
         form = RenewalApplicationForm(request.POST, request.FILES)
         if form.is_valid():
             application = form.save(commit=False)
