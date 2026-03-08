@@ -162,6 +162,7 @@ def _create_active_sa_from_application(app):
         semester=app.semester,
         start_date=app.start_date,
         status='active',
+        duty_schedule=app.availability_schedule,
     )
 
     # Auto-calculate end_date (80 weekdays, skipping no-duty days)
@@ -2584,6 +2585,7 @@ def student_dashboard(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'availability_schedule': app.availability_schedule or {},
         })
 
     for app in renewal_apps:
@@ -2610,6 +2612,7 @@ def student_dashboard(request):
             'submitted_at': app.submitted_at,
             'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
             'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+            'availability_schedule': app.availability_schedule or {},
         })
 
     applications.sort(key=lambda x: x['submitted_at'], reverse=True)
