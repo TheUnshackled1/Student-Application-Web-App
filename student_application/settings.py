@@ -147,7 +147,7 @@ LOGOUT_REDIRECT_URL = "/"
 
 # For development — prints emails to the terminal console:
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = "SWA Application System <noreply@chmsu.edu.ph>"
+DEFAULT_FROM_EMAIL = "jtcoronel.chmsu@gmail.com"
 
 # ── Django JET Configuration ──
 JET_DEFAULT_THEME = "light-gray"
