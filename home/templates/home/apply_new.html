@@ -1181,7 +1181,10 @@ function showDocPreview(src, title, type) {
     var titleEl = document.getElementById('docPreviewTitle');
     titleEl.textContent = title || 'Preview';
     if (type === 'pdf') {
-        body.innerHTML = '<iframe class="file-preview-iframe" src="' + src + '"></iframe>';
+        body.innerHTML = '<object data="' + src + '" type="application/pdf" class="file-preview-iframe">' +
+            '<div class="file-preview-fallback"><i class="fa-solid fa-file-pdf" style="font-size:48px;color:#ef4444;"></i>' +
+            '<p>Your browser cannot display this PDF inline.</p>' +
+            '<a href="' + src + '" class="doc-action-btn" target="_blank">Open PDF in New Tab</a></div></object>';
     } else {
         body.innerHTML = '<img class="file-preview-image" src="' + src + '" alt="' + (title || 'Preview') + '">';
     }

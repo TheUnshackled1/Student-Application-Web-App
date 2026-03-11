@@ -738,7 +738,10 @@ function _loadPdf(url) {
         _renderPdfPage(_pdfPage);
     }).catch(function() {
         document.getElementById('filePreviewBody').innerHTML =
-            '<iframe src="' + url + '" class="file-preview-iframe"></iframe>';
+            '<object data="' + url + '" type="application/pdf" class="file-preview-iframe">' +
+            '<div class="file-preview-fallback"><i class="fa-solid fa-file-pdf" style="font-size:48px;color:#ef4444;"></i>' +
+            '<p>Your browser cannot display this PDF inline.</p>' +
+            '<a href="' + url + '" class="doc-action-btn" target="_blank">Open PDF in New Tab</a></div></object>';
     });
 }
 
