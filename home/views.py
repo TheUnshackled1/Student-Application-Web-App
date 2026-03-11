@@ -28,6 +28,7 @@ from .email_utils import (
 )
 from datetime import date as _date, datetime as _datetime, timedelta
 import json
+import csv
 import calendar
 from collections import defaultdict
 from decimal import Decimal
@@ -3275,3 +3276,111 @@ def staff_delete_no_duty_day(request, pk):
     recalculate_end_dates_for_office(office)
     messages.success(request, 'No-Duty Day removed.')
     return redirect('home:staff_dashboard')
+
+
+# ================================================================
+#  CSV EXPORT VIEWS
+# ================================================================
+
+def _make_csv_response(filename, header, rows):
+    """Helper to build an HttpResponse with CSV content."""
+    from django.http import HttpResponse
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    writer = csv.writer(response)
+    writer.writerow(header)
+    for row in rows:
+        writer.writerow(row)
+    return response
+
+
+@login_required
+def staff_export_applications_csv(request):
+    """Export all applications as CSV (staff)."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    header = [
+        'Type', 'Student ID', 'First Name', 'Last Name', 'Email', 'Contact',
+        'Course', 'Year Level', 'Semester', 'GPA', 'Preferred Office', 'Status',
+        'Submitted At',
+    ]
+    rows = []
+    for app in NewApplication.objects.select_related('preferred_office').order_by('-submitted_at'):
+        rows.append([
+            'New', app.student_id, app.first_name, app.last_name,
+            app.email, app.contact_number, app.course, app.year_level,
+            app.semester, app.gpa or '', app.preferred_office or '',
+            app.get_status_display(), app.submitted_at.strftime('%Y-%m-%d %H:%M'),
+        ])
+    for app in RenewalApplication.objects.select_related('preferred_office').order_by('-submitted_at'):
+        rows.append([
+            'Renewal', app.student_id, app.first_name, app.last_name,
+            app.email, app.contact_number, app.course, app.year_level,
+            app.semester, app.gpa or '', app.preferred_office or '',
+            app.get_status_display(), app.submitted_at.strftime('%Y-%m-%d %H:%M'),
+        ])
+    return _make_csv_response('applications_export.csv', header, rows)
+
+
+@login_required
+def staff_export_active_sa_csv(request):
+    """Export active student assistants as CSV (staff)."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    header = [
+        'Student ID', 'Full Name', 'Email', 'Course', 'Assigned Office',
+        'Semester', 'Academic Year', 'Start Date', 'End Date',
+        'Total Hours', 'Required Hours', 'Status',
+    ]
+    rows = []
+    for sa in ActiveStudentAssistant.objects.select_related('assigned_office').order_by('-created_at'):
+        rows.append([
+            sa.student_id, sa.full_name, sa.email, sa.course,
+            sa.assigned_office or '', sa.semester, sa.academic_year,
+            sa.start_date or '', sa.end_date or '',
+            sa.total_hours, sa.required_hours, sa.get_status_display(),
+        ])
+    return _make_csv_response('active_sa_export.csv', header, rows)
+
+
+@login_required
+def staff_export_attendance_csv(request):
+    """Export attendance records as CSV (staff)."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    header = [
+        'Student ID', 'Full Name', 'Office', 'Date', 'Shift',
+        'Time In', 'Time Out', 'Hours Worked', 'Status', 'Remarks',
+    ]
+    rows = []
+    for att in AttendanceRecord.objects.select_related('student_assistant', 'student_assistant__assigned_office').order_by('-date', '-time_in'):
+        sa = att.student_assistant
+        rows.append([
+            sa.student_id, sa.full_name, sa.assigned_office or '',
+            att.date, att.shift, att.time_in or '', att.time_out or '',
+            att.hours_worked, att.get_status_display(), att.remarks,
+        ])
+    return _make_csv_response('attendance_export.csv', header, rows)
+
+
+@login_required
+def director_export_evaluations_csv(request):
+    """Export performance evaluations as CSV (director only)."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+    header = [
+        'Student ID', 'Full Name', 'Office', 'Period',
+        'Work Quality', 'Punctuality', 'Initiative', 'Cooperation',
+        'Communication', 'Overall Rating', 'Remarks', 'Evaluated By', 'Date',
+    ]
+    rows = []
+    for ev in PerformanceEvaluation.objects.select_related('student_assistant', 'student_assistant__assigned_office', 'evaluated_by').order_by('-evaluated_at'):
+        sa = ev.student_assistant
+        rows.append([
+            sa.student_id, sa.full_name, sa.assigned_office or '',
+            ev.get_evaluation_period_display(),
+            ev.work_quality, ev.punctuality, ev.initiative,
+            ev.cooperation, ev.communication, ev.overall_rating,
+            ev.remarks, ev.evaluated_by or '', ev.evaluated_at.strftime('%Y-%m-%d %H:%M'),
+        ])
+    return _make_csv_response('evaluations_export.csv', header, rows)
