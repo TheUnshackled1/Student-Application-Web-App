@@ -84,4 +84,10 @@ urlpatterns = [
     # ---- Staff: No-Duty Days ----
     path('staff/no-duty/add/', views.staff_add_no_duty_day, name='staff_add_no_duty_day'),
     path('staff/no-duty/<int:pk>/delete/', views.staff_delete_no_duty_day, name='staff_delete_no_duty_day'),
+
+    # ---- CSV Exports ----
+    path('staff/export/applications/', views.staff_export_applications_csv, name='staff_export_applications_csv'),
+    path('staff/export/active-sa/', views.staff_export_active_sa_csv, name='staff_export_active_sa_csv'),
+    path('staff/export/attendance/', views.staff_export_attendance_csv, name='staff_export_attendance_csv'),
+    path('director/export/evaluations/', views.director_export_evaluations_csv, name='director_export_evaluations_csv'),
 ]
