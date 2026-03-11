@@ -2948,6 +2948,16 @@ def student_dashboard(request):
             )
             is_on_duty = rec and rec.time_in and not rec.time_out
             is_done = rec and rec.time_in and rec.time_out
+            is_past = bool(slot_end and now_time > slot_end and not rec)
+
+            # Real-time absent record: shift ended with no clock-in → create absent record now
+            if is_past:
+                rec, _ = AttendanceRecord.objects.get_or_create(
+                    student_assistant=sa,
+                    date=today,
+                    shift=slot,
+                    defaults={'status': 'absent'},
+                )
 
             shifts_status.append({
                 'label': slot,
@@ -2959,8 +2969,11 @@ def student_dashboard(request):
                 'is_done': is_done,
                 'not_yet': slot_start and now_time < earliest_in if earliest_in else False,
                 'earliest_in': earliest_in,
-                'past': slot_end and now_time > slot_end and not rec,
+                'past': is_past,
             })
+
+        # Re-fetch attendance so newly created absent records appear in Recent Attendance
+        attendance = sa.attendance_records.all()[:20]
 
         # ── Monthly payout summary (₱35/hr, 4 months from start_date) ──
         HOURLY_RATE = Decimal('35.00')
