@@ -200,3 +200,43 @@ def send_absent_notification_email(sa, absent_date, shift_label):
         f"— SWA Application System"
     )
     return _send(subject, message, sa.email)
+
+
+def send_consecutive_absence_alert(sa, streak_count, recent_dates):
+    """Alert when a student has consecutive absences."""
+    if not sa.email:
+        return False
+
+    office_name = sa.assigned_office.name if sa.assigned_office else 'your assigned office'
+    dates_str = ', '.join(d.strftime('%B %d') for d in recent_dates)
+    subject = f'Attendance Warning — {streak_count} Consecutive Absences'
+    message = (
+        f"Dear {sa.full_name},\n\n"
+        f"You have been absent for {streak_count} consecutive duty day(s).\n\n"
+        f"  • Office     : {office_name}\n"
+        f"  • Dates      : {dates_str}\n\n"
+        f"Consistent attendance is required for all Student Assistants.\n"
+        f"Please report to your assigned office or contact the SWA staff\n"
+        f"if you have a valid reason for your absences.\n\n"
+        f"— SWA Application System"
+    )
+    return _send(subject, message, sa.email)
+
+
+def send_late_threshold_alert(sa, late_count, month_label):
+    """Alert when a student exceeds the monthly late threshold."""
+    if not sa.email:
+        return False
+
+    office_name = sa.assigned_office.name if sa.assigned_office else 'your assigned office'
+    subject = f'Late Attendance Warning — {late_count} Late Records in {month_label}'
+    message = (
+        f"Dear {sa.full_name},\n\n"
+        f"You have been marked LATE {late_count} time(s) this month ({month_label}).\n\n"
+        f"  • Office     : {office_name}\n"
+        f"  • Late Count : {late_count}\n\n"
+        f"Please make an effort to clock in on time. Excessive tardiness\n"
+        f"may affect your standing as a Student Assistant.\n\n"
+        f"— SWA Application System"
+    )
+    return _send(subject, message, sa.email)

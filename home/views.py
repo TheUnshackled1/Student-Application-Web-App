@@ -3187,6 +3187,109 @@ def _get_today_shifts(sa):
     return _merge_consecutive_slots(raw_slots)
 
 
+# ── Attendance summary helpers ──
+
+CONSECUTIVE_ABSENCE_THRESHOLD = 3
+LATE_MONTHLY_THRESHOLD = 5
+
+
+def _build_weekly_summary(attendance_qs, start_date):
+    """Group attendance by ISO week: {week_label, present, late, absent, hours}."""
+    from collections import defaultdict
+    weeks = defaultdict(lambda: {'present': 0, 'late': 0, 'absent': 0, 'excused': 0, 'hours': Decimal('0')})
+    for rec in attendance_qs:
+        iso_year, iso_week, _ = rec.date.isocalendar()
+        key = (iso_year, iso_week)
+        if rec.status in ('present', 'late', 'absent', 'excused'):
+            weeks[key][rec.status] += 1
+        if rec.time_in and rec.time_out:
+            weeks[key]['hours'] += Decimal(str(rec.hours_worked))
+
+    result = []
+    for (iso_year, iso_week) in sorted(weeks.keys()):
+        # Monday of that ISO week
+        from datetime import date as _d
+        try:
+            week_start = _d.fromisocalendar(iso_year, iso_week, 1)
+            week_end = _d.fromisocalendar(iso_year, iso_week, 5)  # Friday
+        except (ValueError, AttributeError):
+            week_start = week_end = None
+        w = weeks[(iso_year, iso_week)]
+        result.append({
+            'week_num': iso_week,
+            'start': week_start,
+            'end': week_end,
+            'label': f"Week {iso_week} ({week_start.strftime('%b %d') if week_start else '?'} – {week_end.strftime('%b %d') if week_end else '?'})",
+            'present': w['present'],
+            'late': w['late'],
+            'absent': w['absent'],
+            'excused': w['excused'],
+            'hours': float(w['hours']),
+        })
+    return result
+
+
+def _build_semester_report(sa):
+    """Build a semester-wide attendance summary for an SA."""
+    all_records = sa.attendance_records.all()
+    total = all_records.count()
+    present = all_records.filter(status='present').count()
+    late = all_records.filter(status='late').count()
+    absent = all_records.filter(status='absent').count()
+    excused = all_records.filter(status='excused').count()
+    total_hours = sum(Decimal(str(r.hours_worked)) for r in all_records)
+    attendance_rate = round((present + late) / total * 100, 1) if total else 0
+    return {
+        'total': total,
+        'present': present,
+        'late': late,
+        'absent': absent,
+        'excused': excused,
+        'total_hours': float(total_hours),
+        'required_hours': sa.required_hours,
+        'hours_pct': sa.hours_percentage,
+        'attendance_rate': attendance_rate,
+        'semester': sa.get_semester_display(),
+        'academic_year': sa.academic_year,
+    }
+
+
+def _check_consecutive_absences(sa):
+    """Check if student has >= THRESHOLD consecutive absent *dates* (most recent)."""
+    records = (sa.attendance_records
+               .filter(status='absent')
+               .order_by('-date')
+               .values_list('date', flat=True))
+    if not records:
+        return 0, []
+    unique_dates = sorted(set(records), reverse=True)
+    streak = 1
+    streak_dates = [unique_dates[0]]
+    for i in range(1, len(unique_dates)):
+        # Count weekday gaps (skip weekends)
+        prev, cur = unique_dates[i - 1], unique_dates[i]
+        diff_days = (prev - cur).days
+        # If dates are consecutive weekdays (1 day or 3 days for Fri→Mon)
+        if diff_days <= 3 and cur.weekday() < 5:
+            streak += 1
+            streak_dates.append(cur)
+        else:
+            break
+    return streak, list(reversed(streak_dates))
+
+
+def _check_late_threshold(sa):
+    """Check if student exceeded LATE_MONTHLY_THRESHOLD this month."""
+    today = _date.today()
+    late_count = sa.attendance_records.filter(
+        status='late',
+        date__year=today.year,
+        date__month=today.month,
+    ).count()
+    month_label = today.strftime('%B %Y')
+    return late_count, month_label
+
+
 @login_required
 @require_POST
 def student_save_duty_schedule(request, pk):
