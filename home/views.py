@@ -3198,6 +3198,118 @@ def student_dashboard(request):
 
 
 # ================================================================
+#  ATTENDANCE HELPERS — Weekly, Semester, Alerts
+# ================================================================
+
+# Thresholds
+CONSECUTIVE_ABSENCE_THRESHOLD = 3   # consecutive duty-days absent
+LATE_MONTHLY_THRESHOLD = 5          # late records per month
+
+
+def _build_weekly_summary(attendance_qs, start_date):
+    """Group attendance records into ISO-week buckets."""
+    if not start_date:
+        return []
+    weekly = defaultdict(lambda: {'present': 0, 'late': 0, 'absent': 0, 'hours': Decimal('0')})
+    for rec in attendance_qs:
+        iso_year, iso_week, _ = rec.date.isocalendar()
+        key = (iso_year, iso_week)
+        if rec.status in ('present', 'late', 'absent'):
+            weekly[key][rec.status] += 1
+        if rec.time_in and rec.time_out:
+            weekly[key]['hours'] += Decimal(str(rec.hours_worked))
+    if not weekly:
+        return []
+    result = []
+    for (yr, wk) in sorted(weekly.keys(), reverse=True):
+        # Monday of that ISO week
+        from datetime import datetime as _dt
+        monday = _dt.strptime(f'{yr} {wk} 1', '%G %V %u').date()
+        sunday = monday + timedelta(days=6)
+        label = f"{monday.strftime('%b %d')} – {sunday.strftime('%b %d, %Y')}"
+        data = weekly[(yr, wk)]
+        result.append({
+            'label': label,
+            'present': data['present'],
+            'late': data['late'],
+            'absent': data['absent'],
+            'hours': float(data['hours']),
+        })
+    return result[:8]  # last 8 weeks
+
+
+def _build_semester_report(sa):
+    """Build a semester-wide attendance summary."""
+    all_records = sa.attendance_records.all()
+    total = all_records.count()
+    if total == 0:
+        return None
+    present = all_records.filter(status='present').count()
+    late = all_records.filter(status='late').count()
+    absent = all_records.filter(status='absent').count()
+    excused = all_records.filter(status='excused').count()
+    attended = present + late + excused
+    attendance_rate = round(attended / total * 100, 1) if total else 0
+    total_hours = float(sa.total_hours)
+    required_hours = sa.required_hours
+    hours_pct = round(total_hours / required_hours * 100, 1) if required_hours else 0
+    return {
+        'semester': sa.get_semester_display(),
+        'academic_year': sa.academic_year,
+        'total': total,
+        'present': present,
+        'late': late,
+        'absent': absent,
+        'excused': excused,
+        'attendance_rate': attendance_rate,
+        'total_hours': total_hours,
+        'required_hours': required_hours,
+        'hours_pct': hours_pct,
+    }
+
+
+def _check_consecutive_absences(sa):
+    """Check for consecutive duty-day absences (most recent streak)."""
+    records = (
+        sa.attendance_records
+        .filter(status='absent')
+        .order_by('-date')
+        .values_list('date', flat=True)
+    )
+    if not records:
+        return 0, []
+    unique_dates = sorted(set(records), reverse=True)
+    # Walk backwards from the most recent absent date counting consecutive weekdays
+    streak = [unique_dates[0]]
+    cursor = unique_dates[0]
+    used = set(unique_dates)
+    while True:
+        # Find previous weekday
+        prev = cursor - timedelta(days=1)
+        while prev.weekday() >= 5:  # skip weekends
+            prev -= timedelta(days=1)
+        if prev in used:
+            streak.append(prev)
+            cursor = prev
+        else:
+            break
+    streak.reverse()
+    return len(streak), streak
+
+
+def _check_late_threshold(sa):
+    """Count late records in the current month."""
+    today = _date.today()
+    count = sa.attendance_records.filter(
+        status='late',
+        date__year=today.year,
+        date__month=today.month,
+    ).count()
+    month_label = today.strftime('%B %Y')
+    return count, month_label
+
+
+# ================================================================
 #  STUDENT CLOCK-IN / CLOCK-OUT  &  DUTY SCHEDULE
 # ================================================================
 
