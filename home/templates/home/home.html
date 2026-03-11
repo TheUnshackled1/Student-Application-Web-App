@@ -777,7 +777,19 @@ function openFilePreview(url, name) {
     var officeExts = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
 
     if (imageExts.indexOf(ext) !== -1) {
-        body.innerHTML = '<img src="' + url + '" alt="' + name + '" class="file-preview-image">';
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = name;
+        img.className = 'file-preview-image';
+        img.onerror = function() {
+            body.innerHTML = '<div class="file-preview-fallback">' +
+                '<i class="fa-solid fa-image" style="font-size:48px;color:#ef4444;"></i>' +
+                '<p>Image could not be loaded. The file may have been moved or deleted.</p>' +
+                '<a href="' + url + '" class="doc-action-btn" download>Download File</a>' +
+                '</div>';
+        };
+        body.innerHTML = '';
+        body.appendChild(img);
     } else if (pdfExts.indexOf(ext) !== -1) {
         body.innerHTML = '<div id="pdfScrollContainer" style="width:100%;overflow-y:auto;padding:4px 0;"></div>';
         overlay.classList.add('active');
