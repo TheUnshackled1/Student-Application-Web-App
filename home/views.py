@@ -2997,6 +2997,37 @@ def student_dashboard(request):
         })
     approved_students.sort(key=lambda x: x['submitted_at'], reverse=True)
 
+    # ── Reminders & Announcements (same logic as home view) ──
+    from django.db.models import Q
+    reminder_filter = Q(student__isnull=True, is_active=True) & (
+        Q(expires_at__isnull=True) | Q(expires_at__gte=today)
+    )
+    db_reminders = Reminder.objects.filter(reminder_filter).order_by('-created_at')
+    reminders = [
+        {
+            'message': r.message,
+            'priority': r.priority,
+            'id': r.id,
+            'created_at': r.created_at.strftime('%b %d, %Y'),
+        }
+        for r in db_reminders
+    ]
+
+    db_announcements = Announcement.objects.filter(is_active=True).exclude(
+        expires_at__isnull=False, expires_at__lt=today
+    )[:6]
+    seven_days_ago = timezone.now() - timedelta(days=7)
+    announcements = [
+        {
+            'title': a.title,
+            'summary': a.summary,
+            'image': a.image,
+            'published_at': a.published_at.strftime('%b %d, %Y'),
+            'is_new': a.published_at >= seven_days_ago,
+        }
+        for a in db_announcements
+    ]
+
     context = {
         'profile': profile,
         'applications': applications,
@@ -3006,6 +3037,8 @@ def student_dashboard(request):
         'today': today,
         'day_choices': DAY_CHOICES,
         'time_slot_choices': TIME_SLOT_CHOICES,
+        'reminders': reminders,
+        'announcements': announcements,
     }
     return render(request, 'student/dashboard.html', context)
 
