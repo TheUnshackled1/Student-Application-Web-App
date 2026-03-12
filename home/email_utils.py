@@ -39,7 +39,6 @@ def send_application_confirmation(application, app_type='new'):
 
 
 def send_status_update_email(application, old_status, new_status, extra_message=''):
-    """Send email whenever an application status changes."""
     if not application.email:
         return False
 
