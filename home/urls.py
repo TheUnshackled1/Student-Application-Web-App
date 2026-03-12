@@ -70,6 +70,7 @@ urlpatterns = [
     path('director/sa/<int:pk>/evaluate/', views.director_evaluate_sa, name='director_evaluate_sa'),
     path('director/sa/<int:pk>/status/', views.director_update_sa_status, name='director_update_sa_status'),
     path('sa/<int:pk>/certificate/', views.sa_completion_certificate, name='sa_completion_certificate'),
+    path('director/reports/', views.director_department_reports, name='director_department_reports'),
 
     # ---- Student: Schedule & Document Resubmission ----
     path('resubmit-schedule/<str:app_type>/<int:pk>/', views.resubmit_schedule, name='resubmit_schedule'),

@@ -42,6 +42,7 @@
         <div class="logo"><img src="{% static 'home/images/chmsu_logo.png' %}" alt="CHMSU" class="logo-img"></div>
         <a href="{% url 'home:director_dashboard' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-arrow-left"></i><span>DASHBOARD</span></a>
         <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-building"></i><span>OFFICES</span></a>
+        <a href="{% url 'home:director_department_reports' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-chart-bar"></i><span>REPORTS</span></a>
     </div>
     <div class="navbar-right d-flex align-items-center gap-2">
         <form method="post" action="{% url 'logout' %}" style="margin:0;">{% csrf_token %}
