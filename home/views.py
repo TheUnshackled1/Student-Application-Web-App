@@ -3772,7 +3772,7 @@ def director_department_reports(request):
     if not request.user.is_superuser:
         return redirect('home:home')
 
-    from django.db.models import Avg, Count, Q, Sum, F
+    from django.db.models import Avg, Count, FloatField, Q, Sum, F
     from django.db.models.functions import Coalesce
 
     offices = Office.objects.filter(is_active=True).order_by('name')
@@ -3795,9 +3795,9 @@ def director_department_reports(request):
 
         # ── Productivity / hours averages ──
         hours_agg = sas.aggregate(
-            avg_hours=Coalesce(Avg('total_hours'), 0.0),
-            total_hours=Coalesce(Sum('total_hours'), 0.0),
-            avg_required=Coalesce(Avg('required_hours'), 0.0),
+            avg_hours=Coalesce(Avg('total_hours'), 0.0, output_field=FloatField()),
+            total_hours=Coalesce(Sum('total_hours'), 0.0, output_field=FloatField()),
+            avg_required=Coalesce(Avg('required_hours'), 0.0, output_field=FloatField()),
         )
         avg_hours = round(float(hours_agg['avg_hours']), 1)
         total_hours = round(float(hours_agg['total_hours']), 1)
@@ -3854,8 +3854,8 @@ def director_department_reports(request):
 
     all_sas = ActiveStudentAssistant.objects.all()
     g_hours = all_sas.aggregate(
-        avg_hours=Coalesce(Avg('total_hours'), 0.0),
-        total_hours=Coalesce(Sum('total_hours'), 0.0),
+        avg_hours=Coalesce(Avg('total_hours'), 0.0, output_field=FloatField()),
+        total_hours=Coalesce(Sum('total_hours'), 0.0, output_field=FloatField()),
     )
 
     all_evals = PerformanceEvaluation.objects.all()
