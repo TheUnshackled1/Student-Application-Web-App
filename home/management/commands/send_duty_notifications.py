@@ -1,9 +1,3 @@
-"""
-Management command to send duty shift reminders and absent notifications.
-
-Run every minute via Task Scheduler (Windows) or cron (Linux):
-    python manage.py send_duty_notifications
-"""
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
@@ -20,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 def _parse_slot_times(slot_label):
-    """Parse '8:00 AM - 9:00 AM' into (time_start, time_end)."""
     from datetime import datetime
     try:
         parts = slot_label.split(' - ')
