@@ -27,7 +27,7 @@ class CustomIndexDashboard(Dashboard):
             order=0,
         ))
 
-        # ── App List ──
+
         self.children.append(modules.AppList(
             'Application Models',
             column=2,
