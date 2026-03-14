@@ -1029,6 +1029,7 @@
 
         sidInput.addEventListener('input', function() {
             clearTimeout(checkTimer);
+            window._studentIdVerified = false;
             var val = this.value.trim();
 
             // Hide banners while typing
@@ -1082,6 +1083,7 @@
                             foundText.textContent = 'Welcome back, ' + d.full_name + '! Your information has been pre-filled from your previous application. Please verify and update as needed.';
                             foundBox.style.display = 'flex';
                             notFoundBox.style.display = 'none';
+                            window._studentIdVerified = true;
                             statusText.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Student found';
                             statusText.style.color = '#22c55e';
                         } else {
