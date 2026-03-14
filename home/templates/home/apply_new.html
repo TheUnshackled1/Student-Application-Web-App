@@ -430,7 +430,7 @@
             </div>
 
             <!-- ━━━ AVAILABILITY SCHEDULE (inside documents section) ━━━ -->
-            <div style="margin-top: 1.5rem;">
+            <div id="availabilitySection" style="margin-top: 1.5rem; display: none;">
                 <div class="applyform-section-header">
                     <span class="applyform-section-badge" style="background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 3px 10px rgba(5,150,105,0.25);"><i class="fa-solid fa-calendar-check"></i></span>
                     <div>
@@ -1141,6 +1141,34 @@
             }
             hidden.value = JSON.stringify(schedule);
         });
+    })();
+
+    // ── Show Availability Schedule when Official Time is uploaded ──
+    (function() {
+        var section = document.getElementById('availabilitySection');
+        if (!section) return;
+        var fileInput = document.querySelector('input[name="official_time"]');
+        var photoInput = document.getElementById('photo_official_time');
+
+        function showSchedule() {
+            if ((fileInput && fileInput.files && fileInput.files.length > 0) ||
+                (photoInput && photoInput.value)) {
+                section.style.display = '';
+            }
+        }
+
+        if (fileInput) fileInput.addEventListener('change', showSchedule);
+        // Also observe the hidden photo input for camera captures
+        if (photoInput) {
+            new MutationObserver(showSchedule).observe(photoInput, {attributes: true, attributeFilter: ['value']});
+            // Fallback: periodically check (camera modal sets value via JS)
+            setInterval(function() { if (photoInput.value) showSchedule(); }, 500);
+        }
+        // If form was re-rendered with validation errors and schedule already has data, show it
+        var hidden = document.getElementById('id_availability_schedule');
+        if (hidden && hidden.value && hidden.value !== '{}' && hidden.value !== '') {
+            section.style.display = '';
+        }
     })();
 </script>
 <script>
