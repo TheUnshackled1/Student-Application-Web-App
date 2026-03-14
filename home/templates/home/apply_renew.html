@@ -309,14 +309,14 @@
                             <label class="form-label">Total Hours Rendered <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-hourglass-half"></i>
-                                <input type="number" class="form-control" name="hours_rendered" placeholder="e.g. 120" value="{{ form.hours_rendered.value|default:'' }}" required>
+                                <input type="number" class="form-control" name="hours_rendered" id="id_hours_rendered" placeholder="e.g. 120" value="{{ form.hours_rendered.value|default:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Supervisor's Name (Previous)</label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-user-tie"></i>
-                                <input type="text" class="form-control" name="supervisor_name" placeholder="Full name of your previous supervisor" value="{{ form.supervisor_name.value|default:'' }}">
+                                <input type="text" class="form-control" name="supervisor_name" id="id_supervisor_name" placeholder="Full name of your previous supervisor" value="{{ form.supervisor_name.value|default:'' }}">
                             </div>
                         </div>
                     </div>
@@ -1059,6 +1059,10 @@
                             fillField('id_course', d.course);
                             fillField('id_year_level', d.year_level);
                             fillField('id_semester', d.semester);
+
+                            // Auto-fill hours rendered and supervisor name
+                            fillField('id_hours_rendered', d.hours_rendered);
+                            fillField('id_supervisor_name', d.supervisor_name);
 
                             // If previous office info exists, fill it
                             if (d.assigned_office) {

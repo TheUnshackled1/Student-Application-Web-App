@@ -876,6 +876,16 @@ def check_student_id(request):
             full_name_parts.append(app.extension_name)
         full_name = ' '.join(full_name_parts)
 
+        # Look up ActiveStudentAssistant for hours and supervisor
+        sa = ActiveStudentAssistant.objects.filter(student_id=student_id).order_by('-created_at').first()
+        hours_rendered = ''
+        supervisor_name = ''
+        if sa:
+            hours_rendered = str(int(sa.total_hours)) if sa.total_hours else ''
+            last_eval = sa.evaluations.select_related('evaluated_by').order_by('-evaluated_at').first()
+            if last_eval and last_eval.evaluated_by:
+                supervisor_name = last_eval.evaluated_by.get_full_name() or last_eval.evaluated_by.username
+
         return JsonResponse({
             'exists': True,
             'source': 'new',
@@ -893,12 +903,25 @@ def check_student_id(request):
                 'semester': app.semester,
                 'status': app.get_status_display(),
                 'assigned_office': app.assigned_office or '',
+                'hours_rendered': hours_rendered,
+                'supervisor_name': supervisor_name,
             },
         })
 
     # Also check RenewalApplication
     renewal = RenewalApplication.objects.filter(student_id=student_id).order_by('-submitted_at').first()
     if renewal:
+        # Look up ActiveStudentAssistant for hours and supervisor
+        sa = ActiveStudentAssistant.objects.filter(student_id=student_id).order_by('-created_at').first()
+        hours_rendered = str(renewal.hours_rendered) if renewal.hours_rendered else ''
+        supervisor_name = renewal.supervisor_name or ''
+        if sa:
+            if sa.total_hours:
+                hours_rendered = str(int(sa.total_hours))
+            last_eval = sa.evaluations.select_related('evaluated_by').order_by('-evaluated_at').first()
+            if last_eval and last_eval.evaluated_by:
+                supervisor_name = last_eval.evaluated_by.get_full_name() or last_eval.evaluated_by.username
+
         return JsonResponse({
             'exists': True,
             'source': 'renewal',
@@ -913,6 +936,8 @@ def check_student_id(request):
                 'status': renewal.get_status_display(),
                 'assigned_office': renewal.assigned_office or '',
                 'previous_office': renewal.previous_office or '',
+                'hours_rendered': hours_rendered,
+                'supervisor_name': supervisor_name,
             },
         })
 
