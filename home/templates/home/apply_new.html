@@ -893,9 +893,26 @@
                 })
                 .then(function(resp) { return resp.json(); })
                 .then(function(data) {
-                    if (data && data.display_name) {
-                        addrField.value = data.display_name;
-                        status.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Address detected successfully.';
+                    if (data && data.address) {
+                        var a = data.address;
+                        var province = a.state || a.county || a.state_district || '';
+                        // Validate location is within Negros Occidental
+                        if (province.toLowerCase().indexOf('negros occidental') === -1) {
+                            status.textContent = 'Location detected is outside Negros Occidental. Please enter your address manually.';
+                            status.style.color = '#f59e0b';
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Detect';
+                            return;
+                        }
+                        // Extract Barangay, City/Municipality
+                        var brgy = a.suburb || a.village || a.neighbourhood || a.quarter || '';
+                        var city = a.city || a.town || a.municipality || '';
+                        var parts = [];
+                        if (brgy) parts.push('Brgy. ' + brgy);
+                        if (city) parts.push(city);
+                        parts.push('Negros Occidental');
+                        addrField.value = parts.join(', ');
+                        status.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Address detected — Negros Occidental';
                         status.style.color = '#22c55e';
                     } else {
                         status.textContent = 'Could not determine address. Please enter manually.';
