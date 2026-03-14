@@ -10,7 +10,47 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
+/* ── Modern Flatpickr Dark Theme ── */
+.flatpickr-calendar {
+    background: #1e293b !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+    font-family: 'Inter', sans-serif !important;
+    overflow: visible;
+    min-width: 320px;
+}
+.flatpickr-months {
+    background: linear-gradient(135deg, #059669, #10b981) !important;
+    border-radius: 14px 14px 0 0 !important;
+    padding: 6px 0 !important;
+}
+.flatpickr-months .flatpickr-month { color: #fff !important; fill: #fff !important; height: 38px !important; }
+.flatpickr-current-month { font-size: 1rem !important; font-weight: 700 !important; color: #fff !important; }
+.flatpickr-current-month .flatpickr-monthDropdown-months { background: transparent !important; color: #fff !important; font-weight: 700 !important; -webkit-appearance: none !important; }
+.flatpickr-current-month .flatpickr-monthDropdown-months option { background: #1e293b !important; color: #e2e8f0 !important; }
+.flatpickr-current-month input.cur-year { color: #fff !important; font-weight: 700 !important; }
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month { fill: #fff !important; color: #fff !important; }
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover { background: rgba(255,255,255,0.15) !important; border-radius: 50% !important; }
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg { fill: #fff !important; }
+span.flatpickr-weekday { color: #94a3b8 !important; font-weight: 600 !important; font-size: 0.75rem !important; }
+.flatpickr-day { color: #e2e8f0 !important; border-radius: 8px !important; font-weight: 500 !important; transition: all 0.15s ease !important; }
+.flatpickr-day:hover { background: rgba(16,185,129,0.15) !important; border-color: transparent !important; }
+.flatpickr-day.selected, .flatpickr-day.selected:hover { background: linear-gradient(135deg, #059669, #10b981) !important; border-color: transparent !important; color: #fff !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(5,150,105,0.4) !important; }
+.flatpickr-day.today { border-color: #10b981 !important; color: #10b981 !important; font-weight: 700 !important; }
+.flatpickr-day.today.selected { color: #fff !important; }
+.flatpickr-day.flatpickr-disabled, .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay { color: #475569 !important; }
+.flatpickr-innerContainer { padding: 8px 12px !important; overflow: visible !important; }
+.numInputWrapper span { border: none !important; }
+.numInputWrapper span:hover { background: rgba(255,255,255,0.1) !important; }
+.numInputWrapper span.arrowUp:after { border-bottom-color: #fff !important; }
+.numInputWrapper span.arrowDown:after { border-top-color: #fff !important; }
+
 .staff-filter-select {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
@@ -451,7 +491,7 @@
                 </select>
                 <div class="mb-1">
                     <label class="form-label" style="font-size:11px;">Expires On</label>
-                    <input type="date" name="expires_at" class="form-control" value="{% if r.expires_at %}{{ r.expires_at|date:'Y-m-d' }}{% endif %}">
+                    <input type="text" name="expires_at" class="form-control flatpickr-date" value="{% if r.expires_at %}{{ r.expires_at|date:'Y-m-d' }}{% endif %}" placeholder="Select date" readonly style="cursor:pointer;">
                 </div>
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if r.is_active %}checked{% endif %}>
@@ -516,10 +556,10 @@
             <form method="post" action="{% url 'home:staff_edit_date' d.pk %}" class="staff-edit-form" id="date-edit-{{ d.pk }}" style="display:none;">
                 {% csrf_token %}
                 <input type="text" name="title" class="form-control mb-1" value="{{ d.title }}">
-                <input type="date" name="date" class="form-control mb-1" value="{{ d.date|date:'Y-m-d' }}">
+                <input type="text" name="date" class="form-control mb-1 flatpickr-date" value="{{ d.date|date:'Y-m-d' }}" placeholder="Select date" readonly style="cursor:pointer;">
                 <div class="mb-1">
                     <label class="form-label" style="font-size:11px;">Expires On</label>
-                    <input type="date" name="expires_at" class="form-control" value="{% if d.expires_at %}{{ d.expires_at|date:'Y-m-d' }}{% endif %}">
+                    <input type="text" name="expires_at" class="form-control flatpickr-date" value="{% if d.expires_at %}{{ d.expires_at|date:'Y-m-d' }}{% endif %}" placeholder="Select date" readonly style="cursor:pointer;">
                 </div>
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if d.is_active %}checked{% endif %}>
@@ -617,7 +657,7 @@
                 {% endif %}
                 <div class="mb-1">
                     <label class="form-label" style="font-size:11px;">Expires On</label>
-                    <input type="date" name="expires_at" class="form-control" value="{% if a.expires_at %}{{ a.expires_at|date:'Y-m-d' }}{% endif %}">
+                    <input type="text" name="expires_at" class="form-control flatpickr-date" value="{% if a.expires_at %}{{ a.expires_at|date:'Y-m-d' }}{% endif %}" placeholder="Select date" readonly style="cursor:pointer;">
                 </div>
                 <div class="form-check mb-1">
                     <input type="checkbox" name="is_active" class="form-check-input" {% if a.is_active %}checked{% endif %}>
@@ -792,14 +832,25 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    /* ── Flatpickr: init all date inputs ── */
+    document.querySelectorAll('.flatpickr-date').forEach(function(el) {
+        flatpickr(el, {
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'F j, Y',
+            appendTo: document.body,
+        });
+    });
+
     function capitalizeWords(el) {
         var pos = el.selectionStart;
         el.value = el.value.replace(/(?:^|\s|[-\/])([a-z])/g, function(m) { return m.toUpperCase(); });
         try { el.setSelectionRange(pos, pos); } catch(e) {}
     }
-    var textInputs = document.querySelectorAll('input[type="text"]:not([inputmode="numeric"]), textarea');
+    var textInputs = document.querySelectorAll('input[type="text"]:not([inputmode="numeric"]):not([readonly]), textarea');
     textInputs.forEach(function(input) {
         input.addEventListener('input', function() { capitalizeWords(this); });
         input.addEventListener('change', function() { capitalizeWords(this); });
