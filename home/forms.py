@@ -263,7 +263,7 @@ class NewApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
             'preferred_office', 'availability_schedule',
             'application_form', 'id_picture', 'barangay_clearance',
             'parents_itr', 'enrolment_form', 'schedule_classes',
-            'proof_insurance', 'grades_last_sem',
+            'proof_insurance', 'grades_last_sem', 'official_time',
         ]
         for fname in required_fields:
             if fname in self.fields:
@@ -437,7 +437,7 @@ class RenewalApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
         required_fields = [
             'preferred_office', 'availability_schedule',
             'id_picture', 'enrolment_form', 'schedule_classes',
-            'grades_last_sem', 'recommendation_letter',
+            'grades_last_sem', 'official_time', 'recommendation_letter',
             'evaluation_form',
         ]
         for fname in required_fields:
