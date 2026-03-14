@@ -1,4 +1,42 @@
+# Virtual environments
 env/
-backups/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Django
 db.sqlite3
+db.sqlite3-journal
+media/
+
+# Environment variables
+.env
+
+# Encrypted backups
+backups/
 *.enc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
