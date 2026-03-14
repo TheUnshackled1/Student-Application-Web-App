@@ -1204,15 +1204,16 @@ function showScheduleAlert(type, title, msg) {
     document.getElementById('scheduleAlertModal').style.display = 'flex';
 }
 
-// Real-time: prevent exceeding 4 hours (8 slots) per day
+// Real-time validation on each checkbox change
 document.querySelectorAll('.avail-cb').forEach(function(cb) {
     cb.addEventListener('change', function() {
-        if (!this.checked) return;
         var day = this.getAttribute('data-day');
         var count = document.querySelectorAll('.avail-cb[data-day="' + day + '"]:checked').length;
-        if (count > 8) {
+        if (this.checked && count > 8) {
             this.checked = false;
             showScheduleAlert('warning', 'Maximum 4 hours per day!', day + ' already has 4 hours selected. Please deselect another slot first.');
+        } else if (this.checked && count === 1) {
+            showScheduleAlert('warning', 'Minimum 1 hour per day!', day + ' has only 30 minutes. Please select at least 2 consecutive slots (1 hour) to meet the minimum.');
         }
     });
 });
