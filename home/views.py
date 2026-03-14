@@ -4233,7 +4233,6 @@ def sa_completion_certificate(request, pk):
     from django.http import HttpResponse
     from io import BytesIO
 
-    # Build PDF using reportlab if available, otherwise HTML-to-PDF fallback
     try:
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.units import inch
@@ -4289,7 +4288,7 @@ def sa_completion_certificate(request, pk):
         y -= 30
         c.setFont('Helvetica', 12)
 
-        # Body text
+
         office_name = sa.assigned_office.name if sa.assigned_office else 'N/A'
         semester_label = sa.get_semester_display()
         academic_year = sa.academic_year or 'N/A'
@@ -4308,7 +4307,7 @@ def sa_completion_certificate(request, pk):
             c.drawCentredString(width / 2, y, line)
             y -= 20
 
-        # Attendance summary
+
         semester_report = _build_semester_report(sa)
         if semester_report:
             y -= 15
@@ -4318,7 +4317,6 @@ def sa_completion_certificate(request, pk):
                                 f'Present: {semester_report["present"]}    |    Late: {semester_report["late"]}    |    '
                                 f'Absent: {semester_report["absent"]}')
 
-        # Performance
         final_eval = sa.evaluations.filter(evaluation_period='final').first()
         if final_eval:
             y -= 25
@@ -4329,7 +4327,6 @@ def sa_completion_certificate(request, pk):
                 y -= 16
                 c.drawCentredString(width / 2, y, f'Recommendation: {final_eval.get_recommendation_status_display()}')
 
-        # Signature lines
         y -= 60
         c.setStrokeColor(colors.black)
         c.setLineWidth(0.5)
