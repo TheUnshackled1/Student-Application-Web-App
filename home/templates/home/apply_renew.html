@@ -1167,8 +1167,35 @@ document.getElementById('docPreviewOverlay').addEventListener('click', function(
     </div>
 </div>
 <script>
+// Real-time: prevent exceeding 4 hours (8 slots) per day
+document.querySelectorAll('.avail-cb').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        if (!this.checked) return;
+        var day = this.getAttribute('data-day');
+        var count = document.querySelectorAll('.avail-cb[data-day="' + day + '"]:checked').length;
+        if (count > 8) {
+            this.checked = false;
+            alert('⚠️ Maximum 4 hours per day!\n\n' + day + ' already has 4 hours selected. Please deselect another slot first.');
+        }
+    });
+});
+
 function closeScheduleModal() {
+    // Validate minimum 1 hour (2 slots) per day that has any selection
+    var daySlots = {};
+    document.querySelectorAll('.avail-cb:checked').forEach(function(cb) {
+        var day = cb.getAttribute('data-day');
+        daySlots[day] = (daySlots[day] || 0) + 1;
+    });
+    var days = Object.keys(daySlots);
+    for (var i = 0; i < days.length; i++) {
+        if (daySlots[days[i]] < 2) {
+            alert('⚠️ Minimum 1 hour per day!\n\n' + days[i] + ' has only 30 minutes selected. Please select at least 2 consecutive slots (1 hour).');
+            return;
+        }
+    }
     document.getElementById('scheduleModal').style.display = 'none';
+    // Update status text
     var count = document.querySelectorAll('.avail-cb:checked').length;
     var el = document.getElementById('scheduleStatus');
     if (count > 0) {
