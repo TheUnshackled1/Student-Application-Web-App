@@ -1106,6 +1106,30 @@
         });
     })();
 
+    // ── Block form interaction if Student ID not verified ──
+    (function() {
+        var citySelect = document.getElementById('id_city');
+        var notFoundBox = document.getElementById('studentIdNotFound');
+        if (!citySelect) return;
+
+        // Intercept focus/click on city dropdown and all fields beyond basic contact
+        function blockIfNotVerified(e) {
+            if (!window._studentIdVerified && notFoundBox && notFoundBox.style.display !== 'none') {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('renewalBlockModal').style.display = 'flex';
+                return false;
+            }
+        }
+
+        // Apply to city/barangay selects and all section-2+ inputs/selects
+        var guardedFields = document.querySelectorAll('#id_city, #id_barangay, #section-2 input, #section-2 select, #section-2 textarea, #section-3 input, #section-3 select, #section-3 textarea, #section-4 input, #section-4 select');
+        guardedFields.forEach(function(el) {
+            el.addEventListener('mousedown', blockIfNotVerified);
+            el.addEventListener('focus', blockIfNotVerified, true);
+        });
+    })();
+
     // ── Year Level / Semester Eligibility Check ──
     (function() {
         var yearSel = document.getElementById('id_year_level');
