@@ -3822,7 +3822,7 @@ def director_department_reports(request):
             'office': office,
             'sa_count': sa_count,
             'active_count': active_count,
-            # attendance
+
             'att_total': att_total,
             'att_present': att_present,
             'att_late': att_late,
@@ -3844,7 +3844,7 @@ def director_department_reports(request):
             'avg_overall': _r(eval_agg['avg_overall']),
         })
 
-    # ── Global totals ──
+
     all_att = AttendanceRecord.objects.all()
     g_att_total = all_att.count()
     g_attended = all_att.filter(status__in=['present', 'late', 'excused']).count()
@@ -3877,8 +3877,6 @@ def director_department_reports(request):
 
 
 def _build_department_report_data():
-    """Shared helper – builds the same per-office report data used by the HTML page,
-    the PDF export, and the email view so all three stay in sync."""
     from django.db.models import Avg, Count, FloatField, Sum
     from django.db.models.functions import Coalesce
 
@@ -3983,10 +3981,9 @@ def _render_department_report_pdf(report, global_stats):
     styles = getSampleStyleSheet()
     elements = []
 
-    # ── Title ──
     title_style = ParagraphStyle('Title', parent=styles['Title'],
-                                  fontSize=16, textColor=colors.HexColor('#14532d'),
-                                  spaceAfter=4)
+                            fontSize=16, textColor=colors.HexColor('#14532d'),
+                            spaceAfter=4)
     elements.append(Paragraph('CARLOS HILADO MEMORIAL STATE UNIVERSITY', title_style))
 
     sub_style = ParagraphStyle('Sub', parent=styles['Normal'],
@@ -4000,11 +3997,11 @@ def _render_department_report_pdf(report, global_stats):
     elements.append(Paragraph('Department-Level Reports', heading_style))
 
     date_style = ParagraphStyle('Date', parent=styles['Normal'],
-                                 fontSize=9, textColor=colors.HexColor('#6b7280'),
-                                 alignment=1, spaceAfter=8)
+                                fontSize=9, textColor=colors.HexColor('#6b7280'),
+                                alignment=1, spaceAfter=8)
     elements.append(Paragraph(f'Generated: {_date.today().strftime("%B %d, %Y")}', date_style))
 
-    # ── Global summary ──
+
     gs = global_stats
     summary_data = [[
         'Total SAs', 'Active', 'Attendance Rate', 'Avg Hours/SA', 'Avg Rating', 'Evaluations',
@@ -4027,7 +4024,7 @@ def _render_department_report_pdf(report, global_stats):
     elements.append(summary_table)
     elements.append(Spacer(1, 14))
 
-    # ── Per-office table ──
+
     cell_style = ParagraphStyle('Cell', parent=styles['Normal'], fontSize=8, leading=10)
     bold_cell = ParagraphStyle('BoldCell', parent=cell_style, fontName='Helvetica-Bold')
 
@@ -4078,7 +4075,7 @@ def _render_department_report_pdf(report, global_stats):
     elements.append(t)
     elements.append(Spacer(1, 12))
 
-    # ── Per-office evaluation detail table ──
+
     eval_header = [
         Paragraph('<b>Office</b>', bold_cell),
         Paragraph('<b>Quality</b>', bold_cell),
@@ -4105,8 +4102,8 @@ def _render_department_report_pdf(report, global_stats):
 
     if has_evals:
         eval_heading = ParagraphStyle('EH', parent=styles['Heading3'],
-                                       fontSize=11, textColor=colors.HexColor('#92400e'),
-                                       spaceAfter=6)
+                                    fontSize=11, textColor=colors.HexColor('#92400e'),
+                                    spaceAfter=6)
         elements.append(Paragraph('Performance Evaluation Averages by Office', eval_heading))
         et = Table(eval_data, hAlign='CENTER', repeatRows=1)
         et.setStyle(TableStyle([
@@ -4129,7 +4126,6 @@ def _render_department_report_pdf(report, global_stats):
 
 @login_required
 def director_department_reports_pdf(request):
-    """Download department reports as a PDF."""
     if not request.user.is_superuser:
         return redirect('home:home')
 
@@ -4145,7 +4141,6 @@ def director_department_reports_pdf(request):
 
 @login_required
 def director_department_reports_email(request):
-    """Email the department reports PDF to the director's configured email."""
     if not request.user.is_superuser:
         return redirect('home:home')
 
@@ -4182,14 +4177,6 @@ def director_department_reports_email(request):
     return redirect('home:director_department_reports')
 
 def _compute_renewal_recommendation(attendance_rate, total_hours, required_hours, latest_eval):
-    """
-    Compute a system-driven renewal recommendation based on:
-    - Attendance rate (weight 40%)
-    - Hours completion (weight 30%)
-    - Performance rating (weight 30%)
-    Returns dict with recommendation, score, and breakdown.
-    """
-    # Attendance score (0-100)
     att_score = min(attendance_rate, 100)
 
     # Hours completion score (0-100)
