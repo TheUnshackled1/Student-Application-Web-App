@@ -749,8 +749,8 @@
 
             <!-- Assigned Students List -->
             <div class="detail-students-section" id="detailStudentsSection" style="display:none;">
-                <h5 style="font-size:13px; font-weight:700; color:#e2e8f0; margin:16px 0 10px; padding-top:14px; border-top:1px solid #e2e8f0;">
-                    <i class="fa-solid fa-user-graduate" style="color:#60a5fa; margin-right:6px;"></i>
+                <h5 style="font-size:13px; font-weight:700; color:#1e293b; margin:16px 0 10px; padding-top:14px; border-top:1px solid #e2e8f0;">
+                    <i class="fa-solid fa-user-graduate" style="color:#3b82f6; margin-right:6px;"></i>
                     Assigned Student Assistants
                 </h5>
                 <div class="detail-student-list" id="detailStudentList"></div>
@@ -1426,19 +1426,19 @@ function showOfficeDetail(officeId) {
         studentsSection.style.display = 'block';
         studentList.innerHTML = '';
         office.students.forEach(function(s) {
-            var sColor = s.status_key === 'approved' ? '#86efac' : '#fbbf24';
-            var sBg = s.status_key === 'approved' ? 'rgba(22,163,74,0.15)' : 'rgba(251,191,36,0.15)';
+            var sColor = s.status_key === 'approved' ? '#16a34a' : '#d97706';
+            var sBg = s.status_key === 'approved' ? '#dcfce7' : '#fef3c7';
             var avatarHtml = s.photo
                 ? '<img src="' + s.photo + '" alt="' + s.name + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid ' + sColor + ';">'
                 : '<div style="width:36px;height:36px;border-radius:50%;background:' + sBg + ';display:flex;align-items:center;justify-content:center;">' +
                       '<i class="fa-solid fa-user" style="color:' + sColor + ';font-size:13px;"></i>' +
                   '</div>';
             studentList.innerHTML +=
-                '<div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:rgba(255,255,255,0.04); border-radius:10px; margin-bottom:6px; border:1px solid rgba(255,255,255,0.06);">' +
+                '<div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f8fafc; border-radius:10px; margin-bottom:6px; border:1px solid #e2e8f0;">' +
                     avatarHtml +
                     '<div style="flex:1;">' +
-                        '<div style="font-size:13px;font-weight:600;color:#ffffff;">' + s.name + '</div>' +
-                        '<div style="font-size:11px;color:#94a3b8;">ID: ' + maskSid(s.student_id) + '</div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#1e293b;">' + s.name + '</div>' +
+                        '<div style="font-size:11px;color:#64748b;">ID: ' + maskSid(s.student_id) + '</div>' +
                     '</div>' +
                     '<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:' + sBg + ';color:' + sColor + ';">' + s.status + '</span>' +
                 '</div>';
@@ -1447,7 +1447,7 @@ function showOfficeDetail(officeId) {
         studentsSection.style.display = 'block';
         studentList.innerHTML =
             '<div style="text-align:center;padding:12px;color:#94a3b8;font-size:12px;">' +
-                '<i class="fa-regular fa-user" style="font-size:18px;margin-bottom:4px;display:block;"></i>' +
+                '<i class="fa-regular fa-user" style="font-size:18px;margin-bottom:4px;display:block;color:#cbd5e1;"></i>' +
                 'No student assistants assigned yet' +
             '</div>';
     }
