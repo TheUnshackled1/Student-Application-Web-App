@@ -477,6 +477,10 @@
         from { transform: translateX(100%); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
     }
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+        50% { opacity: 0.8; transform: scale(1.3); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    }
     </style>
     <script>
     // Auto-dismiss toast messages after 5 seconds
@@ -537,12 +541,15 @@
                 <span class="staff-stat-lbl">Open &mdash; Accepting SA</span>
             </div>
         </div>
-        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #f59e0b, #d97706);">
-            <div class="staff-stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #f59e0b, #d97706); position:relative; overflow:hidden;">
+            <div class="staff-stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="staff-stat-info">
-                <span class="staff-stat-val">{{ total_limited }}</span>
-                <span class="staff-stat-lbl">Limited Slots</span>
+                <span class="staff-stat-val" style="color:#d97706;">{{ total_limited }}</span>
+                <span class="staff-stat-lbl">Limited Slots — Act Fast!</span>
             </div>
+            {% if total_limited > 0 %}
+            <span style="position:absolute; top:10px; right:12px; width:10px; height:10px; background:#f59e0b; border-radius:50%; animation: pulse-dot 1.5s infinite;"></span>
+            {% endif %}
         </div>
         <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #22c55e, #16a34a); cursor:pointer;" onclick="var m=new bootstrap.Modal(document.getElementById('approvedSAModal'));m.show();">
             <div class="staff-stat-icon"><i class="fa-solid fa-user-check"></i></div>
