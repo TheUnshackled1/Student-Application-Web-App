@@ -2906,10 +2906,6 @@ def student_dashboard(request):
     profile = request.user.student_profile
     student_id = profile.student_id
 
-    # Run auto-expire check
-    auto_expire_student_assistants()
-    generate_absent_records_for_yesterday()
-
     today = _date.today()
 
     # ── Applications ──
