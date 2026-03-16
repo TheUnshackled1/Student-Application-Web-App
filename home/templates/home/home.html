@@ -122,9 +122,12 @@
     {% endif %}
 
     {% if track_success %}
-    <div class="track-app-alert track-app-alert--success" style="margin-bottom: 20px;">
+    <div class="track-app-alert track-app-alert--success" style="margin-bottom: 20px;" id="trackSuccessBanner">
         <i class="fa-solid fa-circle-check"></i>
         <span>{{ track_success }}</span>
+        <button type="button" class="track-app-alert-close" aria-label="Close" onclick="this.parentElement.style.display='none';">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
     </div>
     {% endif %}
 
