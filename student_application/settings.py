@@ -133,6 +133,7 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+WHITENOISE_MANIFEST_STRICT = False
 
 # Media files (user uploads)
 # In production, use DigitalOcean Spaces via django-storages.
