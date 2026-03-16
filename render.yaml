@@ -21,5 +21,7 @@ services:
         fromDatabase:
           name: student-assistant-db
           property: connectionString
+      - key: SITE_URL
+        value: "https://swa-application.onrender.com"
       - key: PYTHON_VERSION
         value: "3.12.3"
