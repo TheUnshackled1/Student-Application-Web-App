@@ -32,6 +32,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.devtunnels.ms",
     "https://*.vscode.dev",
     "https://*.ondigitalocean.app",
+    "https://*.onrender.com",
 ]
 
 
