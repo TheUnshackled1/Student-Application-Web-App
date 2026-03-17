@@ -1515,7 +1515,10 @@ def staff_update_application_status(request, pk):
             mismatch_note = request.POST.get('schedule_mismatch_note', '').strip().title()
             app.schedule_mismatch_note = mismatch_note
             app.schedule_verified = False
-            send_schedule_mismatch_email(app, mismatch_note)
+            try:
+                send_schedule_mismatch_email(app, mismatch_note)
+            except Exception:
+                pass
             ApplicationNote.objects.create(
                 new_application=app, author=request.user,
                 note_type='schedule_mismatch',
@@ -1526,7 +1529,10 @@ def staff_update_application_status(request, pk):
         if new_status == 'documents_requested':
             docs_note = request.POST.get('requested_documents_note', '').strip().title()
             app.requested_documents_note = docs_note
-            send_document_request_email(app, docs_note)
+            try:
+                send_document_request_email(app, docs_note)
+            except Exception:
+                pass
             ApplicationNote.objects.create(
                 new_application=app, author=request.user,
                 note_type='document_request',
@@ -1540,7 +1546,10 @@ def staff_update_application_status(request, pk):
             extra = ''
             if new_status == 'interview_scheduled' and app.interview_date:
                 extra = f'Interview date: {app.interview_date.strftime("%B %d, %Y — %I:%M %p")}'
-            send_status_update_email(app, old_status, new_status, extra)
+            try:
+                send_status_update_email(app, old_status, new_status, extra)
+            except Exception:
+                pass
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
@@ -1952,7 +1961,10 @@ def director_update_application_status(request, pk):
             mismatch_note = request.POST.get('schedule_mismatch_note', '').strip().title()
             app.schedule_mismatch_note = mismatch_note
             app.schedule_verified = False
-            send_schedule_mismatch_email(app, mismatch_note)
+            try:
+                send_schedule_mismatch_email(app, mismatch_note)
+            except Exception:
+                pass
             ApplicationNote.objects.create(
                 new_application=app, author=request.user,
                 note_type='schedule_mismatch',
@@ -1963,7 +1975,10 @@ def director_update_application_status(request, pk):
         if new_status == 'documents_requested':
             docs_note = request.POST.get('requested_documents_note', '').strip().title()
             app.requested_documents_note = docs_note
-            send_document_request_email(app, docs_note)
+            try:
+                send_document_request_email(app, docs_note)
+            except Exception:
+                pass
             ApplicationNote.objects.create(
                 new_application=app, author=request.user,
                 note_type='document_request',
@@ -1977,7 +1992,10 @@ def director_update_application_status(request, pk):
             extra = ''
             if new_status == 'interview_scheduled' and app.interview_date:
                 extra = f'Interview date: {app.interview_date.strftime("%B %d, %Y — %I:%M %p")}'
-            send_status_update_email(app, old_status, new_status, extra)
+            try:
+                send_status_update_email(app, old_status, new_status, extra)
+            except Exception:
+                pass
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
