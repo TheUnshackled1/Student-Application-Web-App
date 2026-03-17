@@ -316,7 +316,7 @@
                             <label class="form-label">Supervisor's Name (Previous)</label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-user-tie"></i>
-                                <input type="text" class="form-control" name="supervisor_name" id="id_supervisor_name" placeholder="Full name of your previous supervisor" value="{{ form.supervisor_name.value|default:'' }}">
+                                <input type="text" class="form-control" name="supervisor_name" id="id_supervisor_name" pattern="[A-Za-z ]+" title="Letters and spaces only" placeholder="Full name of your previous supervisor" value="{{ form.supervisor_name.value|default:'' }}">
                             </div>
                         </div>
                     </div>
@@ -554,6 +554,7 @@
         var contactInput = document.getElementById('id_contact_number');
         var studentIdInput = document.getElementById('id_student_id_renew');
         var fullNameInput = document.getElementById('id_full_name');
+        var supervisorNameInput = document.getElementById('id_supervisor_name');
         if (contactInput) {
             contactInput.addEventListener('input', function() { keepDigitsOnly(this, 11); });
             contactInput.addEventListener('change', function() { keepDigitsOnly(this, 11); });
@@ -568,6 +569,11 @@
             fullNameInput.addEventListener('input', function() { keepLettersOnly(this); });
             fullNameInput.addEventListener('change', function() { keepLettersOnly(this); });
             if (fullNameInput.value) keepLettersOnly(fullNameInput);
+        }
+        if (supervisorNameInput) {
+            supervisorNameInput.addEventListener('input', function() { keepLettersOnly(this); });
+            supervisorNameInput.addEventListener('change', function() { keepLettersOnly(this); });
+            if (supervisorNameInput.value) keepLettersOnly(supervisorNameInput);
         }
         // Handle browser autofill (fires after short delay)
         setTimeout(function() {
