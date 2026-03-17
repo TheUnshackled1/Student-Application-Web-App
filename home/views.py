@@ -794,9 +794,12 @@ def apply_new(request):
             if application.student_id not in tracked:
                 tracked.append(application.student_id)
             request.session['tracked_student_ids'] = tracked
-            # Send confirmation email
-            send_application_confirmation(application, app_type='new')
             request.session['submission_success'] = f'Your new application has been submitted successfully! A confirmation email has been sent to {application.email}. Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
+            # Send confirmation email (non-blocking — failure won't prevent redirect)
+            try:
+                send_application_confirmation(application, app_type='new')
+            except Exception:
+                pass
             return redirect('home:home')
     else:
         form = NewApplicationForm()
@@ -850,9 +853,12 @@ def apply_renew(request):
             if application.student_id not in tracked:
                 tracked.append(application.student_id)
             request.session['tracked_student_ids'] = tracked
-            # Send confirmation email
-            send_application_confirmation(application, app_type='renewal')
             request.session['submission_success'] = f'Your renewal application has been submitted successfully! A confirmation email has been sent to {application.email}. Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
+            # Send confirmation email (non-blocking — failure won't prevent redirect)
+            try:
+                send_application_confirmation(application, app_type='renewal')
+            except Exception:
+                pass
             return redirect('home:home')
     else:
         form = RenewalApplicationForm()
