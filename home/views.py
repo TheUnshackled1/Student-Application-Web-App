@@ -2651,8 +2651,9 @@ def resubmit_schedule(request, app_type, pk):
                 note_type='schedule_resubmit',
                 content='Student resubmitted availability schedule.',
             )
-            send_status_update_email(app, 'schedule_mismatch', 'under_review',
-                                     'Your updated availability schedule has been received and is now under review.')
+            try:
+                send_status_update_email(app, 'schedule_mismatch', 'under_review',
+                                         'Your updated availability schedule has been received and is now under review.')
             except Exception:
                 pass
             messages.success(request, 'Your availability schedule has been updated and resubmitted.')
@@ -2755,8 +2756,11 @@ def resubmit_documents(request, app_type, pk):
                 note_type='document_resubmit',
                 content='Student resubmitted requested documents.',
             )
-            send_status_update_email(app, 'documents_requested', 'under_review',
-                                     'Your updated documents have been received and are now under review.')
+            try:
+                send_status_update_email(app, 'documents_requested', 'under_review',
+                                         'Your updated documents have been received and are now under review.')
+            except Exception:
+                pass
             messages.success(request, 'Your documents have been re-uploaded successfully.')
             if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
                 return redirect('home:student_dashboard')
@@ -2832,7 +2836,10 @@ def staff_verify_schedule(request, pk):
             note_type='schedule_mismatch',
             content=f'Schedule mismatch flagged: {mismatch_note}',
         )
-        send_schedule_mismatch_email(app, mismatch_note)
+        try:
+            send_schedule_mismatch_email(app, mismatch_note)
+        except Exception:
+            pass
         messages.warning(request, 'Schedule mismatch flagged. Student has been notified.')
 
     return redirect('home:staff_review_application', pk=pk)
@@ -3107,7 +3114,10 @@ def student_dashboard(request):
                     )
                     if notif_new:
                         from .email_utils import send_absent_notification_email
-                        send_absent_notification_email(sa, today, slot)
+                        try:
+                            send_absent_notification_email(sa, today, slot)
+                        except Exception:
+                            pass
 
             shifts_status.append({
                 'label': slot,
