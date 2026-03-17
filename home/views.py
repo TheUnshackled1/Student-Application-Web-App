@@ -36,8 +36,6 @@ from decimal import Decimal
 import base64
 import os
 import uuid
-import cv2
-import numpy as np
 from django.core.files.base import ContentFile
 
 
@@ -89,6 +87,8 @@ def _urgency_for_days(days_left):
 
 def _validate_uploaded_file(file_field, field_name):
     """Run OpenCV quality checks on stored uploaded file. Returns dict with results."""
+    import cv2
+    import numpy as np
     result = {'warnings': [], 'checks': {}}
     try:
         if not file_field or not file_field.name:
@@ -980,6 +980,8 @@ def check_student_id(request):
 @require_POST
 def process_camera_photo(request):
     """Receive a base64 webcam image, process with OpenCV (cv2), and save."""
+    import cv2
+    import numpy as np
     try:
         data = json.loads(request.body)
         image_data = data.get('image', '')
@@ -1039,6 +1041,8 @@ def validate_document(request):
       • For all images: blur detection (Laplacian variance) & blank page detection
     Returns JSON with ``valid``, ``warnings`` list, and ``checks`` dict.
     """
+    import cv2
+    import numpy as np
     from .forms import MAX_FILE_SIZE_MB, ALLOWED_DOC_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS
 
     uploaded = request.FILES.get('file')
