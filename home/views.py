@@ -164,6 +164,8 @@ def _create_active_sa_from_application(app):
     Handles both NewApplication and RenewalApplication.
     Idempotent — skips if a record already exists.
     """
+    from django.db import IntegrityError as _IntegrityError
+
     is_renewal = isinstance(app, RenewalApplication)
 
     # Check if record already exists
@@ -215,7 +217,10 @@ def _create_active_sa_from_application(app):
     else:
         sa.new_application = app
 
-    sa.save()
+    try:
+        sa.save()
+    except _IntegrityError:
+        pass
 
 
 def _build_documents_from_app(app):
@@ -1271,6 +1276,7 @@ def staff_dashboard(request):
             'status_display': app.get_status_display(),
             'review_url_name': 'home:staff_review_application',
             'status_url_name': 'home:staff_update_application_status',
+            'is_renewal': False,
         })
 
     for app in renewal_apps.order_by('-submitted_at'):
@@ -1484,9 +1490,12 @@ def staff_update_application_status(request, pk):
 
         # Handle final approval with start date — auto-assign office from preference
         if new_status == 'approved':
-            start = request.POST.get('start_date')
+            start = request.POST.get('start_date', '').strip()
             if start:
-                app.start_date = _date.fromisoformat(start)
+                try:
+                    app.start_date = _date.fromisoformat(start)
+                except (ValueError, TypeError):
+                    pass
             # Always assign from the student's preferred office
             if app.preferred_office:
                 app.assigned_office = app.preferred_office.name
@@ -1525,7 +1534,10 @@ def staff_update_application_status(request, pk):
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
-            _create_active_sa_from_application(app)
+            try:
+                _create_active_sa_from_application(app)
+            except Exception:
+                pass
 
     next_url = request.POST.get('next', '')
     if next_url:
@@ -1906,9 +1918,12 @@ def director_update_application_status(request, pk):
 
         # Handle final approval — auto-assign from preferred_office
         if new_status == 'approved':
-            start = request.POST.get('start_date')
+            start = request.POST.get('start_date', '').strip()
             if start:
-                app.start_date = _date.fromisoformat(start)
+                try:
+                    app.start_date = _date.fromisoformat(start)
+                except (ValueError, TypeError):
+                    pass
             # Always assign from the student's preferred office
             if app.preferred_office:
                 app.assigned_office = app.preferred_office.name
@@ -1956,7 +1971,10 @@ def director_update_application_status(request, pk):
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
-            _create_active_sa_from_application(app)
+            try:
+                _create_active_sa_from_application(app)
+            except Exception:
+                pass
 
     next_url = request.POST.get('next', '')
     if next_url:
