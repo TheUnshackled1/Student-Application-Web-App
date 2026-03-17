@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+import re
 from .models import (
     Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication,
     Office, ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
@@ -24,6 +25,22 @@ def _title_case(value):
     if not isinstance(value, str):
         return value
     return value.strip().title()
+
+
+def _validate_letters_only(value, field_label, allow_spaces=True):
+    """Allow letters only (optionally spaces), reject symbols and digits."""
+    if not isinstance(value, str):
+        return value
+    value = value.strip()
+    if not value:
+        return value
+    pattern = r'^[A-Za-z ]+$' if allow_spaces else r'^[A-Za-z]+$'
+    if not re.fullmatch(pattern, value):
+        msg = f'{field_label} must contain letters only.'
+        if allow_spaces:
+            msg = f'{field_label} must contain letters and spaces only.'
+        raise forms.ValidationError(msg)
+    return value
 
 
 class AutoCapitalizeMixin:
@@ -299,6 +316,21 @@ class NewApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
             )
         return val
 
+    def clean_first_name(self):
+        return _validate_letters_only(self.cleaned_data['first_name'], 'First name', allow_spaces=True)
+
+    def clean_middle_initial(self):
+        return _validate_letters_only(self.cleaned_data['middle_initial'], 'Middle initial', allow_spaces=False)
+
+    def clean_last_name(self):
+        return _validate_letters_only(self.cleaned_data['last_name'], 'Last name', allow_spaces=True)
+
+    def clean_extension_name(self):
+        val = self.cleaned_data.get('extension_name', '')
+        if not val:
+            return val
+        return _validate_letters_only(val, 'Extension name', allow_spaces=False)
+
     def clean_date_of_birth(self):
         from datetime import date
         dob = self.cleaned_data['date_of_birth']
@@ -464,6 +496,12 @@ class RenewalApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
                 'Please track your existing application or wait until it is completed.'
             )
         return val
+
+    def clean_full_name(self):
+        return _validate_letters_only(self.cleaned_data['full_name'], 'Full name', allow_spaces=True)
+
+    def clean_supervisor_name(self):
+        return _validate_letters_only(self.cleaned_data['supervisor_name'], 'Supervisor name', allow_spaces=True)
 
     # ── Document file validators (size & type) ──
 

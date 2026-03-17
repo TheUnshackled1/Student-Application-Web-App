@@ -157,7 +157,7 @@
                             <label class="form-label">Student ID <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-id-badge"></i>
-                                <input type="text" class="form-control" name="student_id" id="id_student_id_renew" maxlength="8" inputmode="numeric" placeholder="12345678" value="{{ form.student_id.value|default:'' }}" required>
+                                <input type="text" class="form-control" name="student_id" id="id_student_id_renew" maxlength="8" minlength="8" inputmode="numeric" pattern="\d{8}" placeholder="12345678" title="Must be exactly 8 digits" value="{{ form.student_id.value|default:'' }}" required>
                             </div>
                             <small class="form-text" style="color: rgba(255,255,255,0.55);" id="studentIdStatus">Type your Student ID to auto-detect</small>
                         </div>
@@ -165,7 +165,7 @@
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-user"></i>
-                                <input type="text" class="form-control" name="full_name" id="id_full_name" placeholder="Juan A. Dela Cruz" value="{{ form.full_name.value|default:'' }}" required>
+                                <input type="text" class="form-control" name="full_name" id="id_full_name" pattern="[A-Za-z ]+" placeholder="Juan A Dela Cruz" title="Letters and spaces only" value="{{ form.full_name.value|default:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -536,11 +536,39 @@
             el.value = el.value.replace(/(?:^|\s|[-\/])([a-z])/g, function(m) { return m.toUpperCase(); });
             try { el.setSelectionRange(pos, pos); } catch(e) {}
         }
+        function keepDigitsOnly(el, maxLen) {
+            var digits = el.value.replace(/\D/g, '');
+            if (typeof maxLen === 'number') {
+                digits = digits.slice(0, maxLen);
+            }
+            el.value = digits;
+        }
+        function keepLettersOnly(el) {
+            el.value = el.value.replace(/[^A-Za-z ]/g, '');
+        }
         var textInputs = document.querySelectorAll('input[type="text"]:not([inputmode="numeric"]), textarea');
         textInputs.forEach(function(input) {
             input.addEventListener('input', function() { capitalizeWords(this); });
             input.addEventListener('change', function() { capitalizeWords(this); });
         });
+        var contactInput = document.getElementById('id_contact_number');
+        var studentIdInput = document.getElementById('id_student_id_renew');
+        var fullNameInput = document.getElementById('id_full_name');
+        if (contactInput) {
+            contactInput.addEventListener('input', function() { keepDigitsOnly(this, 11); });
+            contactInput.addEventListener('change', function() { keepDigitsOnly(this, 11); });
+            if (contactInput.value) keepDigitsOnly(contactInput, 11);
+        }
+        if (studentIdInput) {
+            studentIdInput.addEventListener('input', function() { keepDigitsOnly(this, 8); });
+            studentIdInput.addEventListener('change', function() { keepDigitsOnly(this, 8); });
+            if (studentIdInput.value) keepDigitsOnly(studentIdInput, 8);
+        }
+        if (fullNameInput) {
+            fullNameInput.addEventListener('input', function() { keepLettersOnly(this); });
+            fullNameInput.addEventListener('change', function() { keepLettersOnly(this); });
+            if (fullNameInput.value) keepLettersOnly(fullNameInput);
+        }
         // Handle browser autofill (fires after short delay)
         setTimeout(function() {
             textInputs.forEach(function(input) {

@@ -293,19 +293,19 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="first_name" maxlength="15" placeholder="Juan" value="{{ form.first_name.value|default:'' }}" required>
+                            <input type="text" class="form-control" name="first_name" id="id_first_name" maxlength="15" pattern="[A-Za-z ]+" placeholder="Juan" title="Letters and spaces only" value="{{ form.first_name.value|default:'' }}" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">M.I. <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control text-center" name="middle_initial" maxlength="1" placeholder="A" value="{{ form.middle_initial.value|default:'' }}" required>
+                            <input type="text" class="form-control text-center" name="middle_initial" id="id_middle_initial" maxlength="1" pattern="[A-Za-z]" placeholder="A" title="Letter only" value="{{ form.middle_initial.value|default:'' }}" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="last_name" maxlength="10" placeholder="Dela Cruz" value="{{ form.last_name.value|default:'' }}" required>
+                            <input type="text" class="form-control" name="last_name" id="id_last_name" maxlength="10" pattern="[A-Za-z ]+" placeholder="Dela Cruz" title="Letters and spaces only" value="{{ form.last_name.value|default:'' }}" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Ext.</label>
-                            <input type="text" class="form-control text-center" name="extension_name" maxlength="5" placeholder="Jr" value="{{ form.extension_name.value|default:'' }}">
+                            <input type="text" class="form-control text-center" name="extension_name" id="id_extension_name" maxlength="5" pattern="[A-Za-z]+" placeholder="Jr" title="Letters only" value="{{ form.extension_name.value|default:'' }}">
                         </div>
                     </div>
                 </div>
@@ -338,7 +338,7 @@
                             <label class="form-label">Contact Number <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-mobile-screen-button"></i>
-                                <input type="text" class="form-control" name="contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" value="{{ form.contact_number.value|default:'' }}" required>
+                                <input type="text" class="form-control" name="contact_number" id="id_contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" value="{{ form.contact_number.value|default:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -692,10 +692,43 @@
             el.value = el.value.replace(/(?:^|\s|[-\/])([a-z])/g, function(m) { return m.toUpperCase(); });
             try { el.setSelectionRange(pos, pos); } catch(e) {}
         }
+        function keepDigitsOnly(el, maxLen) {
+            var digits = el.value.replace(/\D/g, '');
+            if (typeof maxLen === 'number') {
+                digits = digits.slice(0, maxLen);
+            }
+            el.value = digits;
+        }
+        function keepLettersOnly(el, allowSpaces) {
+            var regex = allowSpaces ? /[^A-Za-z ]/g : /[^A-Za-z]/g;
+            el.value = el.value.replace(regex, '');
+        }
         var textInputs = document.querySelectorAll('input[type="text"]:not([inputmode="numeric"]), textarea');
         textInputs.forEach(function(input) {
             input.addEventListener('input', function() { capitalizeWords(this); });
             input.addEventListener('change', function() { capitalizeWords(this); });
+        });
+        var numericInputs = [
+            { el: document.getElementById('id_contact_number'), max: 11 },
+            { el: document.getElementById('id_student_id_new'), max: 8 }
+        ];
+        numericInputs.forEach(function(item) {
+            if (!item.el) return;
+            item.el.addEventListener('input', function() { keepDigitsOnly(this, item.max); });
+            item.el.addEventListener('change', function() { keepDigitsOnly(this, item.max); });
+            if (item.el.value) keepDigitsOnly(item.el, item.max);
+        });
+        var letterOnlyInputs = [
+            { el: document.getElementById('id_first_name'), allowSpaces: true },
+            { el: document.getElementById('id_middle_initial'), allowSpaces: false },
+            { el: document.getElementById('id_last_name'), allowSpaces: true },
+            { el: document.getElementById('id_extension_name'), allowSpaces: false }
+        ];
+        letterOnlyInputs.forEach(function(item) {
+            if (!item.el) return;
+            item.el.addEventListener('input', function() { keepLettersOnly(this, item.allowSpaces); });
+            item.el.addEventListener('change', function() { keepLettersOnly(this, item.allowSpaces); });
+            if (item.el.value) keepLettersOnly(item.el, item.allowSpaces);
         });
         setTimeout(function() {
             textInputs.forEach(function(input) {
