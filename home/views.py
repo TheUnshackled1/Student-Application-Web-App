@@ -1601,7 +1601,10 @@ def staff_return_document(request, pk):
 
     # Build per-document summary for email
     doc_summary = '\n'.join(f'  • {k}: {v}' for k, v in returned.items())
-    send_document_request_email(app, f'The following document(s) need to be re-uploaded:\n{doc_summary}')
+    try:
+        send_document_request_email(app, f'The following document(s) need to be re-uploaded:\n{doc_summary}')
+    except Exception:
+        pass
 
     messages.success(request, f'"{doc_label}" has been returned to the student.')
     return redirect('home:staff_review_application', pk=pk)
@@ -2044,7 +2047,10 @@ def director_return_document(request, pk):
     )
 
     doc_summary = '\n'.join(f'  • {k}: {v}' for k, v in returned.items())
-    send_document_request_email(app, f'The following document(s) need to be re-uploaded:\n{doc_summary}')
+    try:
+        send_document_request_email(app, f'The following document(s) need to be re-uploaded:\n{doc_summary}')
+    except Exception:
+        pass
 
     messages.success(request, f'"{doc_label}" has been returned to the student.')
     return redirect('home:director_review_application', pk=pk)
@@ -2647,6 +2653,8 @@ def resubmit_schedule(request, app_type, pk):
             )
             send_status_update_email(app, 'schedule_mismatch', 'under_review',
                                      'Your updated availability schedule has been received and is now under review.')
+            except Exception:
+                pass
             messages.success(request, 'Your availability schedule has been updated and resubmitted.')
             if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
                 return redirect('home:student_dashboard')
