@@ -11,7 +11,7 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
     ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
-    ApplicationNote, NoDutyDay, DutyReminder,
+    ApplicationNote, NoDutyDay, DutyReminder, DBFile,
     calculate_end_date, recalculate_end_dates_for_office, auto_expire_student_assistants,
     generate_absent_records_for_yesterday,
 )
@@ -4478,3 +4478,26 @@ def sa_completion_certificate(request, pk):
         <div class="footer"><div class="sig">Student Director</div><div class="sig">Office Head</div></div>
         </body></html>"""
         return HttpResponse(html)
+
+
+# ================================================================
+#  Database File Serving (production)
+# ================================================================
+
+def serve_db_file(request, file_path):
+    """Serve a file stored in the database (used in production)."""
+    from django.http import HttpResponse, Http404
+    from .models import DBFile
+
+    try:
+        db_file = DBFile.objects.get(name=file_path)
+    except DBFile.DoesNotExist:
+        raise Http404("File not found")
+
+    response = HttpResponse(db_file.data, content_type=db_file.content_type)
+    response['Content-Length'] = db_file.size
+
+    # Set caching headers
+    response['Cache-Control'] = 'public, max-age=86400'
+
+    return response
