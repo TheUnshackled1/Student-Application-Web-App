@@ -4,6 +4,27 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from datetime import date as _date, timedelta
 
 
+# ================================================================
+#  Database File Storage Model
+# ================================================================
+
+class DBFile(models.Model):
+    """Stores uploaded files as binary data in the database."""
+    name = models.CharField(max_length=500, unique=True, db_index=True)
+    data = models.BinaryField()
+    content_type = models.CharField(max_length=100, default='application/octet-stream')
+    size = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Database File'
+        verbose_name_plural = 'Database Files'
+
+    def __str__(self):
+        return self.name
+
+
 class Office(models.Model):
     """Campus office that can accept student assistants."""
     name = models.CharField(max_length=200, unique=True)

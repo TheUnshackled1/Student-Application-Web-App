@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 app_name = 'home'
@@ -11,6 +11,9 @@ urlpatterns = [
     path('apply/check-student/', views.check_student_id, name='check_student_id'),
     path('apply/camera-photo/', views.process_camera_photo, name='process_camera_photo'),
     path('apply/validate-document/', views.validate_document, name='validate_document'),
+
+    # ---- Database File Serving (production) ----
+    re_path(r'^media/(?P<file_path>.+)$', views.serve_db_file, name='serve_db_file'),
 
     # ---- Student Auth & Dashboard ----
     path('student/login/', views.student_login, name='student_login'),

@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "db_file_storage",
     "home",
 ]
 
@@ -139,11 +138,18 @@ STORAGES = {
 }
 
 # Media files (user uploads)
-# In production, use DigitalOcean Spaces via django-storages.
+# In production, files are stored in the database.
 # Locally, files are saved to disk.
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Use database storage in production (files stored in PostgreSQL)
+if not DEBUG:
+    STORAGES["default"] = {
+        "BACKEND": "home.storage.DatabaseStorage",
+    }
+
+# Override with DigitalOcean Spaces if configured
 if os.environ.get("DO_SPACES_BUCKET"):
     STORAGES["default"] = {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
