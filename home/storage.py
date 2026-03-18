@@ -73,7 +73,7 @@ class DatabaseStorage(Storage):
 
     def url(self, name):
         from django.urls import reverse
-        return reverse('serve_db_file', kwargs={'file_path': name})
+        return reverse('home:serve_db_file', kwargs={'file_path': name})
 
     def get_accessed_time(self, name):
         from home.models import DBFile
