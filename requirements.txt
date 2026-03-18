@@ -19,3 +19,4 @@ sqlparse==0.5.5
 typing_extensions==4.15.0
 tzdata==2025.3
 whitenoise==6.8.2
+django-db-file-storage==0.5.6.1
