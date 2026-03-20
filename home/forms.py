@@ -10,7 +10,6 @@ from .models import (
 import json
 
 
-# ── Auto-capitalize mixin ──
 
 # Fields that should NOT be title-cased
 _SKIP_CAPITALIZE = {
