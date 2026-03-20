@@ -1,7 +1,3 @@
-"""
-Custom database storage backend for storing uploaded files in PostgreSQL.
-Files are stored as binary data in the DBFile model.
-"""
 
 import hashlib
 import mimetypes
