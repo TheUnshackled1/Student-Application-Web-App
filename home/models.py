@@ -4,9 +4,6 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from datetime import date as _date, timedelta
 
 
-# ================================================================
-#  Database File Storage Model
-# ================================================================
 
 class DBFile(models.Model):
     """Stores uploaded files as binary data in the database."""
