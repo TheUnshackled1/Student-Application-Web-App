@@ -170,7 +170,7 @@ class RenewalApplicationAdmin(admin.ModelAdmin):
         ('Documents', {
             'classes': ('collapse',),
             'fields': ('id_picture', 'enrolment_form', 'schedule_classes',
-                       'grades_last_sem', 'official_time', 'recommendation_letter', 'evaluation_form')
+                    'grades_last_sem', 'official_time', 'recommendation_letter', 'evaluation_form')
         }),
         ('Workflow', {
             'fields': ('status', 'interview_date', 'assigned_office', 'start_date', 'submitted_at')
@@ -222,7 +222,7 @@ class EvaluationInline(admin.TabularInline):
     model = PerformanceEvaluation
     extra = 0
     fields = ('evaluation_period', 'work_quality', 'punctuality', 'initiative',
-              'cooperation', 'communication', 'overall_rating', 'recommendation_status', 'evaluated_by')
+            'cooperation', 'communication', 'overall_rating', 'recommendation_status', 'evaluated_by')
     readonly_fields = ('overall_rating',)
 
 
